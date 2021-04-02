@@ -1,0 +1,16 @@
+[package]
+name = "tai-util"
+version = "0.0.1"
+authors = ["Robert Steiner <robertt.debug@gmail.com>"]
+license = "MIT/Apache-2.0"
+description = "Mobile-testing made easier"
+repository = "https://github.com/Robert-Steiner/cargo-tai"
+keywords = [
+    "test", "mobile", "ios", "android", "cargo"
+]
+categories = [ "development-tools::cargo-plugins", "development-tools::testing" , "development-tools::profiling" ]
+readme = "../README.md"
+edition = "2018"
+
+[target.'cfg(target_os="ios")'.dependencies]
+ns-path-utilities-sys = { path = "../ns-path-utilities-sys" }
