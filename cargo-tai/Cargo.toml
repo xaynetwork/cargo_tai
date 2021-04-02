@@ -1,0 +1,22 @@
+[package]
+name = "cargo-tai"
+version = "0.0.1"
+authors = ["Robert Steiner <robertt.debug@gmail.com>"]
+license = "MIT/Apache-2.0"
+description = "Mobile-testing made easier"
+repository = "https://github.com/Robert-Steiner/cargo-tai"
+keywords = [
+    "test", "mobile", "ios", "android", "cargo"
+]
+categories = [ "development-tools::cargo-plugins", "development-tools::testing" ]
+readme = "../README.md"
+edition = "2018"
+
+[dependencies]
+anyhow = "1.0.40"
+clap = "2.32"
+cfg-expr = "0.7.4"
+tracing = "0.1"
+tracing-subscriber = "0.2.17"
+structopt = "0.3.21"
+tai-lib = { path = "../tai-lib" }

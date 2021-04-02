@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "cargo-tai",
+    "tai-lib",
+    "test-p"
+]
