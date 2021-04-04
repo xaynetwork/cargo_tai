@@ -4,12 +4,13 @@ use anyhow::{bail, Error};
 use tracing::{info, instrument};
 
 use crate::{
+    compiler::compile_tests,
     ios::{
         bundle::{
             bundler::create_bundles,
             signing::{create_entitlements_file, find_signing_settings, sign_bundle},
         },
-        compiler::compile_test,
+        compiler::test_command,
         tools::ios_deploy,
     },
     task::Options,
@@ -20,11 +21,13 @@ pub const APP_NAME: &'static str = "Dinghy";
 
 #[instrument(name = "test", skip(requested))]
 pub fn run_test(requested: &Options) -> TaiResult<()> {
+    let test_cmd = test_command()?;
+    let build_units = compile_tests(test_cmd, requested)?;
+
     let device = ios_deploy::list_device()?.unwrap();
     let sig_settings = find_signing_settings(&device.id)?;
 
-    let units = compile_test(requested)?;
-    let bundles = create_bundles(units, &sig_settings.app_id)?;
+    let bundles = create_bundles(build_units, &sig_settings.app_id)?;
     let entitlements = create_entitlements_file(&bundles.root, &sig_settings.entitlements)?;
 
     bundles

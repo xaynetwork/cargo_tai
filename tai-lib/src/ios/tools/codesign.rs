@@ -13,5 +13,5 @@ pub fn sign<P1: AsRef<Path>, P2: AsRef<Path>>(
         .args(&["-s", identity, "--entitlements"])
         .args(&[entitlements.as_ref(), bundle.as_ref()])
         .status()?
-        .expect_success()
+        .expect_success("failed to sign app")
 }

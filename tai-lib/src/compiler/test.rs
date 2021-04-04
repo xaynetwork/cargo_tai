@@ -10,9 +10,7 @@ use crate::{task::Options, TaiResult};
 
 use super::{util::extend_with_options, BuildUnit};
 
-pub fn compile_test(requested: &Options) -> TaiResult<Vec<BuildUnit>> {
-    let mut cmd = Command::new("cargo");
-    cmd.args(&["build", "--tests"]);
+pub fn compile_tests(mut cmd: Command, requested: &Options) -> TaiResult<Vec<BuildUnit>> {
     let cmd = extend_with_options(&mut cmd, requested)?;
     cmd.stdout(Stdio::piped());
     let mut child = cmd.spawn()?;

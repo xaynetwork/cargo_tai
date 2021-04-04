@@ -23,7 +23,7 @@ pub fn launch_app<P: AsRef<Path>>(bundle_root: P, args: &[&str], envs: &[&str]) 
         ])
         .arg(bundle_root.as_ref())
         .status()?
-        .expect_success()
+        .expect_success("failed to launch app")
 }
 
 pub fn list_device() -> TaiResult<Option<Device>> {

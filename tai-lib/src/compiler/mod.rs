@@ -4,7 +4,7 @@ mod util;
 use cfg_expr::targets::TargetInfo;
 use std::path::PathBuf;
 
-pub use test::compile_test;
+pub use test::compile_tests;
 
 #[derive(Debug)]
 pub struct BuildUnit {
@@ -12,4 +12,3 @@ pub struct BuildUnit {
     pub executable: PathBuf,
     pub target: TargetInfo<'static>,
 }
-

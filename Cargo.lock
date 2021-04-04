@@ -115,7 +115,6 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "cfg-expr",
- "clap",
  "structopt",
  "tai-lib",
  "tracing",

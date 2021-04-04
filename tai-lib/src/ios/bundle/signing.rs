@@ -96,7 +96,7 @@ pub fn find_signing_settings(device_id: &str) -> TaiResult<SigningSettings> {
                         .into();
                         break;
                     }
-                    Err(err) => debug!("profile unsuitable: {}", err),
+                    Err(err) => debug!("skip profile: {}", err),
                 }
             }
         }

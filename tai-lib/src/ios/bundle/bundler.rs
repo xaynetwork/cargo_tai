@@ -8,7 +8,7 @@ use cfg_expr::targets::{Arch, TargetInfo};
 use serde::Serialize;
 use tracing::{debug, instrument};
 
-use crate::{ios::compiler::BuildUnit, TaiResult};
+use crate::{compiler::BuildUnit, TaiResult};
 
 use super::{BuildBundle, BuildBundles, APP_DISPLAY_NAME};
 
