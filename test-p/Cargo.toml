@@ -13,4 +13,4 @@ readme = "../README.md"
 edition = "2018"
 
 [dependencies]
-sodiumoxide = "0.2.6"
+# sodiumoxide = "0.2.6"
