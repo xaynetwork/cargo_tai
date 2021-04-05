@@ -13,8 +13,8 @@ use serde::Deserialize;
 use tracing::{debug, instrument};
 
 use crate::{
+    bundle::BuildBundle,
     ios::{
-        bundle::BuildBundle,
         platform::physical::APP_NAME,
         tools::{codesign, security},
     },

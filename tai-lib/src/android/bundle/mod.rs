@@ -1,17 +1,23 @@
-use std::path::PathBuf;
+use std::{
+    fs::{copy, create_dir_all},
+    path::Path,
+};
 
-use crate::compiler::BuildUnit;
+use tracing::debug;
 
-pub mod bundler;
+use crate::{bundle::BuildBundle, compiler::BuildUnit, TaiResult};
 
-#[derive(Debug)]
-pub struct BuildBundles {
-    pub root: PathBuf,
-    pub bundles: Vec<BuildBundle>,
-}
+pub fn create_bundle<P: AsRef<Path>>(unit: BuildUnit, bundles_root: P) -> TaiResult<BuildBundle> {
+    let bundle_root = bundles_root.as_ref().join(&unit.name);
 
-#[derive(Debug)]
-pub struct BuildBundle {
-    pub root: PathBuf,
-    pub build_unit: BuildUnit,
+    create_dir_all(&bundle_root)?;
+    debug!("create dir: {:?}", bundle_root);
+    let to = bundle_root.join(&unit.name);
+    copy(&unit.executable, &to)?;
+    debug!("copy {:?} to {:?}", &unit.executable, to);
+
+    Ok(BuildBundle {
+        root: bundle_root,
+        build_unit: unit,
+    })
 }

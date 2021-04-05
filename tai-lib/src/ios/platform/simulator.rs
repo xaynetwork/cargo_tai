@@ -10,9 +10,10 @@ use tempdir::TempDir;
 use tracing::{debug, info, instrument};
 
 use crate::{
+    bundle::create_bundles,
     compiler::compile_tests,
     ios::{
-        bundle::bundler::create_bundles,
+        bundle::bundler::create_bundle,
         compiler::test_command,
         tools::{lldb, xcrun},
     },
@@ -26,7 +27,7 @@ const APP_ID: &'static str = "cargo-tai";
 pub fn run_test(requested: &Options) -> TaiResult<()> {
     let test_cmd = test_command()?;
     let build_units = compile_tests(test_cmd, requested)?;
-    let bundles = create_bundles(build_units, APP_ID)?;
+    let bundles = create_bundles(build_units, |unit, root| create_bundle(unit, root, APP_ID))?;
 
     let simulator = xcrun::list_booted_simulators()?
         .pop()

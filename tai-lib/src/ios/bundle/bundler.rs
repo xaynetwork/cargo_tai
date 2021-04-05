@@ -1,22 +1,20 @@
 use std::{
-    fs::{copy, create_dir, create_dir_all, remove_dir_all, File},
+    fs::{copy, create_dir_all, File},
     path::{Path, PathBuf},
 };
 
-use anyhow::{anyhow, bail, Error};
+use anyhow::bail;
 use cfg_expr::targets::{Arch, TargetInfo};
 use serde::Serialize;
 use tracing::{debug, instrument};
 
-use crate::{compiler::BuildUnit, TaiResult};
+use crate::{bundle::BuildBundle, compiler::BuildUnit, TaiResult};
 
-use super::{BuildBundle, BuildBundles, APP_DISPLAY_NAME};
-
-const BUNDLES_ROOT_NAME: &'static str = "tai-test";
+const APP_DISPLAY_NAME: &'static str = "cargo-tai";
 const INFO_PLIST: &'static str = "Info.plist";
 
 #[instrument(name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, app_id))]
-fn create_bundle<P: AsRef<Path>>(
+pub fn create_bundle<P: AsRef<Path>>(
     unit: BuildUnit,
     bundles_root: P,
     app_id: &str,
@@ -34,39 +32,6 @@ fn create_bundle<P: AsRef<Path>>(
     Ok(BuildBundle {
         root: bundle_root,
         build_unit: unit,
-    })
-}
-
-pub fn create_bundles(units: Vec<BuildUnit>, app_id: &str) -> TaiResult<BuildBundles> {
-    let unit = units.get(0).ok_or(anyhow!("no units to bundle"))?;
-    let root = unit
-        .executable
-        .parent()
-        .ok_or(anyhow!("no units to bundle"))?
-        .parent()
-        .ok_or(anyhow!("no units to bundle"))?
-        .to_path_buf();
-
-    let bundles_root = root.join(BUNDLES_ROOT_NAME);
-
-    match (bundles_root.is_dir(), bundles_root.is_file()) {
-        (false, false) => create_dir(&bundles_root)?,
-        (true, false) => {
-            remove_dir_all(&bundles_root)?;
-            create_dir(&bundles_root)?;
-        }
-        (false, true) => bail!("bundle root is a file"),
-        _ => unreachable!(),
-    };
-
-    let bundles = units
-        .into_iter()
-        .map(|unit| create_bundle(unit, &bundles_root, app_id))
-        .collect::<Result<Vec<_>, Error>>()?;
-
-    Ok(BuildBundles {
-        root: bundles_root,
-        bundles,
     })
 }
 

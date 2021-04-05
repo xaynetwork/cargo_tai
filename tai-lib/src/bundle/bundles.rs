@@ -1,35 +1,18 @@
 use std::{
-    fs::{copy, create_dir, create_dir_all, remove_dir_all, File},
-    path::{Path, PathBuf},
+    fs::{create_dir, remove_dir_all},
+    path::PathBuf,
 };
 
 use anyhow::{anyhow, bail, Error};
-use cfg_expr::targets::{Arch, TargetInfo};
-use serde::Serialize;
-use tracing::{debug, instrument};
 
 use crate::{compiler::BuildUnit, TaiResult};
 
-use super::{BuildBundle, BuildBundles};
+use super::{BuildBundle, BuildBundles, BUNDLES_ROOT_NAME};
 
-const BUNDLES_ROOT_NAME: &'static str = "tai-test";
-
-fn create_bundle<P: AsRef<Path>>(unit: BuildUnit, bundles_root: P) -> TaiResult<BuildBundle> {
-    let bundle_root = bundles_root.as_ref().join(&unit.name);
-
-    create_dir_all(&bundle_root)?;
-    debug!("create dir: {:?}", bundle_root);
-    let to = bundle_root.join(&unit.name);
-    copy(&unit.executable, &to)?;
-    debug!("copy {:?} to {:?}", &unit.executable, to);
-
-    Ok(BuildBundle {
-        root: bundle_root,
-        build_unit: unit,
-    })
-}
-
-pub fn create_bundles(units: Vec<BuildUnit>) -> TaiResult<BuildBundles> {
+pub fn create_bundles(
+    units: Vec<BuildUnit>,
+    f: impl Fn(BuildUnit, &PathBuf) -> TaiResult<BuildBundle>,
+) -> TaiResult<BuildBundles> {
     let unit = units.get(0).ok_or(anyhow!("no units to bundle"))?;
     let root = unit
         .executable
@@ -53,7 +36,7 @@ pub fn create_bundles(units: Vec<BuildUnit>) -> TaiResult<BuildBundles> {
 
     let bundles = units
         .into_iter()
-        .map(|unit| create_bundle(unit, &bundles_root))
+        .map(|unit| f(unit, &bundles_root))
         .collect::<Result<Vec<_>, Error>>()?;
 
     Ok(BuildBundles {

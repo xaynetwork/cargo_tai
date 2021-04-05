@@ -1,6 +1,7 @@
 use anyhow::Error;
 
 pub mod android;
+pub mod bundle;
 mod command_ext;
 pub mod compiler;
 pub mod task;
