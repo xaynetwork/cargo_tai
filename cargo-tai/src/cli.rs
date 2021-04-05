@@ -31,6 +31,9 @@ pub struct GeneralOptions {
     /// Build for the target triples
     #[structopt(long, parse(try_from_str = parse_target))]
     pub target: TargetInfo<'static>,
+    /* File name: only required when `out-type` is set to `file` */
+     * #[structopt(name = "FILE", required_if("target", "aarch64-apple-ios"))]
+     * file_name: Option<String>, */
 }
 
 fn parse_target(src: &str) -> Result<TargetInfo<'static>, Error> {

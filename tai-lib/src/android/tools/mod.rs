@@ -17,11 +17,16 @@ impl AndroidSdk {
             env::var_os("ANDROID_NDK_HOME").ok_or(anyhow!("ANDROID_NDK_HOME not set"))?;
 
         let ndk = PathBuf::from(ndk_home);
+
         let adb = ndk
             .parent()
-            .ok_or(anyhow!("cannot find `sdk` folder"))?
+            .ok_or(anyhow!(
+                "failed to find `ndk` folder in ../ANDROID_NDK_HOME"
+            ))?
             .parent()
-            .ok_or(anyhow!("cannot find `sdk` folder"))?
+            .ok_or(anyhow!(
+                "failed to find `sdk` folder in ../../ANDROID_NDK_HOME"
+            ))?
             .join("platform-tools")
             .join("adb")
             .to_path_buf();

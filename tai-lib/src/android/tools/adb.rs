@@ -9,7 +9,8 @@ use once_cell::sync::OnceCell;
 
 use crate::{command_ext::ExitStatusExt, TaiResult};
 
-const ADB: &'static str = "adb";
+use super::AndroidSdk;
+
 static DEVICE_REGEX: OnceCell<regex::Regex> = OnceCell::new();
 
 pub struct Device {
@@ -17,8 +18,8 @@ pub struct Device {
     pub arch: Arch<'static>,
 }
 
-pub fn devices() -> TaiResult<Vec<Device>> {
-    let output = Command::new(ADB).arg("devices").output()?;
+pub fn devices(sdk: &AndroidSdk) -> TaiResult<Vec<Device>> {
+    let output = Command::new(&sdk.adb).arg("devices").output()?;
     let device_regex =
         DEVICE_REGEX.get_or_init(|| regex::Regex::new(r#"^(\S+)\tdevice\r?$"#).unwrap());
 
@@ -29,7 +30,7 @@ pub fn devices() -> TaiResult<Vec<Device>> {
         .try_fold(vec![], |mut devices, line| {
             if let Some(caps) = device_regex.captures(line) {
                 let id = caps[1].to_owned();
-                let arch = arch(&id)?;
+                let arch = arch(sdk, &id)?;
 
                 devices.push(Device { id: id, arch })
             }
@@ -37,48 +38,53 @@ pub fn devices() -> TaiResult<Vec<Device>> {
         })
 }
 
-pub fn arch(device: &str) -> TaiResult<Arch<'static>> {
-    let output = Command::new(ADB)
+pub fn arch(sdk: &AndroidSdk, device: &str) -> TaiResult<Arch<'static>> {
+    let output = Command::new(&sdk.adb)
         .args(&["-s", device, "shell", "getprop", "ro.product.cpu.abi"])
         .output()?;
     let cpu_arch: CpuArch = String::from_utf8(output.stdout)?.trim().into();
     Ok(cpu_arch.into())
 }
 
-pub fn mkdir<P: AsRef<Path>>(device: &str, path: P) -> TaiResult<()> {
-    Command::new(ADB)
+pub fn mkdir<P: AsRef<Path>>(sdk: &AndroidSdk, device: &str, path: P) -> TaiResult<()> {
+    Command::new(&sdk.adb)
         .args(&["-s", device, "shell", "mkdir", "-p"])
         .arg(path.as_ref())
         .status()?
         .expect_success("failed to create directory")
 }
 
-pub fn sync<FP: AsRef<Path>, TP: AsRef<Path>>(device: &str, from: FP, to: TP) -> TaiResult<()> {
-    Command::new(ADB)
+pub fn sync<FP: AsRef<Path>, TP: AsRef<Path>>(
+    sdk: &AndroidSdk,
+    device: &str,
+    from: FP,
+    to: TP,
+) -> TaiResult<()> {
+    Command::new(&sdk.adb)
         .args(&["-s", device, "push", "--sync"])
         .args(&[from.as_ref(), to.as_ref()])
         .status()?
         .expect_success("failed to sync files")
 }
 
-pub fn rm<P: AsRef<Path>>(device: &str, path: P) -> TaiResult<()> {
-    Command::new(ADB)
+pub fn rm<P: AsRef<Path>>(sdk: &AndroidSdk, device: &str, path: P) -> TaiResult<()> {
+    Command::new(&sdk.adb)
         .args(&["-s", device, "shell", "rm", "-rf"])
         .arg(path.as_ref())
         .status()?
         .expect_success("failed to remove files/directories")
 }
 
-pub fn chmod<P: AsRef<Path>>(device: &str, path: P) -> TaiResult<()> {
-    Command::new(ADB)
+pub fn chmod<P: AsRef<Path>>(sdk: &AndroidSdk, device: &str, path: P) -> TaiResult<()> {
+    Command::new(&sdk.adb)
         .args(&["-s", device, "shell", "chmod", "755"])
         .arg(path.as_ref())
         .status()?
         .expect_success("failed to chmod file/directory")
 }
 
-pub fn run(device: &str, start_script: &str) -> TaiResult<Output> {
-    Command::new(ADB)
+pub fn run(sdk: &AndroidSdk, device: &str, start_script: &str) -> TaiResult<Output> {
+    Command::new(&sdk.adb)
         .args(&["-s", device, "shell"])
         .arg(start_script)
         .output()
