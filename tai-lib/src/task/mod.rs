@@ -14,6 +14,7 @@ pub enum Mode {
 
 #[derive(Debug)]
 pub struct Options {
+    // cargo
     /// Build artifacts in release mode, with optimizations
     pub release: bool,
 
@@ -30,6 +31,12 @@ pub struct Options {
     pub features: Vec<String>,
 
     pub mode: Mode,
+
+    // android
+    pub android_platform: u8,
+
+    // application
+    pub envs: Option<Vec<(String, String)>>,
 }
 
 pub fn run_mode(requested: &Options) -> TaiResult<()> {

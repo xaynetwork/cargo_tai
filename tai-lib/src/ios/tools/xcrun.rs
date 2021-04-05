@@ -12,20 +12,26 @@ pub fn launch_app(
     app_id: &str,
     stdout: &str,
     args: &[&str],
-    envs: &[&str],
+    envs: &Option<Vec<(String, String)>>,
 ) -> TaiResult<String> {
-    let launch_output = Command::new(XCRUN)
-        .args(&[
-            "simctl",
-            "launch",
-            &format!("--stdout={}", stdout),
-            "-w",
-            dev_id,
-            app_id,
-        ])
-        .args(args)
-        .args(envs)
-        .output()?;
+    let mut cmd = Command::new(XCRUN);
+
+    cmd.args(&[
+        "simctl",
+        "launch",
+        &format!("--stdout={}", stdout),
+        "-w",
+        dev_id,
+        app_id,
+    ])
+    .args(args);
+    if let Some(envs) = envs {
+        cmd.envs(
+            envs.iter()
+                .map(|(key, value)| (format!("SIMCTL_CHILD_{}", key), value)),
+        );
+    };
+    let launch_output = cmd.output()?;
     let launch_output = String::from_utf8_lossy(&launch_output.stdout);
 
     // Output from the launch command should be "APP_ID: $PID"

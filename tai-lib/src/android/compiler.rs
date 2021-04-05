@@ -70,8 +70,6 @@ fn toolchain_suffix(target: &TargetInfo<'static>, host_arch: &str, bin: &str) ->
 }
 
 pub fn test_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
-    let android_platform = 21;
-
     let cc_key = format!("CC_{}", to_env_key(&requested.target));
     let ar_key = format!("AR_{}", to_env_key(&requested.target));
     let cxx_key = format!("CXX_{}", to_env_key(&requested.target));
@@ -94,13 +92,13 @@ pub fn test_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command>
     let target_linker = &sdk.ndk.join(clang_suffix(
         &requested.target,
         &HOST_ARCH,
-        android_platform,
+        requested.android_platform,
         "",
     ));
     let target_cxx = &sdk.ndk.join(clang_suffix(
         &requested.target,
         &HOST_ARCH,
-        android_platform,
+        requested.android_platform,
         "++",
     ));
 

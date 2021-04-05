@@ -36,12 +36,17 @@ pub fn run_test(requested: &Options) -> TaiResult<()> {
     bundles
         .bundles
         .iter()
-        .map(|bundle| install_and_launch(&simulator, &bundle.root))
+        .map(|bundle| install_and_launch(&simulator, &bundle.root, &[], &requested.envs))
         .collect()
 }
 
 #[instrument(name = "run", fields(device = %device.udid), skip(bundle_root))]
-fn install_and_launch<P: AsRef<Path>>(device: &Device, bundle_root: P) -> TaiResult<()> {
+fn install_and_launch<P: AsRef<Path>>(
+    device: &Device,
+    bundle_root: P,
+    args: &[&str],
+    envs: &Option<Vec<(String, String)>>,
+) -> TaiResult<()> {
     let bundle_root = bundle_root.as_ref();
     info!("uninstall app with app id: {}", APP_ID);
     device
@@ -54,7 +59,7 @@ fn install_and_launch<P: AsRef<Path>>(device: &Device, bundle_root: P) -> TaiRes
         .map_err(|_| anyhow!("failed to install: {}", APP_ID))?;
 
     info!("launch app with app id:: {}", APP_ID);
-    match launch_app(device, &[], &[])? {
+    match launch_app(device, args, envs)? {
         0 => {
             info!("test result ok");
             Ok(())
@@ -70,7 +75,11 @@ fn install_and_launch<P: AsRef<Path>>(device: &Device, bundle_root: P) -> TaiRes
     }
 }
 
-fn launch_app(device: &Device, args: &[&str], envs: &[&str]) -> TaiResult<u32> {
+fn launch_app(
+    device: &Device,
+    args: &[&str],
+    envs: &Option<Vec<(String, String)>>,
+) -> TaiResult<u32> {
     let install_path = device
         .get_app_container(APP_ID, &Container::App)
         .map_err(|err| anyhow!("{:?}", err))?;

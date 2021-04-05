@@ -1,4 +1,4 @@
-use anyhow::{anyhow, bail, Context};
+use anyhow::{anyhow, bail};
 use std::{io::Write, path::PathBuf};
 use tracing::debug;
 
@@ -31,7 +31,7 @@ pub fn run_test(requested: &Options) -> TaiResult<()> {
     bundles
         .bundles
         .iter()
-        .map(|bundle| install_and_launch(&sdk, &devices.id, &bundle, &[], &[]))
+        .map(|bundle| install_and_launch(&sdk, &devices.id, &bundle, &[], &requested.envs))
         .collect()
 }
 
@@ -40,7 +40,7 @@ fn install_and_launch(
     device: &str,
     bundle: &BuildBundle,
     args: &[&str],
-    envs: &[&str],
+    envs: &Option<Vec<(String, String)>>,
 ) -> TaiResult<()> {
     let remote_workdir = PathBuf::from(ANDROID_REMOTE_WORKDIR);
     adb::mkdir(&sdk, device, &remote_workdir)?;
@@ -52,10 +52,19 @@ fn install_and_launch(
     // debug!("chmod {:?}", remote_exe);
     // adb::chmod(device, &remote_exe)?;
 
+    let envs_as_string = if let Some(envs) = envs {
+        envs.iter()
+            .map(|(key, value)| format!("{}={}", key, value))
+            .collect::<Vec<String>>()
+            .join(" ")
+    } else {
+        String::from("")
+    };
+
     let start_script = format!(
         include_str!("../templates/start_script.tmpl"),
         remote_bundle_root = remote_root.to_string_lossy(),
-        envs = envs.join(" "),
+        envs = envs_as_string,
         remote_executable = remote_exe.to_string_lossy(),
         args = args.join(" ")
     );

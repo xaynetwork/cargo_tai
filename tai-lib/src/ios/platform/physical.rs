@@ -42,12 +42,16 @@ pub fn run_test(requested: &Options) -> TaiResult<()> {
     bundles
         .bundles
         .iter()
-        .map(|bundle| install_and_launch(&bundle.root, &[], &[]))
+        .map(|bundle| install_and_launch(&bundle.root, &[], &requested.envs))
         .collect()
 }
 
 #[instrument(name = "run", skip(bundle_root, args, envs))]
-fn install_and_launch<P>(bundle_root: P, args: &[&str], envs: &[&str]) -> TaiResult<()>
+fn install_and_launch<P>(
+    bundle_root: P,
+    args: &[&str],
+    envs: &Option<Vec<(String, String)>>,
+) -> TaiResult<()>
 where
     P: AsRef<Path>,
 {
