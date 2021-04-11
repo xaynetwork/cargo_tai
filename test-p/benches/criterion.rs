@@ -1,6 +1,4 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use std::path::PathBuf;
-use tai_util::ios::user_documents;
+use criterion::{black_box, criterion_group, Criterion};
 
 fn fibonacci(n: u64) -> u64 {
     match n {
@@ -17,9 +15,14 @@ fn criterion_benchmark(c: &mut Criterion) {
 criterion_group!(benches, criterion_benchmark);
 
 fn main() {
-    let path = user_documents().join("target");
-    std::fs::create_dir(&path);
-    std::env::set_var("CRITERION_HOME", path);
+    #[cfg(target_os = "ios")]
+    {
+        use tai_util::ios::user_documents;
+        let path = user_documents().join("target");
+        std::fs::create_dir(&path);
+        std::env::set_var("CRITERION_HOME", path);
+    }
+
     benches();
 
     criterion::Criterion::default()

@@ -43,6 +43,7 @@ pub fn try_test_file_path(test_data_id: &str) -> Option<PathBuf> {
     }
 }
 
+#[cfg(target_os = "ios")]
 pub mod ios {
     use ns_path_utilities_sys::{
         INSArray,

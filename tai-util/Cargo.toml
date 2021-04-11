@@ -12,5 +12,5 @@ categories = [ "development-tools::cargo-plugins", "development-tools::testing" 
 readme = "../README.md"
 edition = "2018"
 
-[dependencies]
+[target.'cfg(target_os="ios")'.dependencies]
 ns-path-utilities-sys = { path = "../ns-path-utilities-sys" }

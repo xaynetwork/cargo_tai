@@ -76,14 +76,15 @@ fn build(sdk_path: Option<&str>, target: &str) {
 
     // Write them to the crate root.
     bindings
-        .write_to_file(out_dir.join("ns_path_sys.rs"))
+        .write_to_file(out_dir.join("ns_path_utilities_sys.rs"))
         .expect("could not write bindings");
 }
 
 fn main() {
     let target = std::env::var("TARGET").unwrap();
     if !target.contains("apple-ios") {
-        panic!("uikit-sys requires the ios target");
+        // panic!("uikit-sys requires the ios target");
+        return;
     }
 
     let directory = sdk_path(&target).ok();
