@@ -1,7 +1,9 @@
+mod bench;
 mod test;
 
+use bench::run_benches;
 use cfg_expr::targets::TargetInfo;
-use test::run_test;
+use test::run_tests;
 use tracing::debug;
 
 use crate::TaiResult;
@@ -42,7 +44,7 @@ pub struct Options {
 pub fn run_mode(requested: &Options) -> TaiResult<()> {
     debug!("run with options:\n{:?}", requested);
     match requested.mode {
-        Mode::Test => run_test(requested),
-        Mode::Bench => unimplemented!(),
+        Mode::Test => run_tests(requested),
+        Mode::Bench => run_benches(requested),
     }
 }

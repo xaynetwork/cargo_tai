@@ -11,10 +11,10 @@ use tracing::{debug, info, instrument};
 
 use crate::{
     bundle::create_bundles,
-    compiler::compile_tests,
+    compiler::{compile_bench, compile_tests},
     ios::{
         bundle::bundler::create_bundle,
-        compiler::test_command,
+        compiler::{bench_command, test_command},
         tools::{lldb, xcrun},
     },
     task::Options,
@@ -22,6 +22,23 @@ use crate::{
 };
 
 const APP_ID: &'static str = "cargo-tai";
+
+#[instrument(name = "bench", skip(requested))]
+pub fn run_bench(requested: &Options) -> TaiResult<()> {
+    let test_cmd = bench_command()?;
+    let build_units = compile_bench(test_cmd, requested)?;
+    let bundles = create_bundles(build_units, |unit, root| create_bundle(unit, root, APP_ID))?;
+
+    let simulator = xcrun::list_booted_simulators()?
+        .pop()
+        .ok_or(anyhow!("no ios simulator available"))?;
+
+    bundles
+        .bundles
+        .iter()
+        .map(|bundle| install_and_launch(&simulator, &bundle.root, &["--bench"], &requested.envs))
+        .collect()
+}
 
 #[instrument(name = "test", skip(requested))]
 pub fn run_test(requested: &Options) -> TaiResult<()> {

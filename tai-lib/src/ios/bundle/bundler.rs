@@ -47,6 +47,10 @@ pub struct InfoPlist<'a> {
     pub cf_bundle_version: &'a str,
     #[serde(rename = "CFBundleShortVersionString")]
     pub cf_bundle_short_version_string: &'a str,
+    #[serde(rename = "UIFileSharingEnabled")]
+    pub ui_file_sharing_enabled: bool,
+    #[serde(rename = "LSSupportsOpeningDocumentsInPlace")]
+    pub ls_supports_opening_documents_in_place: bool,
 }
 
 fn create_plist<P: AsRef<Path>>(
@@ -66,6 +70,8 @@ fn create_plist<P: AsRef<Path>>(
             ui_required_device_capabilities: vec![to_apple_arch(&build_unit.target)?],
             cf_bundle_version: "1",
             cf_bundle_short_version_string: "1.0",
+            ui_file_sharing_enabled: true,
+            ls_supports_opening_documents_in_place: true,
         },
     )?;
     Ok(path)

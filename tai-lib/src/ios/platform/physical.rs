@@ -5,13 +5,13 @@ use tracing::{info, instrument};
 
 use crate::{
     bundle::create_bundles,
-    compiler::compile_tests,
+    compiler::{compile_bench, compile_tests},
     ios::{
         bundle::{
             bundler::create_bundle,
             signing::{create_entitlements_file, find_signing_settings, sign_bundle},
         },
-        compiler::test_command,
+        compiler::{bench_command, test_command},
         tools::ios_deploy,
     },
     task::Options,
@@ -19,6 +19,32 @@ use crate::{
 };
 
 pub const APP_NAME: &'static str = "Dinghy";
+
+#[instrument(name = "bench", skip(requested))]
+pub fn run_bench(requested: &Options) -> TaiResult<()> {
+    let bench_cmd = bench_command()?;
+    let build_units = compile_bench(bench_cmd, requested)?;
+
+    let device = ios_deploy::list_device()?.unwrap();
+    let sig_settings = find_signing_settings(&device.id)?;
+
+    let bundles = create_bundles(build_units, |unit, root| {
+        create_bundle(unit, root, &sig_settings.app_id)
+    })?;
+    let entitlements = create_entitlements_file(&bundles.root, &sig_settings.entitlements)?;
+
+    bundles
+        .bundles
+        .iter()
+        .map(|bundle| sign_bundle(&bundle, &sig_settings, &entitlements))
+        .collect::<Result<(), Error>>()?;
+
+    bundles
+        .bundles
+        .iter()
+        .map(|bundle| install_and_launch(&bundle.root, &["--bench"], &requested.envs))
+        .collect()
+}
 
 #[instrument(name = "test", skip(requested))]
 pub fn run_test(requested: &Options) -> TaiResult<()> {
@@ -46,7 +72,7 @@ pub fn run_test(requested: &Options) -> TaiResult<()> {
         .collect()
 }
 
-#[instrument(name = "run", skip(bundle_root, args, envs))]
+#[instrument(name = "run", skip(bundle_root))]
 fn install_and_launch<P>(
     bundle_root: P,
     args: &[&str],

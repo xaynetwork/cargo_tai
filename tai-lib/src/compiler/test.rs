@@ -4,13 +4,36 @@ use std::{
 };
 
 use anyhow::{anyhow, bail};
-use cargo_metadata::{diagnostic::DiagnosticLevel, Message};
+use cargo_metadata::{camino::Utf8PathBuf, diagnostic::DiagnosticLevel, Artifact, Message};
 
 use crate::{task::Options, TaiResult};
 
 use super::{util::extend_with_options, BuildUnit};
 
-pub fn compile_tests(mut cmd: Command, requested: &Options) -> TaiResult<Vec<BuildUnit>> {
+fn is_test(artifact: Artifact) -> Option<Utf8PathBuf> {
+    if let (Some(path), true) = (artifact.executable, artifact.profile.test) {
+        Some(path)
+    } else {
+        None
+    }
+}
+
+fn is_bench(artifact: Artifact) -> Option<Utf8PathBuf> {
+    if let (Some(path), true) = (
+        artifact.executable,
+        artifact.target.kind.contains(&String::from("bench")),
+    ) {
+        Some(path)
+    } else {
+        None
+    }
+}
+
+fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
+    mut cmd: Command,
+    requested: &Options,
+    f: F,
+) -> TaiResult<Vec<BuildUnit>> {
     let cmd = extend_with_options(&mut cmd, requested)?;
     cmd.stdout(Stdio::piped());
     let mut child = cmd.spawn()?;
@@ -24,7 +47,7 @@ pub fn compile_tests(mut cmd: Command, requested: &Options) -> TaiResult<Vec<Bui
         .into_iter()
         .try_fold(vec![], |mut acc, msg| match msg? {
             Message::CompilerArtifact(art) => {
-                if let (Some(path), true) = (art.executable, art.profile.test) {
+                if let Some(path) = f(art) {
                     let unit = BuildUnit {
                         name: path
                             .file_name()
@@ -48,4 +71,12 @@ pub fn compile_tests(mut cmd: Command, requested: &Options) -> TaiResult<Vec<Bui
 
     child.wait()?;
     build_units
+}
+
+pub fn compile_tests(cmd: Command, requested: &Options) -> TaiResult<Vec<BuildUnit>> {
+    compile(cmd, requested, is_test)
+}
+
+pub fn compile_bench(cmd: Command, requested: &Options) -> TaiResult<Vec<BuildUnit>> {
+    compile(cmd, requested, is_bench)
 }
