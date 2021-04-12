@@ -11,7 +11,7 @@ pub fn launch_app(
     dev_id: &str,
     app_id: &str,
     stdout: &str,
-    args: &[&str],
+    args: &Option<Vec<String>>,
     envs: &Option<Vec<(String, String)>>,
 ) -> TaiResult<String> {
     let mut cmd = Command::new(XCRUN);
@@ -23,8 +23,12 @@ pub fn launch_app(
         "-w",
         dev_id,
         app_id,
-    ])
-    .args(args);
+    ]);
+
+    if let Some(args) = args {
+        cmd.args(args);
+    }
+
     if let Some(envs) = envs {
         cmd.envs(
             envs.iter()

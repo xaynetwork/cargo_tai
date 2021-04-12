@@ -5,7 +5,7 @@ use tracing::{info, instrument};
 
 use crate::{
     bundle::create_bundles,
-    compiler::{compile_bench, compile_tests, BuildUnit},
+    compiler::{compile_benches, compile_tests, BuildUnit},
     ios::{
         bundle::{
             bundler::create_bundle,
@@ -23,10 +23,13 @@ pub const APP_NAME: &'static str = "Dinghy";
 #[instrument(name = "benches", skip(requested))]
 pub fn run_benches(requested: &Options) -> TaiResult<()> {
     let bench_cmd = bench_command()?;
-    let build_units = compile_bench(bench_cmd, requested)?;
-    let args = vec!["--bench"];
+    let build_units = compile_benches(bench_cmd, requested)?;
+    let mut bench_arg = vec!["--bench".to_string()];
+    if let Some(ref args) = requested.args {
+        bench_arg.extend_from_slice(args);
+    };
 
-    run(build_units, &args, &requested.envs)
+    run(build_units, &Some(bench_arg), &requested.envs)
 }
 
 #[instrument(name = "tests", skip(requested))]
@@ -34,13 +37,13 @@ pub fn run_tests(requested: &Options) -> TaiResult<()> {
     let test_cmd = test_command()?;
     let build_units = compile_tests(test_cmd, requested)?;
 
-    run(build_units, &[], &requested.envs)
+    run(build_units, &requested.args, &requested.envs)
 }
 
 #[instrument(name = "run")]
 pub fn run(
     build_units: Vec<BuildUnit>,
-    args: &[&str],
+    args: &Option<Vec<String>>,
     envs: &Option<Vec<(String, String)>>,
 ) -> TaiResult<()> {
     let device = ios_deploy::list_device()?.unwrap();
@@ -67,7 +70,7 @@ pub fn run(
 #[instrument(name = "install_launch", skip(bundle_root))]
 fn install_and_launch<P>(
     bundle_root: P,
-    args: &[&str],
+    args: &Option<Vec<String>>,
     envs: &Option<Vec<(String, String)>>,
 ) -> TaiResult<()>
 where

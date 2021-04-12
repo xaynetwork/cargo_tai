@@ -1,10 +1,11 @@
-use std::{env, fs::File, io::prelude::*, path::PathBuf};
+use std::{env, fs::File, io::Read, path::PathBuf};
 
-pub fn test_file_path(test_data_id: &str) -> PathBuf {
-    try_test_file_path(test_data_id).expect(&format!("Couldn't find test data {}", test_data_id))
+pub fn resources_file_path(test_data_id: &str) -> PathBuf {
+    try_resources_file_path(test_data_id)
+        .expect(&format!("Couldn't find test data {}", test_data_id))
 }
 
-pub fn try_test_file_path(test_data_id: &str) -> Option<PathBuf> {
+pub fn try_resources_file_path(test_data_id: &str) -> Option<PathBuf> {
     let current_exe = env::current_exe().expect("Current exe path not accessible");
 
     if cfg!(any(target_os = "ios", target_os = "android")) || env::var("DINGHY").is_ok() {
@@ -58,35 +59,24 @@ pub mod ios {
     use std::{os::raw::c_char, path::PathBuf};
 
     pub fn user_library() -> PathBuf {
-        let search = unsafe {
-            NSSearchPathForDirectoriesInDomains(
-                NSSearchPathDirectory_NSLibraryDirectory,
-                NSSearchPathDomainMask_NSUserDomainMask,
-                true,
-            )
-        };
-        let path_ptr = unsafe { INSArray::<NSString>::objectAtIndex_(&search, 0) };
-        let ns_string = NSString(path_ptr);
-        let bytes_ptr = unsafe {
-            let bytes: *const c_char = ns_string.UTF8String();
-            bytes as *const u8
-        };
-        let path = unsafe {
-            let len = ns_string.length();
-            let bytes = std::slice::from_raw_parts(bytes_ptr, len as usize);
-            std::str::from_utf8(bytes).unwrap()
-        };
-        PathBuf::from(path)
+        get_path_for_documents(
+            NSSearchPathDirectory_NSLibraryDirectory,
+            NSSearchPathDomainMask_NSUserDomainMask,
+        )
     }
 
     pub fn user_documents() -> PathBuf {
-        let search = unsafe {
-            NSSearchPathForDirectoriesInDomains(
-                NSSearchPathDirectory_NSDocumentDirectory,
-                NSSearchPathDomainMask_NSUserDomainMask,
-                true,
-            )
-        };
+        get_path_for_documents(
+            NSSearchPathDirectory_NSDocumentDirectory,
+            NSSearchPathDomainMask_NSUserDomainMask,
+        )
+    }
+
+    fn get_path_for_documents(
+        directory: NSSearchPathDirectory,
+        domain_mask: NSSearchPathDomainMask,
+    ) -> PathBuf {
+        let search = unsafe { NSSearchPathForDirectoriesInDomains(directory, domain_mask, true) };
         let path_ptr = unsafe { INSArray::<NSString>::objectAtIndex_(&search, 0) };
         let ns_string = NSString(path_ptr);
         let bytes_ptr = unsafe {

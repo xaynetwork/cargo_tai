@@ -12,11 +12,15 @@ const IOS_DEPLOY: &'static str = "ios-deploy";
 
 pub fn launch_app<P: AsRef<Path>>(
     bundle_root: P,
-    args: &[&str],
+    args: &Option<Vec<String>>,
     envs: &Option<Vec<(String, String)>>,
 ) -> TaiResult<()> {
     let mut cmd = Command::new(IOS_DEPLOY);
-    cmd.args(&["--noninteractive", "--debug", "--args", &args.join(" ")]);
+    cmd.args(&["--noninteractive", "--debug"]);
+
+    if let Some(args) = args {
+        cmd.args(&["--args", &args.join(" ")]);
+    };
 
     if let Some(envs) = envs {
         let envs_as_string = envs
@@ -26,6 +30,7 @@ pub fn launch_app<P: AsRef<Path>>(
             .join(" ");
         cmd.args(&["--envs", &envs_as_string]);
     };
+
     cmd.arg("--bundle")
         .arg(bundle_root.as_ref())
         .status()?

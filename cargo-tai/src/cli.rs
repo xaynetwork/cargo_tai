@@ -1,33 +1,16 @@
 use anyhow::{anyhow, Error};
 use cfg_expr::targets::{get_builtin_target_by_triple, TargetInfo};
-use structopt::StructOpt;
+use structopt::{clap::ArgSettings, StructOpt};
 use tai_lib::task::{self, Mode};
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 pub enum Options {
     Bench(GeneralOptions),
     Test(GeneralOptions),
 }
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 pub struct GeneralOptions {
-    /// Build artifacts in release mode, with optimizations
-    #[structopt(long)]
-    pub release: bool,
-
-    /// Activate all available features
-    #[structopt(long = "all-features")]
-    pub all_features: bool,
-
-    /// Do not activate the `default` feature
-    #[structopt(long = "no-default-features")]
-    pub no_default_features: bool,
-
-    /// Space-separated list of features to activate
-    #[structopt(value_delimiter = ",")]
-    #[structopt(long, default_value = "")]
-    pub features: Vec<String>,
-
     /// Build for the target triples
     #[structopt(long, parse(try_from_str = parse_target))]
     pub target: TargetInfo<'static>,
@@ -45,9 +28,17 @@ pub struct GeneralOptions {
     )]
     android_platform: u8,
 
-    /// environment variable that should be passed to the app when launching it key=value
+    /// Environment variables to pass to the app when launching it. Format: key=value
     #[structopt(long, parse(try_from_str = parse_key_val))]
     envs: Option<Vec<(String, String)>>,
+
+    /// Arguments to pass to the app when launching it.
+    #[structopt(long)]
+    args: Option<Vec<String>>,
+
+    /// Arguments that are passed to cargo. See `cargo build --help`.
+    #[structopt(set = ArgSettings::Last)]
+    cargo_args: Vec<String>,
 }
 
 /// Parse a single key-value pair
@@ -77,14 +68,12 @@ impl From<Options> for task::Options {
         };
 
         Self {
-            release: general_opts.release,
-            target: general_opts.target,
-            all_features: general_opts.all_features,
-            no_default_features: general_opts.no_default_features,
-            features: general_opts.features,
             mode,
+            target: general_opts.target,
             android_platform: general_opts.android_platform,
             envs: general_opts.envs,
+            args: general_opts.args,
+            cargo_args: general_opts.cargo_args,
         }
     }
 }

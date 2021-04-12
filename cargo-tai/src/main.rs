@@ -1,6 +1,7 @@
 use anyhow::Error;
+
 use structopt::StructOpt;
-use tai_lib::task::run_mode;
+use tai_lib::task::{self, run_mode};
 
 mod cli;
 
@@ -12,9 +13,31 @@ fn main() -> Result<(), Error> {
         .with_env_filter(EnvFilter::from_default_env())
         .with_ansi(true)
         .with_target(false)
+        .without_time()
         .init();
 
     let opt = Options::from_args();
+    tracing::debug!("{:?}", opt);
+    let requested_opt: task::Options = opt.into();
 
-    run_mode(&opt.into())
+    #[cfg(not(target_os = "macos"))]
+    {
+        // workaround because this is not possible:
+        //
+        // [target.'cfg(not(target_os="macos"))'.dependencies]
+        // tai-lib = { path = "../tai-lib" }
+
+        // [target.'cfg(target_os="macos")'.dependencies]
+        // tai-lib = { path = "../tai-lib", features = ["ios"] }
+        //
+        // it would be possible if we switch to resolver = "2" but
+        // it might be to early
+
+        use cfg_expr::targets::Os;
+        if let Some(Os::ios) = &requested_opt.target.os {
+            panic!("cannot compile any iOS targets on a non Apple host system")
+        }
+    }
+
+    run_mode(&requested_opt)
 }

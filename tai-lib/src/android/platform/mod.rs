@@ -1,6 +1,6 @@
 use anyhow::{anyhow, bail};
 use std::{io::Write, path::PathBuf};
-use tracing::debug;
+use tracing::{debug, instrument};
 
 const ANDROID_REMOTE_WORKDIR: &str = "/data/local/tmp/cargo-tai";
 
@@ -31,15 +31,18 @@ pub fn run_test(requested: &Options) -> TaiResult<()> {
     bundles
         .bundles
         .iter()
-        .map(|bundle| install_and_launch(&sdk, &devices.id, &bundle, &[], &requested.envs))
+        .map(|bundle| {
+            install_and_launch(&sdk, &devices.id, &bundle, &requested.args, &requested.envs)
+        })
         .collect()
 }
 
+#[instrument(name = "install_launch", skip(sdk, bundle))]
 fn install_and_launch(
     sdk: &AndroidSdk,
     device: &str,
     bundle: &BuildBundle,
-    args: &[&str],
+    args: &Option<Vec<String>>,
     envs: &Option<Vec<(String, String)>>,
 ) -> TaiResult<()> {
     let remote_workdir = PathBuf::from(ANDROID_REMOTE_WORKDIR);
@@ -49,8 +52,8 @@ fn install_and_launch(
     debug!("copy from: {:?} to: {:?}", bundle.root, remote_root);
     adb::sync(&sdk, device, &bundle.root, &remote_root)?;
     let remote_exe = remote_root.join(&bundle.build_unit.name);
-    // debug!("chmod {:?}", remote_exe);
-    // adb::chmod(device, &remote_exe)?;
+    debug!("chmod {:?}", remote_exe);
+    adb::chmod(sdk, device, &remote_exe)?;
 
     let envs_as_string = if let Some(envs) = envs {
         envs.iter()
@@ -66,7 +69,7 @@ fn install_and_launch(
         remote_bundle_root = remote_root.to_string_lossy(),
         envs = envs_as_string,
         remote_executable = remote_exe.to_string_lossy(),
-        args = args.join(" ")
+        args = args.as_ref().unwrap_or(&vec![]).join(" ")
     );
 
     let result = adb::run(&sdk, device, &start_script)?;

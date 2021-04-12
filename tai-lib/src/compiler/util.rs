@@ -1,22 +1,83 @@
-use std::process::Command;
+use std::{
+    io::BufReader,
+    process::{Command, Stdio},
+};
+
+use anyhow::{anyhow, bail};
+use cargo_metadata::{camino::Utf8PathBuf, diagnostic::DiagnosticLevel, Artifact, Message};
 
 use crate::{task::Options, TaiResult};
 
-pub fn extend_with_options<'a>(
+use super::BuildUnit;
+
+pub fn is_test(artifact: Artifact) -> Option<Utf8PathBuf> {
+    if let (Some(path), true) = (artifact.executable, artifact.profile.test) {
+        Some(path)
+    } else {
+        None
+    }
+}
+
+pub fn is_bench(artifact: Artifact) -> Option<Utf8PathBuf> {
+    if let (Some(path), true) = (
+        artifact.executable,
+        artifact.target.kind.contains(&String::from("bench")),
+    ) {
+        Some(path)
+    } else {
+        None
+    }
+}
+
+pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
+    mut cmd: Command,
+    requested: &Options,
+    f: F,
+) -> TaiResult<Vec<BuildUnit>> {
+    let cmd = extend_with_cargo_args(&mut cmd, requested)?;
+    cmd.stdout(Stdio::piped());
+    let mut child = cmd.spawn()?;
+    let cargo_output = child
+        .stdout
+        .take()
+        .ok_or(anyhow!("failed to read cargo output"))?;
+
+    let reader = BufReader::new(cargo_output);
+    let build_units: Result<Vec<BuildUnit>, _> = Message::parse_stream(reader)
+        .into_iter()
+        .try_fold(vec![], |mut acc, msg| match msg? {
+            Message::CompilerArtifact(art) => {
+                if let Some(path) = f(art) {
+                    let unit = BuildUnit {
+                        name: path
+                            .file_name()
+                            .ok_or(anyhow!("build artifact should have a name"))?
+                            .to_string(),
+                        executable: path.into(),
+                        target: requested.target.clone(),
+                    };
+                    acc.push(unit);
+                }
+                Ok(acc)
+            }
+            Message::CompilerMessage(m) => match m.message.level {
+                DiagnosticLevel::Error | DiagnosticLevel::Ice => {
+                    bail!("{}", m);
+                }
+                _ => Ok(acc),
+            },
+            _ => Ok(acc),
+        });
+
+    child.wait()?;
+    build_units
+}
+
+pub fn extend_with_cargo_args<'a>(
     cmd: &'a mut Command,
     requested: &Options,
 ) -> TaiResult<&'a mut Command> {
-    if requested.release == true {
-        cmd.arg("--release");
-    }
-
-    if requested.all_features == true {
-        cmd.arg("--all-features");
-    }
-
-    if requested.no_default_features == true {
-        cmd.arg("--no-default-features");
-    }
+    cmd.args(&requested.cargo_args);
 
     cmd.args(&[
         "--target",
