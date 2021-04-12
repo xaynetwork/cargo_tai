@@ -17,9 +17,9 @@ pub fn create_bundles(
     let root = unit
         .executable
         .parent()
-        .ok_or(anyhow!("no units to bundle"))?
-        .parent()
-        .ok_or(anyhow!("no units to bundle"))?
+        .map(|p| p.parent())
+        .flatten()
+        .ok_or(anyhow!("cannot find bundle root"))?
         .to_path_buf();
 
     let bundles_root = root.join(BUNDLES_ROOT_NAME);

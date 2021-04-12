@@ -11,7 +11,7 @@ use tracing::{debug, info, instrument};
 
 use crate::{
     bundle::create_bundles,
-    compiler::{compile_bench, compile_tests},
+    compiler::{compile_bench, compile_tests, BuildUnit},
     ios::{
         bundle::bundler::create_bundle,
         compiler::{bench_command, test_command},
@@ -23,27 +23,29 @@ use crate::{
 
 const APP_ID: &'static str = "cargo-tai";
 
-#[instrument(name = "bench", skip(requested))]
-pub fn run_bench(requested: &Options) -> TaiResult<()> {
-    let test_cmd = bench_command()?;
-    let build_units = compile_bench(test_cmd, requested)?;
-    let bundles = create_bundles(build_units, |unit, root| create_bundle(unit, root, APP_ID))?;
+#[instrument(name = "benches", skip(requested))]
+pub fn run_benches(requested: &Options) -> TaiResult<()> {
+    let bench_cmd = bench_command()?;
+    let build_units = compile_bench(bench_cmd, requested)?;
+    let args = vec!["--bench"];
 
-    let simulator = xcrun::list_booted_simulators()?
-        .pop()
-        .ok_or(anyhow!("no ios simulator available"))?;
-
-    bundles
-        .bundles
-        .iter()
-        .map(|bundle| install_and_launch(&simulator, &bundle.root, &["--bench"], &requested.envs))
-        .collect()
+    run(build_units, &args, &requested.envs)
 }
 
-#[instrument(name = "test", skip(requested))]
-pub fn run_test(requested: &Options) -> TaiResult<()> {
+#[instrument(name = "tests", skip(requested))]
+pub fn run_tests(requested: &Options) -> TaiResult<()> {
     let test_cmd = test_command()?;
     let build_units = compile_tests(test_cmd, requested)?;
+
+    run(build_units, &[], &requested.envs)
+}
+
+#[instrument(name = "run")]
+pub fn run(
+    build_units: Vec<BuildUnit>,
+    args: &[&str],
+    envs: &Option<Vec<(String, String)>>,
+) -> TaiResult<()> {
     let bundles = create_bundles(build_units, |unit, root| create_bundle(unit, root, APP_ID))?;
 
     let simulator = xcrun::list_booted_simulators()?
@@ -53,11 +55,11 @@ pub fn run_test(requested: &Options) -> TaiResult<()> {
     bundles
         .bundles
         .iter()
-        .map(|bundle| install_and_launch(&simulator, &bundle.root, &[], &requested.envs))
+        .map(|bundle| install_and_launch(&simulator, &bundle.root, args, envs))
         .collect()
 }
 
-#[instrument(name = "run", fields(device = %device.udid), skip(bundle_root))]
+#[instrument(name = "install_launch", fields(device = %device.udid), skip(bundle_root))]
 fn install_and_launch<P: AsRef<Path>>(
     device: &Device,
     bundle_root: P,

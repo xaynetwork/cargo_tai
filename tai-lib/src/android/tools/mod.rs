@@ -20,10 +20,8 @@ impl AndroidSdk {
 
         let adb = ndk
             .parent()
-            .ok_or(anyhow!(
-                "failed to find `ndk` folder in ../ANDROID_NDK_HOME"
-            ))?
-            .parent()
+            .map(|p| p.parent())
+            .flatten()
             .ok_or(anyhow!(
                 "failed to find `sdk` folder in ../../ANDROID_NDK_HOME"
             ))?

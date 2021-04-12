@@ -5,7 +5,7 @@ use tracing::{info, instrument};
 
 use crate::{
     bundle::create_bundles,
-    compiler::{compile_bench, compile_tests},
+    compiler::{compile_bench, compile_tests, BuildUnit},
     ios::{
         bundle::{
             bundler::create_bundle,
@@ -20,37 +20,29 @@ use crate::{
 
 pub const APP_NAME: &'static str = "Dinghy";
 
-#[instrument(name = "bench", skip(requested))]
-pub fn run_bench(requested: &Options) -> TaiResult<()> {
+#[instrument(name = "benches", skip(requested))]
+pub fn run_benches(requested: &Options) -> TaiResult<()> {
     let bench_cmd = bench_command()?;
     let build_units = compile_bench(bench_cmd, requested)?;
+    let args = vec!["--bench"];
 
-    let device = ios_deploy::list_device()?.unwrap();
-    let sig_settings = find_signing_settings(&device.id)?;
-
-    let bundles = create_bundles(build_units, |unit, root| {
-        create_bundle(unit, root, &sig_settings.app_id)
-    })?;
-    let entitlements = create_entitlements_file(&bundles.root, &sig_settings.entitlements)?;
-
-    bundles
-        .bundles
-        .iter()
-        .map(|bundle| sign_bundle(&bundle, &sig_settings, &entitlements))
-        .collect::<Result<(), Error>>()?;
-
-    bundles
-        .bundles
-        .iter()
-        .map(|bundle| install_and_launch(&bundle.root, &["--bench"], &requested.envs))
-        .collect()
+    run(build_units, &args, &requested.envs)
 }
 
-#[instrument(name = "test", skip(requested))]
-pub fn run_test(requested: &Options) -> TaiResult<()> {
+#[instrument(name = "tests", skip(requested))]
+pub fn run_tests(requested: &Options) -> TaiResult<()> {
     let test_cmd = test_command()?;
     let build_units = compile_tests(test_cmd, requested)?;
 
+    run(build_units, &[], &requested.envs)
+}
+
+#[instrument(name = "run")]
+pub fn run(
+    build_units: Vec<BuildUnit>,
+    args: &[&str],
+    envs: &Option<Vec<(String, String)>>,
+) -> TaiResult<()> {
     let device = ios_deploy::list_device()?.unwrap();
     let sig_settings = find_signing_settings(&device.id)?;
 
@@ -68,11 +60,11 @@ pub fn run_test(requested: &Options) -> TaiResult<()> {
     bundles
         .bundles
         .iter()
-        .map(|bundle| install_and_launch(&bundle.root, &[], &requested.envs))
+        .map(|bundle| install_and_launch(&bundle.root, args, envs))
         .collect()
 }
 
-#[instrument(name = "run", skip(bundle_root))]
+#[instrument(name = "install_launch", skip(bundle_root))]
 fn install_and_launch<P>(
     bundle_root: P,
     args: &[&str],

@@ -4,5 +4,4 @@ members = [
     "tai-lib",
     "test-p",
     "tai-util",
-    "ns-path-utilities-sys",
 ]

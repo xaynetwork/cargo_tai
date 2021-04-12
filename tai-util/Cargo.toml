@@ -13,4 +13,5 @@ readme = "../README.md"
 edition = "2018"
 
 [target.'cfg(target_os="ios")'.dependencies]
-ns-path-utilities-sys = { path = "../ns-path-utilities-sys" }
+# cacao = { git = "https://github.com/ryanmcgrath/cacao", rev = "420422187a6118a1ea04eaae79543fdba4068c1e", features = ["ios"] }
+ns-path-utilities-sys = { git = "ssh://git@github.com/Robert-Steiner/ns-path-utilities-sys.git" }

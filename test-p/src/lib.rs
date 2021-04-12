@@ -1,5 +1,8 @@
 #[cfg(test)]
 mod tests {
+    #[allow(unused_imports)]
+    use std::env;
+
     #[cfg(all(test, target_os = "ios", target_arch = "aarch64"))]
     #[test]
     fn test_aarch64_ios() {
