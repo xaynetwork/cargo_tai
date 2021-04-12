@@ -3,6 +3,15 @@ mod tests {
     #[allow(unused_imports)]
     use std::env;
 
+    #[test]
+    fn test_host_and_device() {
+        use std::fs::File;
+        use tai_util::try_resources_file_path;
+        let path = try_resources_file_path("test_txt").unwrap_or("./data/test.txt".into());
+
+        File::open(path).unwrap();
+    }
+
     #[cfg(all(test, target_os = "ios", target_arch = "aarch64"))]
     #[test]
     fn test_aarch64_ios() {

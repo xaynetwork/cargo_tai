@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Error};
 use tracing::{info, instrument};
@@ -22,22 +22,31 @@ pub const APP_NAME: &'static str = "Dinghy";
 
 #[instrument(name = "benches", skip(requested))]
 pub fn run_benches(requested: &Options) -> TaiResult<()> {
-    let bench_cmd = bench_command()?;
-    let build_units = compile_benches(bench_cmd, requested)?;
-    let mut bench_arg = vec!["--bench".to_string()];
+    let build_units = compile_benches(bench_command()?, requested)?;
+
+    let mut args_with_bench = vec!["--bench".to_string()];
     if let Some(ref args) = requested.args {
-        bench_arg.extend_from_slice(args);
+        args_with_bench.extend_from_slice(args);
     };
 
-    run(build_units, &Some(bench_arg), &requested.envs)
+    run(
+        build_units,
+        &Some(args_with_bench),
+        &requested.envs,
+        &requested.resources,
+    )
 }
 
 #[instrument(name = "tests", skip(requested))]
 pub fn run_tests(requested: &Options) -> TaiResult<()> {
-    let test_cmd = test_command()?;
-    let build_units = compile_tests(test_cmd, requested)?;
+    let build_units = compile_tests(test_command()?, requested)?;
 
-    run(build_units, &requested.args, &requested.envs)
+    run(
+        build_units,
+        &requested.args,
+        &requested.envs,
+        &requested.resources,
+    )
 }
 
 #[instrument(name = "run", skip(build_units))]
@@ -45,12 +54,13 @@ pub fn run(
     build_units: Vec<BuildUnit>,
     args: &Option<Vec<String>>,
     envs: &Option<Vec<(String, String)>>,
+    resources: &Option<Vec<(String, PathBuf)>>,
 ) -> TaiResult<()> {
     let device = ios_deploy::list_device()?.unwrap();
     let sig_settings = find_signing_settings(&device.id)?;
 
-    let bundles = create_bundles(build_units, |unit, root| {
-        create_bundle(unit, root, &sig_settings.app_id)
+    let bundles = create_bundles(build_units, |unit, bundles_root| {
+        create_bundle(unit, bundles_root, resources, &sig_settings.app_id)
     })?;
     let entitlements = create_entitlements_file(&bundles.root, &sig_settings.entitlements)?;
 

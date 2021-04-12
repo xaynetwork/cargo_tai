@@ -2,6 +2,6 @@
 members = [
     "cargo-tai",
     "tai-lib",
-    "test-p",
     "tai-util",
+    "test-project",
 ]

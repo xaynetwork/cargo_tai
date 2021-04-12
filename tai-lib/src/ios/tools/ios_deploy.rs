@@ -4,6 +4,7 @@ use std::{
     process::Command,
 };
 
+use anyhow::anyhow;
 use serde::{Deserialize, Deserializer};
 
 use crate::{command_ext::ExitStatusExt, TaiResult};
@@ -34,14 +35,15 @@ pub fn launch_app<P: AsRef<Path>>(
     cmd.arg("--bundle")
         .arg(bundle_root.as_ref())
         .status()?
-        .expect_success("failed to launch app")
+        .expect_success(&format!("{} command failed", IOS_DEPLOY))
 }
 
 pub fn list_device() -> TaiResult<Option<Device>> {
     let output = Command::new(IOS_DEPLOY)
         .args(&["--detect", "--detect", "--timeout", "1", "--json"])
         .output()?;
-    let devices: Option<Devices> = serde_json::from_slice(&output.stdout)?;
+    let devices: Option<Devices> =
+        serde_json::from_slice(&output.stdout).map_err(|_| anyhow!("Cannot find any devices"))?;
     if let Some(devices) = devices {
         Ok(Some(devices.device))
     } else {

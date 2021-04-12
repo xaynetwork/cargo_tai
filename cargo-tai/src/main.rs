@@ -13,11 +13,11 @@ fn main() -> Result<(), Error> {
         .with_env_filter(EnvFilter::from_default_env())
         .with_ansi(true)
         .with_target(false)
+        .with_level(false)
         .without_time()
         .init();
 
     let opt = Options::from_args();
-    tracing::debug!("{:?}", opt);
     let requested_opt: task::Options = opt.into();
 
     #[cfg(not(target_os = "macos"))]

@@ -1,6 +1,8 @@
 mod bench;
 mod test;
 
+use std::path::PathBuf;
+
 use bench::run_benches;
 use cfg_expr::targets::TargetInfo;
 use test::run_tests;
@@ -25,9 +27,11 @@ pub struct Options {
     pub android_platform: u8,
 
     // application
-    pub envs: Option<Vec<(String, String)>>,
     pub args: Option<Vec<String>>,
+    pub envs: Option<Vec<(String, String)>>,
+    pub resources: Option<Vec<(String, PathBuf)>>,
 
+    // cargo arguments
     pub cargo_args: Vec<String>,
 }
 

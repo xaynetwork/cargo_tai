@@ -1142,6 +1142,7 @@ dependencies = [
  "serde",
  "serde_json",
  "simctl",
+ "tai-util",
  "tempdir",
  "tracing",
 ]
@@ -1173,7 +1174,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "test-p"
+name = "test-project"
 version = "0.0.1"
 dependencies = [
  "criterion",

@@ -25,22 +25,31 @@ const APP_ID: &'static str = "cargo-tai";
 
 #[instrument(name = "benches", skip(requested))]
 pub fn run_benches(requested: &Options) -> TaiResult<()> {
-    let bench_cmd = bench_command()?;
-    let build_units = compile_benches(bench_cmd, requested)?;
-    let mut bench_arg = vec!["--bench".to_string()];
+    let build_units = compile_benches(bench_command()?, requested)?;
+
+    let mut args_with_bench = vec!["--bench".to_string()];
     if let Some(ref args) = requested.args {
-        bench_arg.extend_from_slice(args);
+        args_with_bench.extend_from_slice(args);
     };
 
-    run(build_units, &Some(bench_arg), &requested.envs)
+    run(
+        build_units,
+        &Some(args_with_bench),
+        &requested.envs,
+        &requested.resources,
+    )
 }
 
 #[instrument(name = "tests", skip(requested))]
 pub fn run_tests(requested: &Options) -> TaiResult<()> {
-    let test_cmd = test_command()?;
-    let build_units = compile_tests(test_cmd, requested)?;
+    let build_units = compile_tests(test_command()?, requested)?;
 
-    run(build_units, &requested.args, &requested.envs)
+    run(
+        build_units,
+        &requested.args,
+        &requested.envs,
+        &requested.resources,
+    )
 }
 
 #[instrument(name = "run", skip(build_units))]
@@ -48,8 +57,11 @@ pub fn run(
     build_units: Vec<BuildUnit>,
     args: &Option<Vec<String>>,
     envs: &Option<Vec<(String, String)>>,
+    resources: &Option<Vec<(String, PathBuf)>>,
 ) -> TaiResult<()> {
-    let bundles = create_bundles(build_units, |unit, root| create_bundle(unit, root, APP_ID))?;
+    let bundles = create_bundles(build_units, |unit, root| {
+        create_bundle(unit, root, resources, APP_ID)
+    })?;
 
     let simulator = xcrun::list_booted_simulators()?
         .pop()

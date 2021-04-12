@@ -105,6 +105,7 @@ pub fn find_signing_settings(device_id: &str) -> TaiResult<SigningSettings> {
     setting.ok_or(anyhow!("no signing profiles available"))
 }
 
+#[instrument(name = "entitlements", skip(bundles_root, entitlements))]
 pub fn create_entitlements_file(bundles_root: &PathBuf, entitlements: &str) -> TaiResult<PathBuf> {
     let path = bundles_root.join(ENTITLEMENTS_XCENT);
     debug!("create entitlements file: {:?}", path);
