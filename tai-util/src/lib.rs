@@ -49,8 +49,10 @@ pub mod ios {
     use ns_path_utilities_sys::{
         INSArray,
         INSString,
+        NSSearchPathDirectory,
         NSSearchPathDirectory_NSDocumentDirectory,
         NSSearchPathDirectory_NSLibraryDirectory,
+        NSSearchPathDomainMask,
         NSSearchPathDomainMask_NSUserDomainMask,
         NSSearchPathForDirectoriesInDomains,
         NSString,

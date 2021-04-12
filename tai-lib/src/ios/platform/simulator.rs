@@ -43,7 +43,7 @@ pub fn run_tests(requested: &Options) -> TaiResult<()> {
     run(build_units, &requested.args, &requested.envs)
 }
 
-#[instrument(name = "run")]
+#[instrument(name = "run", skip(build_units))]
 pub fn run(
     build_units: Vec<BuildUnit>,
     args: &Option<Vec<String>>,
