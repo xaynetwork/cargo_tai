@@ -23,16 +23,22 @@ pub struct Options {
     /// Build for the target triples
     pub target: TargetInfo<'static>,
 
-    // android
-    pub android_platform: u8,
-
     // application
     pub args: Option<Vec<String>>,
     pub envs: Option<Vec<(String, String)>>,
     pub resources: Option<Vec<(String, PathBuf)>>,
 
+    // android
+    pub android: AndroidOptions,
+
     // cargo arguments
     pub cargo_args: Vec<String>,
+}
+
+#[derive(Debug)]
+pub struct AndroidOptions {
+    pub platform: u8,
+    pub ndk: PathBuf,
 }
 
 pub fn run_mode(requested: &Options) -> TaiResult<()> {

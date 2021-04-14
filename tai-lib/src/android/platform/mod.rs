@@ -10,30 +10,66 @@ use crate::{
         tools::{adb, AndroidSdk},
     },
     bundle::{create_bundles, BuildBundle},
-    compiler::compile_tests,
+    compiler::{compile_benches, compile_tests, BuildUnit},
     task::Options,
     TaiResult,
 };
 
-use super::compiler::test_command;
+use super::compiler::{bench_command, test_command};
 
+#[instrument(name = "benches", skip(requested))]
+pub fn run_benches(requested: &Options) -> TaiResult<()> {
+    let sdk = AndroidSdk::derive_sdk(&requested.android.ndk)?;
+    let build_units = compile_benches(bench_command(&sdk, requested)?, requested)?;
+
+    let mut args_with_bench = vec!["--bench".to_string()];
+    if let Some(ref args) = requested.args {
+        args_with_bench.extend_from_slice(args);
+    };
+
+    run(
+        &sdk,
+        build_units,
+        &Some(args_with_bench),
+        &requested.envs,
+        &requested.resources,
+    )
+}
+
+#[instrument(name = "tests", skip(requested))]
 pub fn run_test(requested: &Options) -> TaiResult<()> {
-    let sdk = AndroidSdk::derive_sdk()?;
+    let sdk = AndroidSdk::derive_sdk(&requested.android.ndk)?;
+    let build_units = compile_tests(test_command(&sdk, requested)?, requested)?;
 
-    let test_cmd = test_command(&sdk, requested)?;
-    let build_units = compile_tests(test_cmd, requested)?;
+    run(
+        &sdk,
+        build_units,
+        &requested.args,
+        &requested.envs,
+        &requested.resources,
+    )
+}
+
+#[instrument(name = "run", skip(sdk, build_units))]
+pub fn run(
+    sdk: &AndroidSdk,
+    build_units: Vec<BuildUnit>,
+    args: &Option<Vec<String>>,
+    envs: &Option<Vec<(String, String)>>,
+    resources: &Option<Vec<(String, PathBuf)>>,
+) -> TaiResult<()> {
     let devices = adb::devices(&sdk)?
         .pop()
         .ok_or(anyhow!("no android device available"))?;
 
-    let bundles = create_bundles(build_units, |unit, root| create_bundle(unit, root))?;
+    let bundles = create_bundles(build_units, |unit, root| {
+        create_bundle(unit, root, resources)
+    })?;
 
     bundles
         .bundles
         .iter()
-        .map(|bundle| {
-            install_and_launch(&sdk, &devices.id, &bundle, &requested.args, &requested.envs)
-        })
+        .map(|bundle| install_and_launch(&sdk, &devices.id, &bundle, args, envs))
         .collect()
 }
 

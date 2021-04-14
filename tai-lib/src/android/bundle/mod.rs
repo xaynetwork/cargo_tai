@@ -1,13 +1,22 @@
 use std::{
     fs::{copy, create_dir_all},
-    path::Path,
+    path::{Path, PathBuf},
 };
 
-use tracing::debug;
+use tracing::{debug, instrument};
 
-use crate::{bundle::BuildBundle, compiler::BuildUnit, TaiResult};
+use crate::{
+    bundle::{copy_resources, BuildBundle},
+    compiler::BuildUnit,
+    TaiResult,
+};
 
-pub fn create_bundle<P: AsRef<Path>>(unit: BuildUnit, bundles_root: P) -> TaiResult<BuildBundle> {
+#[instrument(name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, resources))]
+pub fn create_bundle<P: AsRef<Path>>(
+    unit: BuildUnit,
+    bundles_root: P,
+    resources: &Option<Vec<(String, PathBuf)>>,
+) -> TaiResult<BuildBundle> {
     let bundle_root = bundles_root.as_ref().join(&unit.name);
 
     create_dir_all(&bundle_root)?;
@@ -15,6 +24,7 @@ pub fn create_bundle<P: AsRef<Path>>(unit: BuildUnit, bundles_root: P) -> TaiRes
     let to = bundle_root.join(&unit.name);
     copy(&unit.executable, &to)?;
     debug!("copy {:?} to {:?}", &unit.executable, to);
+    copy_resources(&bundle_root, resources)?;
 
     Ok(BuildBundle {
         root: bundle_root,

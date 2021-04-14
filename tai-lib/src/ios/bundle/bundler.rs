@@ -1,5 +1,5 @@
 use std::{
-    fs::{copy, create_dir, create_dir_all, File},
+    fs::{copy, create_dir_all, File},
     path::{Path, PathBuf},
 };
 
@@ -8,7 +8,11 @@ use cfg_expr::targets::{Arch, TargetInfo};
 use serde::Serialize;
 use tracing::{debug, instrument};
 
-use crate::{bundle::BuildBundle, compiler::BuildUnit, TaiResult};
+use crate::{
+    bundle::{copy_resources, BuildBundle},
+    compiler::BuildUnit,
+    TaiResult,
+};
 
 const APP_DISPLAY_NAME: &'static str = "cargo-tai";
 const INFO_PLIST: &'static str = "Info.plist";
@@ -40,33 +44,6 @@ pub fn create_bundle<P: AsRef<Path>>(
         root: bundle_root,
         build_unit: unit,
     })
-}
-
-fn copy_resources<P: AsRef<Path>>(
-    bundle_root: P,
-    resources: &Option<Vec<(String, PathBuf)>>,
-) -> TaiResult<()> {
-    if let Some(resources) = resources {
-        debug!("copy resources");
-        let test_data_root = bundle_root.as_ref().join(tai_util::DATA_DIR_NAME);
-        create_dir(&test_data_root)
-            .with_context(|| format!("Failed to create resource root {:?}", test_data_root))?;
-        debug!("create dir: {:?}", test_data_root);
-
-        let copied: TaiResult<Vec<()>> = resources
-            .iter()
-            .map(|(id, local_path)| {
-                let remote_path = test_data_root.join(id);
-                copy(local_path, &remote_path)
-                    .with_context(|| format!("Failed to copy resource {:?}", local_path))?;
-                debug!("copy {:?} to {:?}", local_path, remote_path);
-                Ok(())
-            })
-            .collect();
-        copied?;
-    }
-
-    Ok(())
 }
 
 #[derive(Clone, Debug, Serialize)]

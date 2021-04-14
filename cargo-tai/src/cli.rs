@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use anyhow::{anyhow, Error};
 use cfg_expr::targets::{get_builtin_target_by_triple, TargetInfo};
 use structopt::{clap::ArgSettings, StructOpt};
-use tai_lib::task::{self, Mode};
+use tai_lib::task::{self, AndroidOptions, Mode};
 
 #[derive(StructOpt, Debug)]
 pub enum Options {
@@ -25,11 +25,11 @@ Supported targets:
 - `i686-linux-android`
 - `armv7-linux-androideabi`"
     )]
-    pub target: TargetInfo<'static>,
+    target: TargetInfo<'static>,
 
-    /// Android platform version: only required when "target" is set to "*-linux-android*"
+    /// Android platform version: only required when "target" is "*-linux-android*"
     #[structopt(
-        name = "android platform version",
+        long,
         default_value = "21",
         required_ifs(&[
             ("target", "x86_64-linux-android"),
@@ -39,6 +39,23 @@ Supported targets:
         ])
     )]
     android_platform: u8,
+
+    /// The path to the android ndk: only required when "target" is "*-linux-android*"
+    ///
+    /// Example:
+    ///
+    /// `cargo-tai test --android_ndk ~/Library/Android/sdk/ndk/22.1.7171670`
+    #[structopt(
+        long,
+        required_ifs(&[
+            ("target", "x86_64-linux-android"),
+            ("target", "aarch64-linux-android"),
+            ("target", "i686-linux-android"),
+            ("target", "armv7-linux-androideabi"),
+        ]),
+        env = "ANDROID_NDK_HOME"
+    )]
+    android_ndk: PathBuf,
 
     /// A comma-separated list of arguments to pass to the app when launching it.
     ///
@@ -102,10 +119,13 @@ impl From<Options> for task::Options {
         Self {
             mode,
             target: general_opts.target,
-            android_platform: general_opts.android_platform,
             args: general_opts.args,
             envs: general_opts.envs,
             resources: general_opts.resources,
+            android: AndroidOptions {
+                platform: general_opts.android_platform,
+                ndk: general_opts.android_ndk,
+            },
             cargo_args: general_opts.cargo_args,
         }
     }

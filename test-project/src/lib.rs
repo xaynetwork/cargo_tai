@@ -4,7 +4,7 @@ mod tests {
     use std::env;
 
     #[test]
-    fn test_host_and_device() {
+    fn test_data_host_and_device() {
         use std::fs::File;
         use tai_util::try_resources_file_path;
         let path = try_resources_file_path("test_txt").unwrap_or("./data/test.txt".into());

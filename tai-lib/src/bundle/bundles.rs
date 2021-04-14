@@ -1,9 +1,10 @@
 use std::{
-    fs::{create_dir, remove_dir_all},
-    path::PathBuf,
+    fs::{copy, create_dir, remove_dir_all},
+    path::{Path, PathBuf},
 };
 
-use anyhow::{anyhow, bail, Error};
+use anyhow::{anyhow, bail, Context, Error};
+use tracing::debug;
 
 use crate::{compiler::BuildUnit, TaiResult};
 
@@ -43,4 +44,31 @@ pub fn create_bundles(
         root: bundles_root,
         bundles,
     })
+}
+
+pub fn copy_resources<P: AsRef<Path>>(
+    bundle_root: P,
+    resources: &Option<Vec<(String, PathBuf)>>,
+) -> TaiResult<()> {
+    if let Some(resources) = resources {
+        debug!("copy resources");
+        let test_data_root = bundle_root.as_ref().join(tai_util::DATA_DIR_NAME);
+        create_dir(&test_data_root)
+            .with_context(|| format!("Failed to create resource root {:?}", test_data_root))?;
+        debug!("create dir: {:?}", test_data_root);
+
+        let copied: TaiResult<Vec<()>> = resources
+            .iter()
+            .map(|(id, local_path)| {
+                let remote_path = test_data_root.join(id);
+                copy(local_path, &remote_path)
+                    .with_context(|| format!("Failed to copy resource {:?}", local_path))?;
+                debug!("copy {:?} to {:?}", local_path, remote_path);
+                Ok(())
+            })
+            .collect();
+        copied?;
+    }
+
+    Ok(())
 }

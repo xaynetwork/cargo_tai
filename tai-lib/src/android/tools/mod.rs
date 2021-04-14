@@ -1,4 +1,4 @@
-use std::{env, path::PathBuf};
+use std::path::{Path, PathBuf};
 
 use anyhow::anyhow;
 
@@ -12,13 +12,9 @@ pub struct AndroidSdk {
 }
 
 impl AndroidSdk {
-    pub fn derive_sdk() -> TaiResult<AndroidSdk> {
-        let ndk_home =
-            env::var_os("ANDROID_NDK_HOME").ok_or(anyhow!("ANDROID_NDK_HOME not set"))?;
-
-        let ndk = PathBuf::from(ndk_home);
-
+    pub fn derive_sdk<P: AsRef<Path>>(ndk: P) -> TaiResult<AndroidSdk> {
         let adb = ndk
+            .as_ref()
             .parent()
             .map(|p| p.parent())
             .flatten()
@@ -29,6 +25,9 @@ impl AndroidSdk {
             .join("adb")
             .to_path_buf();
 
-        Ok(Self { adb, ndk })
+        Ok(Self {
+            adb,
+            ndk: ndk.as_ref().to_path_buf(),
+        })
     }
 }

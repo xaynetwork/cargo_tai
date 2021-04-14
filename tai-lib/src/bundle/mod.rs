@@ -4,7 +4,7 @@ use crate::compiler::BuildUnit;
 
 mod bundles;
 
-pub use bundles::create_bundles;
+pub use bundles::{copy_resources, create_bundles};
 
 pub const BUNDLES_ROOT_NAME: &'static str = "tai-test";
 
