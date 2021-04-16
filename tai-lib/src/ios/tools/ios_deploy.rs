@@ -9,7 +9,7 @@ use serde::{Deserialize, Deserializer};
 
 use crate::{command_ext::ExitStatusExt, TaiResult};
 
-const IOS_DEPLOY: &'static str = "ios-deploy";
+const IOS_DEPLOY: &str = "ios-deploy";
 
 pub fn launch_app<P: AsRef<Path>>(
     bundle_root: P,

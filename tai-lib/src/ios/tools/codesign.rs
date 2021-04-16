@@ -2,7 +2,7 @@ use std::{path::Path, process::Command};
 
 use crate::{command_ext::ExitStatusExt, TaiResult};
 
-const CODE_SIGN: &'static str = "codesign";
+const CODE_SIGN: &str = "codesign";
 
 pub fn sign<P1: AsRef<Path>, P2: AsRef<Path>>(
     identity: &str,

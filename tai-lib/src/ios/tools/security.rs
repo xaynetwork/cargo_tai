@@ -7,7 +7,7 @@ use anyhow::anyhow;
 
 use crate::TaiResult;
 
-const SECURITY: &'static str = "security";
+const SECURITY: &str = "security";
 
 pub fn find_identities() -> TaiResult<Output> {
     Command::new(SECURITY)

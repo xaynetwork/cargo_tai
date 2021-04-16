@@ -21,7 +21,7 @@ use crate::{
     TaiResult,
 };
 
-const APP_ID: &'static str = "cargo-tai";
+const APP_ID: &str = "cargo-tai";
 
 #[instrument(name = "benches", skip(requested))]
 pub fn run_benches(requested: &Options) -> TaiResult<()> {
@@ -65,13 +65,12 @@ pub fn run(
 
     let simulator = xcrun::list_booted_simulators()?
         .pop()
-        .ok_or(anyhow!("no ios simulator available"))?;
+        .ok_or_else(|| anyhow!("no iOS simulator available"))?;
 
     bundles
         .bundles
         .iter()
-        .map(|bundle| install_and_launch(&simulator, &bundle.root, args, envs))
-        .collect()
+        .try_for_each(|bundle| install_and_launch(&simulator, &bundle.root, args, envs))
 }
 
 #[instrument(name = "install_launch", fields(device = %device.udid), skip(bundle_root))]
@@ -98,7 +97,7 @@ fn install_and_launch<P: AsRef<Path>>(
             info!("test result ok");
             Ok(())
         }
-        ec @ _ => {
+        ec => {
             bail!(
                 "test {} {:?} failed with exit code: {}",
                 APP_ID,
@@ -150,7 +149,7 @@ fn create_lldb_script(app_pid: &str) -> Result<(PathBuf, TempDir), Error> {
     Ok((path, temp_dir))
 }
 
-fn extract_lldb_exit_status(stdout: &Vec<u8>) -> TaiResult<u32> {
+fn extract_lldb_exit_status(stdout: &[u8]) -> TaiResult<u32> {
     let output = String::from_utf8_lossy(stdout).to_string();
     debug!("LLDB output:\n{}", output);
     /*
@@ -177,7 +176,7 @@ fn extract_lldb_exit_status(stdout: &Vec<u8>) -> TaiResult<u32> {
 
     We need the "exit with status" line which is the 2rd from the last
     */
-    let exit_status_line: Option<&str> = output.lines().rev().skip(2).next();
+    let exit_status_line: Option<&str> = output.lines().rev().nth(2);
     let tokens: Vec<&str> = if let Some(exit_status_line) = exit_status_line {
         exit_status_line.split_whitespace().rev().collect()
     } else {

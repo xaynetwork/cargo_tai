@@ -5,7 +5,7 @@ use simctl::{list::DeviceState, Device, DeviceQuery, Simctl};
 
 use crate::TaiResult;
 
-const XCRUN: &'static str = "xcrun";
+const XCRUN: &str = "xcrun";
 
 pub fn launch_app(
     dev_id: &str,
@@ -51,7 +51,7 @@ pub fn list_booted_simulators() -> TaiResult<Vec<Device>> {
     let devices = simctl.list().map_err(|err| anyhow!("{:?}", err))?;
     Ok(devices
         .devices()
-        .into_iter()
+        .iter()
         .available()
         .filter(|d| d.state == DeviceState::Booted)
         .cloned()

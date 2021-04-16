@@ -33,7 +33,7 @@ pub fn devices(sdk: &AndroidSdk) -> TaiResult<Vec<Device>> {
                 let id = caps[1].to_owned();
                 let arch = arch(sdk, &id)?;
 
-                devices.push(Device { id: id, arch })
+                devices.push(Device { id, arch })
             }
             Ok(devices)
         })

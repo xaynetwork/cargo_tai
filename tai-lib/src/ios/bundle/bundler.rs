@@ -14,8 +14,8 @@ use crate::{
     TaiResult,
 };
 
-const APP_DISPLAY_NAME: &'static str = "cargo-tai";
-const INFO_PLIST: &'static str = "Info.plist";
+const APP_DISPLAY_NAME: &str = "cargo-tai";
+const INFO_PLIST: &str = "Info.plist";
 
 #[instrument(name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, app_id, resources))]
 pub fn create_bundle<P: AsRef<Path>>(

@@ -40,7 +40,7 @@ pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
     let cargo_output = child
         .stdout
         .take()
-        .ok_or(anyhow!("failed to read cargo output"))?;
+        .ok_or_else(|| anyhow!("failed to read cargo output"))?;
 
     let reader = BufReader::new(cargo_output);
     let build_units: Result<Vec<BuildUnit>, _> = Message::parse_stream(reader)
@@ -51,7 +51,7 @@ pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
                     let unit = BuildUnit {
                         name: path
                             .file_name()
-                            .ok_or(anyhow!("build artifact should have a name"))?
+                            .ok_or_else(|| anyhow!("build artifact should have a name"))?
                             .to_string(),
                         executable: path.into(),
                         target: requested.target.clone(),

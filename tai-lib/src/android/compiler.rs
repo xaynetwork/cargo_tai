@@ -137,16 +137,12 @@ fn setup_android_deps(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Comman
 }
 
 fn check_if_utils_exists(paths: &[&PathBuf]) -> TaiResult<()> {
-    paths
-        .iter()
-        .map(|path| {
-            if !path.exists() {
-                bail!("{:?} does not exist", path);
-            }
-            Ok(())
-        })
-        .collect::<TaiResult<Vec<()>>>()?;
-    Ok(())
+    paths.iter().try_for_each(|path| {
+        if !path.exists() {
+            bail!("{:?} does not exist", path);
+        }
+        Ok(())
+    })
 }
 
 // pub(crate) fn strip(ndk_home: &Path, triple: &str, bin_path: &Path) -> std::process::ExitStatus {

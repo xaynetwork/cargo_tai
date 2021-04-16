@@ -18,12 +18,9 @@ impl AndroidSdk {
             .parent()
             .map(|p| p.parent())
             .flatten()
-            .ok_or(anyhow!(
-                "failed to find `sdk` folder in ../../ANDROID_NDK_HOME"
-            ))?
+            .ok_or_else(|| anyhow!("failed to find `sdk` folder in ../../ANDROID_NDK_HOME"))?
             .join("platform-tools")
-            .join("adb")
-            .to_path_buf();
+            .join("adb");
 
         Ok(Self {
             adb,

@@ -7,7 +7,7 @@ use anyhow::anyhow;
 
 use crate::TaiResult;
 
-const LLDB: &'static str = "lldb";
+const LLDB: &str = "lldb";
 
 pub fn run_source<P: AsRef<Path>>(source: P) -> TaiResult<Output> {
     Command::new(LLDB)

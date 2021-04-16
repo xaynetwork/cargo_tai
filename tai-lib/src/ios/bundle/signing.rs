@@ -8,7 +8,6 @@ use std::{
 use anyhow::{anyhow, bail};
 use once_cell::sync::OnceCell;
 use openssl::{nid::Nid, x509::X509};
-use plist;
 use serde::Deserialize;
 use tracing::{debug, instrument};
 
@@ -21,8 +20,8 @@ use crate::{
     TaiResult,
 };
 
-const ENTITLEMENTS_XCENT: &'static str = "entitlements.xcent";
-const PROFILE_DIR: &'static str = "Library/MobileDevice/Provisioning Profiles";
+const ENTITLEMENTS_XCENT: &str = "entitlements.xcent";
+const PROFILE_DIR: &str = "Library/MobileDevice/Provisioning Profiles";
 static IDENTITY_REGEX: OnceCell<regex::Regex> = OnceCell::new();
 
 #[derive(Debug)]
@@ -72,7 +71,7 @@ pub fn find_signing_settings(device_id: &str) -> TaiResult<SigningSettings> {
     debug!("found {:?}", identities);
 
     let profiles = dirs::home_dir()
-        .ok_or(anyhow!("cannot find home directory"))?
+        .ok_or_else(|| anyhow!("cannot find home directory"))?
         .join(PROFILE_DIR);
 
     let mut setting = None;
@@ -82,7 +81,6 @@ pub fn find_signing_settings(device_id: &str) -> TaiResult<SigningSettings> {
                 .path()
                 .extension()
                 .map_or_else(|| false, |ex| ex == "mobileprovision")
-                == true
             {
                 debug!("considering profile {:?}", entry.path());
                 match read_and_validate_profile(&identities, device_id, entry.path()) {
@@ -102,7 +100,7 @@ pub fn find_signing_settings(device_id: &str) -> TaiResult<SigningSettings> {
         }
     }
 
-    setting.ok_or(anyhow!("no signing profiles available"))
+    setting.ok_or_else(|| anyhow!("no signing profiles available"))
 }
 
 #[instrument(name = "entitlements", skip(bundles_root, entitlements))]
@@ -150,7 +148,7 @@ fn find_identities() -> TaiResult<Vec<SigningIdentity>> {
                 identities.push(SigningIdentity {
                     id: caps[1].into(),
                     name: caps[2].into(),
-                    team: subject.to_string(),
+                    team: subject,
                 });
             }
         }

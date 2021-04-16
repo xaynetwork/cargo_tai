@@ -113,6 +113,7 @@ jobs:
         run: |
           cargo check --all-targets
           cargo check --all-targets --all-features
+
   clippy:
     name: cargo-clippy
     needs: [registry-cache, check]
@@ -150,6 +151,7 @@ jobs:
         run: |
           cargo clippy --all-targets -- --deny warnings
           cargo clippy --all-targets --all-features -- --deny warnings
+
   test:
     name: cargo-test
     needs: [registry-cache, check]
@@ -181,10 +183,6 @@ jobs:
           path: ${{ github.workspace }}/target
           key: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.rustc }}-tests-${{ needs.registry-cache.outputs.cache-date }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.rustc }}-tests-${{ needs.registry-cache.outputs.cache-date }}-
-
-      # TODO: cache this as well to avoid frequent downloading
-      - name: Download data
-        run: sh download_data.sh
 
       - name: Run tests
         env:

@@ -60,7 +60,7 @@ pub fn run(
 ) -> TaiResult<()> {
     let devices = adb::devices(&sdk)?
         .pop()
-        .ok_or(anyhow!("no android device available"))?;
+        .ok_or_else(|| anyhow!("no android device available"))?;
 
     let bundles = create_bundles(build_units, |unit, root| {
         create_bundle(unit, root, resources)
@@ -69,8 +69,7 @@ pub fn run(
     bundles
         .bundles
         .iter()
-        .map(|bundle| install_and_launch(&sdk, &devices.id, &bundle, args, envs))
-        .collect()
+        .try_for_each(|bundle| install_and_launch(&sdk, &devices.id, &bundle, args, envs))
 }
 
 #[instrument(name = "install_launch", skip(sdk, bundle))]

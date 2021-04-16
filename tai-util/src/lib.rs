@@ -1,6 +1,6 @@
 use std::{env, path::PathBuf};
 
-pub const DATA_DIR_NAME: &'static str = "test-data";
+pub const DATA_DIR_NAME: &str = "test-data";
 
 pub fn resources_file_path(test_data_id: &str) -> PathBuf {
     try_resources_file_path(test_data_id)

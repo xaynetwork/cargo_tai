@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{bail, Error};
+use anyhow::bail;
 use tracing::{info, instrument};
 
 use crate::{
@@ -18,7 +18,7 @@ use crate::{
     TaiResult,
 };
 
-pub const APP_NAME: &'static str = "Dinghy";
+pub const APP_NAME: &str = "Dinghy";
 
 #[instrument(name = "benches", skip(requested))]
 pub fn run_benches(requested: &Options) -> TaiResult<()> {
@@ -67,14 +67,12 @@ pub fn run(
     bundles
         .bundles
         .iter()
-        .map(|bundle| sign_bundle(&bundle, &sig_settings, &entitlements))
-        .collect::<Result<(), Error>>()?;
+        .try_for_each(|bundle| sign_bundle(&bundle, &sig_settings, &entitlements))?;
 
     bundles
         .bundles
         .iter()
-        .map(|bundle| install_and_launch(&bundle.root, args, envs))
-        .collect()
+        .try_for_each(|bundle| install_and_launch(&bundle.root, args, envs))
 }
 
 #[instrument(name = "install_launch", skip(bundle_root))]

@@ -6,7 +6,7 @@ mod bundles;
 
 pub use bundles::{copy_resources, create_bundles};
 
-pub const BUNDLES_ROOT_NAME: &'static str = "tai-test";
+pub const BUNDLES_ROOT_NAME: &str = "tai-test";
 
 #[derive(Debug)]
 pub struct BuildBundles {

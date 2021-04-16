@@ -14,13 +14,13 @@ pub fn create_bundles(
     units: Vec<BuildUnit>,
     f: impl Fn(BuildUnit, &PathBuf) -> TaiResult<BuildBundle>,
 ) -> TaiResult<BuildBundles> {
-    let unit = units.get(0).ok_or(anyhow!("no units to bundle"))?;
+    let unit = units.get(0).ok_or_else(|| anyhow!("no units to bundle"))?;
     let root = unit
         .executable
         .parent()
         .map(|p| p.parent())
         .flatten()
-        .ok_or(anyhow!("cannot find bundle root"))?
+        .ok_or_else(|| anyhow!("cannot find bundle root"))?
         .to_path_buf();
 
     let bundles_root = root.join(BUNDLES_ROOT_NAME);
