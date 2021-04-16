@@ -4,7 +4,7 @@ pub const DATA_DIR_NAME: &str = "test-data";
 
 pub fn resources_file_path(test_data_id: &str) -> PathBuf {
     try_resources_file_path(test_data_id)
-        .expect(&format!("Couldn't find test data {}", test_data_id))
+        .unwrap_or_else(|| panic!("couldn't find test data {}", test_data_id))
 }
 
 pub fn try_resources_file_path(test_data_id: &str) -> Option<PathBuf> {

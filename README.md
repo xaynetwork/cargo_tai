@@ -13,12 +13,12 @@
 
 - Xcode
 - [ios-deploy](https://github.com/ios-control/ios-deploy)
-- a valid iOS Development certificate
+- A valid iOS Development certificate
 
 ### Android
 
 - [Android Studio](https://developer.android.com/studio)
-- Install Android NDK
+- Android NDK
 
 
 ## Tested Configurations
