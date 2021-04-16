@@ -1,5 +1,6 @@
 use std::{path::PathBuf, process::Command};
 
+use anyhow::{bail, Context};
 use cfg_expr::targets::TargetInfo;
 use tracing::debug;
 
@@ -13,14 +14,14 @@ const HOST_ARCH: &str = "darwin-x86_64";
 const HOST_ARCH: &str = "linux-x86_64";
 
 pub fn bench_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
-    let mut cmd = setup_android_deps(sdk, requested);
+    let mut cmd = setup_android_deps(sdk, requested)?;
     cmd.args(&["build", "--benches"]);
 
     Ok(cmd)
 }
 
 pub fn test_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
-    let mut cmd = setup_android_deps(sdk, requested);
+    let mut cmd = setup_android_deps(sdk, requested)?;
     cmd.args(&["build", "--tests"]);
 
     Ok(cmd)
@@ -81,7 +82,7 @@ fn toolchain_suffix(target: &TargetInfo<'static>, host_arch: &str, bin: &str) ->
     .collect()
 }
 
-fn setup_android_deps(sdk: &AndroidSdk, requested: &Options) -> Command {
+fn setup_android_deps(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
     let cc_key = format!("CC_{}", to_env_key(&requested.target));
     let ar_key = format!("AR_{}", to_env_key(&requested.target));
     let cxx_key = format!("CXX_{}", to_env_key(&requested.target));
@@ -101,18 +102,23 @@ fn setup_android_deps(sdk: &AndroidSdk, requested: &Options) -> Command {
     let target_ar = &sdk
         .ndk
         .join(toolchain_suffix(&requested.target, &HOST_ARCH, "ar"));
+
     let target_linker = &sdk.ndk.join(clang_suffix(
         &requested.target,
         &HOST_ARCH,
-        requested.android.platform,
+        requested.android.api_lvl,
         "",
     ));
+
     let target_cxx = &sdk.ndk.join(clang_suffix(
         &requested.target,
         &HOST_ARCH,
-        requested.android.platform,
+        requested.android.api_lvl,
         "++",
     ));
+
+    check_if_utils_exists(&[&target_ar, &target_linker, &target_cxx])
+        .with_context(|| "Did you choose the right Android API level?")?;
 
     debug!("{}={}", cc_key, target_linker.display());
     debug!("{}={}", ar_key, target_ar.display());
@@ -127,7 +133,20 @@ fn setup_android_deps(sdk: &AndroidSdk, requested: &Options) -> Command {
         .env(cargo_ar_key, &target_ar)
         .env(cargo_linker_key, &target_linker);
 
-    cmd
+    Ok(cmd)
+}
+
+fn check_if_utils_exists(paths: &[&PathBuf]) -> TaiResult<()> {
+    paths
+        .iter()
+        .map(|path| {
+            if !path.exists() {
+                bail!("{:?} does not exist", path);
+            }
+            Ok(())
+        })
+        .collect::<TaiResult<Vec<()>>>()?;
+    Ok(())
 }
 
 // pub(crate) fn strip(ndk_home: &Path, triple: &str, bin_path: &Path) -> std::process::ExitStatus {

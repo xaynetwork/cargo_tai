@@ -37,7 +37,7 @@ pub struct Options {
 
 #[derive(Debug)]
 pub struct AndroidOptions {
-    pub platform: u8,
+    pub api_lvl: u8,
     pub ndk: PathBuf,
 }
 

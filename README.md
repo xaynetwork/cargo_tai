@@ -1,20 +1,34 @@
 # Cargo Tai
 
-**Tested Configurations**
+## Tested Configurations
 
-- intel based mac with macOS BigSur 11.2.3
-- ios-deploy 1.11.4
+**iOS**
+- Real device: iPhone 8 with iOS 14
+- Simulator: iPhone 12 with iOS 14
+
+**Android**
+- Real device: Xiaomi Redmi Note 9 (aarch64), Android 10
+- Emulator: x84_64, Android 10 (API 29)
+
+**Host**
+- Intel based Mac with macOS BigSur 11.2.3
+
 - Xcode 12.4
-- cargo 1.49.0
-- iOS 14
-- Android Studio 4.1.3
-- toolchain:
-  - "x86_64-linux-android"
-  - "aarch64-linux-android"
-  - "i686-linux-android"
-  - "armv7-linux-androideabi"
+- ios-deploy 1.11.4
 
-## Requirements
+- Android Studio 4.1.3
+- API level 21
+- NDK 22.1.7171670
+
+- cargo 1.49.0
+- cargo toolchains:
+  - `x86_64-linux-android`
+  - `aarch64-linux-android`
+  - `i686-linux-android`
+  - `armv7-linux-androideabi`
+
+
+## Host Requirements
 
 ### iOS (macOS only)
 
@@ -24,20 +38,14 @@
 
 ### Android
 
-1. Install [Android Studio](https://developer.android.com/studio)
-2. Install Android NDK | [Guide](https://developer.android.com/studio/projects/install-ndk)
-    - open Android Studio
-    - go to `Configure` > `SDK Manager` > `Appearance & Behavior` > `System Settings` > `Android SDK` > `SDK Tools` and select `NDK (Side by side)` and `CMake`
-    - click on `Apply` and wait for the installation to complete
-    - close Android Studio
+- [Android Studio](https://developer.android.com/studio)
+- Install Android NDK
 
 ## Features
 
-- run test or benchmark on iOS (simulator/real device) and Android (emulator/real device)
-- support for `criterion` ([example](./test-project/benches/criterion.rs))
-  - reports can be accessed via the file app or via iTunes
-- include resources like test-data
-- signing ios app
+- Run tests or benchmarks on iOS (simulator/real device) and Android (emulator/real device).
+- Support for `criterion` ([example](./test-project/benches/criterion.rs))
+- Include resources data that are required by tour test/benchmarks
 
 ## Examples
 
@@ -63,7 +71,9 @@ cargo-tai test --target aarch64-apple-ios --args -Z,unstable-options,--report-ti
 
 ## Inspired by
 
-- [cargo-dinghy](https://github.com/sonos/dinghy)
+This project is based on [cargo-dinghy](https://github.com/sonos/dinghy).
+Furthermore ideas were taken from the following projects:
+
 - [cargo-ndk](https://github.com/bbqsrc/cargo-ndk)
 - [polyhorn](https://github.com/polyhorn)
 - [cargo-mobile](https://github.com/BrainiumLLC/cargo-mobile)
@@ -71,3 +81,20 @@ cargo-tai test --target aarch64-apple-ios --args -Z,unstable-options,--report-ti
 - [uikit-sys](https://github.com/simlay/uikit-sys)
 - [android-ndk-rs](https://github.com/rust-windowing/android-ndk-rs)
 - [cross](https://github.com/rust-embedded/cross)
+
+## Limitations/backward compatibility
+
+- currently only one device is supported
+- you can not specify the device
+- currently there are no plans to add support for older versions of xcode, ...
+
+
+# Documentation
+
+## Runnings tests on iOS
+
+## Runnings benchmarks on iOS
+
+
+
+## Runnings tests on Android

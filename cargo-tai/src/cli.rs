@@ -27,7 +27,12 @@ Supported targets:
     )]
     target: TargetInfo<'static>,
 
-    /// Android platform version: only required when "target" is "*-linux-android*"
+    /// Android API level: only required when "target" is "*-linux-android*"
+    ///
+    /// You can find platform version information in Android Studio's Create New Project wizard.
+    /// Example:
+    ///
+    /// `cargo-tai test --android_api_lvl 20`
     #[structopt(
         long,
         default_value = "21",
@@ -38,7 +43,7 @@ Supported targets:
             ("target", "armv7-linux-androideabi"),
         ])
     )]
-    android_platform: u8,
+    android_api_lvl: u8,
 
     /// The path to the android ndk: only required when "target" is "*-linux-android*"
     ///
@@ -123,7 +128,7 @@ impl From<Options> for task::Options {
             envs: general_opts.envs,
             resources: general_opts.resources,
             android: AndroidOptions {
-                platform: general_opts.android_platform,
+                api_lvl: general_opts.android_api_lvl,
                 ndk: general_opts.android_ndk,
             },
             cargo_args: general_opts.cargo_args,

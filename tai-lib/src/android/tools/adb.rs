@@ -13,6 +13,7 @@ use super::AndroidSdk;
 
 static DEVICE_REGEX: OnceCell<regex::Regex> = OnceCell::new();
 
+#[derive(Debug)]
 pub struct Device {
     pub id: String,
     pub arch: Arch<'static>,
