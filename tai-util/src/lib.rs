@@ -22,12 +22,15 @@ pub fn try_resources_file_path(test_data_id: &str) -> Option<PathBuf> {
 
 #[cfg(target_os = "ios")]
 pub mod ios {
+    //! https://docs.microsoft.com/de-de/xamarin/ios/app-fundamentals/file-system#application-directories
+    //! https://medium.com/@anandin02/ios-storage-best-practices-294fca83ad9
     use ns_path_utilities_sys::{
         INSArray,
         INSString,
         NSSearchPathDirectory,
+        NSSearchPathDirectory_NSApplicationSupportDirectory,
+        NSSearchPathDirectory_NSCachesDirectory,
         NSSearchPathDirectory_NSDocumentDirectory,
-        NSSearchPathDirectory_NSLibraryDirectory,
         NSSearchPathDomainMask,
         NSSearchPathDomainMask_NSUserDomainMask,
         NSSearchPathForDirectoriesInDomains,
@@ -36,16 +39,23 @@ pub mod ios {
     };
     use std::{os::raw::c_char, path::PathBuf};
 
-    pub fn user_library() -> PathBuf {
+    pub fn user_documents() -> PathBuf {
         get_path_for_documents(
-            NSSearchPathDirectory_NSLibraryDirectory,
+            NSSearchPathDirectory_NSDocumentDirectory,
             NSSearchPathDomainMask_NSUserDomainMask,
         )
     }
 
-    pub fn user_documents() -> PathBuf {
+    pub fn user_application_support() -> PathBuf {
         get_path_for_documents(
-            NSSearchPathDirectory_NSDocumentDirectory,
+            NSSearchPathDirectory_NSApplicationSupportDirectory,
+            NSSearchPathDomainMask_NSUserDomainMask,
+        )
+    }
+
+    pub fn user_cache() -> PathBuf {
+        get_path_for_documents(
+            NSSearchPathDirectory_NSCachesDirectory,
             NSSearchPathDomainMask_NSUserDomainMask,
         )
     }

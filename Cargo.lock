@@ -616,7 +616,6 @@ dependencies = [
 [[package]]
 name = "ns-path-utilities-sys"
 version = "0.0.1"
-source = "git+ssh://git@github.com/Robert-Steiner/ns-path-utilities-sys.git#584ad299ba455ed5720d1e7e192a8e385dff7c79"
 dependencies = [
  "bindgen",
  "block",

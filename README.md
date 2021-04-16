@@ -1,32 +1,11 @@
 # Cargo Tai
 
-## Tested Configurations
 
-**iOS**
-- Real device: iPhone 8 with iOS 14
-- Simulator: iPhone 12 with iOS 14
+## Features
 
-**Android**
-- Real device: Xiaomi Redmi Note 9 (aarch64), Android 10
-- Emulator: x84_64, Android 10 (API 29)
-
-**Host**
-- Intel based Mac with macOS BigSur 11.2.3
-
-- Xcode 12.4
-- ios-deploy 1.11.4
-
-- Android Studio 4.1.3
-- API level 21
-- NDK 22.1.7171670
-
-- cargo 1.49.0
-- cargo toolchains:
-  - `x86_64-linux-android`
-  - `aarch64-linux-android`
-  - `i686-linux-android`
-  - `armv7-linux-androideabi`
-
+- Run tests or benchmarks on iOS (simulator/real device) and Android (emulator/real device).
+- Support for `criterion` ([example](./test-project/benches/criterion.rs))
+- Include resources data that are required by tour test/benchmarks
 
 ## Host Requirements
 
@@ -41,11 +20,30 @@
 - [Android Studio](https://developer.android.com/studio)
 - Install Android NDK
 
-## Features
 
-- Run tests or benchmarks on iOS (simulator/real device) and Android (emulator/real device).
-- Support for `criterion` ([example](./test-project/benches/criterion.rs))
-- Include resources data that are required by tour test/benchmarks
+## Tested Configurations
+
+**iOS**
+- Real device: iPhone 8 with iOS 14
+- Simulator: iPhone 12 with iOS 14
+
+**Android**
+- Real device: Xiaomi Redmi Note 9 (aarch64), Android 10
+- Emulator: x84_64, Android 10 (API 29)
+
+**Host**
+- Intel based Mac with macOS BigSur 11.2.3
+- Xcode 12.4
+- ios-deploy 1.11.4
+- Android Studio 4.1.3
+- API level 21
+- NDK 22.1.7171670
+- cargo 1.49.0
+- cargo toolchains:
+  - `x86_64-linux-android`
+  - `aarch64-linux-android`
+  - `i686-linux-android`
+  - `armv7-linux-androideabi`
 
 ## Examples
 
@@ -87,14 +85,42 @@ Furthermore ideas were taken from the following projects:
 - currently only one device is supported
 - you can not specify the device
 - currently there are no plans to add support for older versions of xcode, ...
-
+- test data does not allow intra-links 
 
 # Documentation
 
+
+```
+cargo-tai test --target aarch64-apple-ios -- --release
+`-------’ `..’ `------------------------’    `.......’
+ binary   mode       cargo-tai args          cargo args
+```
+
 ## Runnings tests on iOS
+
+We are using the `test-project` project as an example
+
+```
+// run the tests and include the test data `test_txt`
+cargo-tai test --target aarch64-apple-ios -r test_txt=./data/test.txt
+
+// pass additional arguments to cargo
+cargo-tai test --target aarch64-apple-ios -- --release
+
+// pass additional arguments to cargo
+cargo-tai test --target aarch64-apple-ios -- --release
+```
 
 ## Runnings benchmarks on iOS
 
+We are using the `test-project` project as an example
+
+```
+// run the benchmarks
+cargo-tai bech --target aarch64-apple-ios
+
+ios-deploy --bundle_id 'robertt.debug.com.Dinghy.Dinghy' --download --to .
+```
 
 
 ## Runnings tests on Android
