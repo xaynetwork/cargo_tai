@@ -18,40 +18,44 @@ pub enum Mode {
 
 #[derive(Debug)]
 pub struct Options {
-    pub mode: Mode,
+    pub general: GeneralOptions,
 
+    pub platform: PlatformOptions,
+}
+
+#[derive(Debug)]
+pub struct GeneralOptions {
+    pub mode: Mode,
+    pub compiler: CompilerOptions,
+    pub binary: BinaryOptions,
+}
+
+#[derive(Debug)]
+pub struct CompilerOptions {
     /// Build for the target triples
     pub target: TargetInfo<'static>,
-
-    // application
-    pub args: Option<Vec<String>>,
-    pub envs: Option<Vec<(String, String)>>,
-    pub resources: Option<Vec<(String, PathBuf)>>,
-
-    // android
-    pub android: AndroidOptions,
-
-    // ios
-    pub ios: IosOptions,
 
     // cargo arguments
     pub cargo_args: Vec<String>,
 }
 
 #[derive(Debug)]
-pub struct AndroidOptions {
-    pub api_lvl: u8,
-    pub ndk: PathBuf,
+pub struct BinaryOptions {
+    pub args: Option<Vec<String>>,
+    pub envs: Option<Vec<(String, String)>>,
+    pub resources: Option<Vec<(String, PathBuf)>>,
 }
 
 #[derive(Debug)]
-pub struct IosOptions {
-    pub mobile_provision: PathBuf,
+pub struct PlatformOptions {
+    pub android_api_lvl: Option<u8>,
+    pub android_ndk: Option<PathBuf>,
+    pub ios_mobile_provision: Option<PathBuf>,
 }
 
-pub fn run_mode(requested: &Options) -> TaiResult<()> {
+pub fn run_mode(requested: Options) -> TaiResult<()> {
     debug!("run with options:\n{:?}", requested);
-    match requested.mode {
+    match requested.general.mode {
         Mode::Test => run_tests(requested),
         Mode::Bench => run_benches(requested),
     }

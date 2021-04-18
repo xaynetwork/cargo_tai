@@ -1,4 +1,5 @@
 use std::{
+    convert::TryFrom,
     fs::File,
     io::{BufRead, BufReader, Write},
     path::{Path, PathBuf},
@@ -17,38 +18,38 @@ use crate::{
         compiler::{bench_command, test_command},
         tools::{lldb, xcrun},
     },
-    task::Options,
+    task::{self, GeneralOptions},
     TaiResult,
 };
 
 use super::APP_ID;
 
 #[instrument(name = "benches", skip(requested))]
-pub fn run_benches(requested: &Options) -> TaiResult<()> {
-    let build_units = compile_benches(bench_command()?, requested)?;
+pub fn run_benches(requested: Options) -> TaiResult<()> {
+    let build_units = compile_benches(bench_command()?, &requested.general.compiler)?;
 
     let mut args_with_bench = vec!["--bench".to_string()];
-    if let Some(ref args) = requested.args {
+    if let Some(ref args) = requested.general.binary.args {
         args_with_bench.extend_from_slice(args);
     };
 
     run(
         build_units,
         &Some(args_with_bench),
-        &requested.envs,
-        &requested.resources,
+        &requested.general.binary.envs,
+        &requested.general.binary.resources,
     )
 }
 
 #[instrument(name = "tests", skip(requested))]
-pub fn run_tests(requested: &Options) -> TaiResult<()> {
-    let build_units = compile_tests(test_command()?, requested)?;
+pub fn run_tests(requested: Options) -> TaiResult<()> {
+    let build_units = compile_tests(test_command()?, &requested.general.compiler)?;
 
     run(
         build_units,
-        &requested.args,
-        &requested.envs,
-        &requested.resources,
+        &requested.general.binary.args,
+        &requested.general.binary.envs,
+        &requested.general.binary.resources,
     )
 }
 
@@ -195,5 +196,19 @@ fn extract_lldb_exit_status(stdout: &[u8]) -> TaiResult<u32> {
             "failed to parse lldb exit line for an exit status. {:?}",
             tokens
         )
+    }
+}
+
+pub struct Options {
+    pub general: GeneralOptions,
+}
+
+impl TryFrom<task::Options> for Options {
+    type Error = anyhow::Error;
+
+    fn try_from(opt: task::Options) -> Result<Self, Self::Error> {
+        Ok(Self {
+            general: opt.general,
+        })
     }
 }

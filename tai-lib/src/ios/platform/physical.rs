@@ -1,6 +1,9 @@
-use std::path::{Path, PathBuf};
+use std::{
+    convert::TryFrom,
+    path::{Path, PathBuf},
+};
 
-use anyhow::bail;
+use anyhow::{anyhow, bail};
 use tracing::{info, instrument};
 
 use crate::{
@@ -14,40 +17,40 @@ use crate::{
         compiler::{bench_command, test_command},
         tools::ios_deploy,
     },
-    task::Options,
+    task::{self, GeneralOptions},
     TaiResult,
 };
 
 use super::APP_ID;
 
 #[instrument(name = "benches", skip(requested))]
-pub fn run_benches(requested: &Options) -> TaiResult<()> {
-    let build_units = compile_benches(bench_command()?, requested)?;
+pub fn run_benches(requested: Options) -> TaiResult<()> {
+    let build_units = compile_benches(bench_command()?, &requested.general.compiler)?;
 
     let mut args_with_bench = vec!["--bench".to_string()];
-    if let Some(ref args) = requested.args {
+    if let Some(ref args) = requested.general.binary.args {
         args_with_bench.extend_from_slice(args);
     };
 
     run(
-        &requested.ios.mobile_provision,
+        &requested.mobile_provision,
         build_units,
         &Some(args_with_bench),
-        &requested.envs,
-        &requested.resources,
+        &requested.general.binary.envs,
+        &requested.general.binary.resources,
     )
 }
 
 #[instrument(name = "tests", skip(requested))]
-pub fn run_tests(requested: &Options) -> TaiResult<()> {
-    let build_units = compile_tests(test_command()?, requested)?;
+pub fn run_tests(requested: Options) -> TaiResult<()> {
+    let build_units = compile_tests(test_command()?, &requested.general.compiler)?;
 
     run(
-        &requested.ios.mobile_provision,
+        &requested.mobile_provision,
         build_units,
-        &requested.args,
-        &requested.envs,
-        &requested.resources,
+        &requested.general.binary.args,
+        &requested.general.binary.envs,
+        &requested.general.binary.resources,
     )
 }
 
@@ -103,5 +106,25 @@ where
                 err
             )
         }
+    }
+}
+
+pub struct Options {
+    pub general: GeneralOptions,
+
+    pub mobile_provision: PathBuf,
+}
+
+impl TryFrom<task::Options> for Options {
+    type Error = anyhow::Error;
+
+    fn try_from(opt: task::Options) -> Result<Self, Self::Error> {
+        Ok(Self {
+            general: opt.general,
+            mobile_provision: opt
+                .platform
+                .ios_mobile_provision
+                .ok_or_else(|| anyhow!("the option mobile_provision is missing"))?,
+        })
     }
 }

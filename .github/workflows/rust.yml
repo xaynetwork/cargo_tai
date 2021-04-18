@@ -286,4 +286,4 @@ jobs:
         with:
           arch: x86_64
           api-level: 29
-          script: cargo-tai test --target x86_64-linux-android -r test_txt=./test-project/data/test.txt --args -Z,unstable-options,--report-time --android-ndk $ANDROID_NDK_LATEST_HOME -- -p test-project && cargo-tai bench --target x86_64-linux-android --android-ndk $ANDROID_NDK_LATEST_HOME -- -p test-project --release
+          script: cargo-tai test --target x86_64-linux-android -r test_txt=./test-project/data/test.txt --args -Z,unstable-options,--report-time --android-api-lvl 21 --android-ndk $ANDROID_NDK_LATEST_HOME -- -p test-project && cargo-tai bench --target x86_64-linux-android --android-api-lvl 21 --android-ndk $ANDROID_NDK_LATEST_HOME -- -p test-project --release

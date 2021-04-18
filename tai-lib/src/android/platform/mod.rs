@@ -1,5 +1,5 @@
 use anyhow::{anyhow, bail};
-use std::{io::Write, path::PathBuf};
+use std::{convert::TryFrom, io::Write, path::PathBuf};
 use tracing::{debug, instrument};
 
 const ANDROID_REMOTE_WORKDIR: &str = "/data/local/tmp/cargo-tai";
@@ -11,19 +11,22 @@ use crate::{
     },
     bundle::{create_bundles, BuildBundle},
     compiler::{compile_benches, compile_tests, BuildUnit},
-    task::Options,
+    task::{self, GeneralOptions},
     TaiResult,
 };
 
 use super::compiler::{bench_command, test_command};
 
 #[instrument(name = "benches", skip(requested))]
-pub fn run_benches(requested: &Options) -> TaiResult<()> {
-    let sdk = AndroidSdk::derive_sdk(&requested.android.ndk)?;
-    let build_units = compile_benches(bench_command(&sdk, requested)?, requested)?;
+pub fn run_benches(requested: Options) -> TaiResult<()> {
+    let sdk = AndroidSdk::derive_sdk(&requested.android_ndk)?;
+    let build_units = compile_benches(
+        bench_command(&sdk, &requested)?,
+        &requested.general.compiler,
+    )?;
 
     let mut args_with_bench = vec!["--bench".to_string()];
-    if let Some(ref args) = requested.args {
+    if let Some(ref args) = requested.general.binary.args {
         args_with_bench.extend_from_slice(args);
     };
 
@@ -31,22 +34,22 @@ pub fn run_benches(requested: &Options) -> TaiResult<()> {
         &sdk,
         build_units,
         &Some(args_with_bench),
-        &requested.envs,
-        &requested.resources,
+        &requested.general.binary.envs,
+        &requested.general.binary.resources,
     )
 }
 
 #[instrument(name = "tests", skip(requested))]
-pub fn run_test(requested: &Options) -> TaiResult<()> {
-    let sdk = AndroidSdk::derive_sdk(&requested.android.ndk)?;
-    let build_units = compile_tests(test_command(&sdk, requested)?, requested)?;
+pub fn run_test(requested: Options) -> TaiResult<()> {
+    let sdk = AndroidSdk::derive_sdk(&requested.android_ndk)?;
+    let build_units = compile_tests(test_command(&sdk, &requested)?, &requested.general.compiler)?;
 
     run(
         &sdk,
         build_units,
-        &requested.args,
-        &requested.envs,
-        &requested.resources,
+        &requested.general.binary.args,
+        &requested.general.binary.envs,
+        &requested.general.binary.resources,
     )
 }
 
@@ -117,5 +120,30 @@ fn install_and_launch(
         Ok(())
     } else {
         bail!("test failed")
+    }
+}
+
+pub struct Options {
+    pub general: GeneralOptions,
+
+    pub android_api_lvl: u8,
+    pub android_ndk: PathBuf,
+}
+
+impl TryFrom<task::Options> for Options {
+    type Error = anyhow::Error;
+
+    fn try_from(opt: task::Options) -> Result<Self, Self::Error> {
+        Ok(Self {
+            general: opt.general,
+            android_api_lvl: opt
+                .platform
+                .android_api_lvl
+                .ok_or_else(|| anyhow!("the option android_api_lvl is missing"))?,
+            android_ndk: opt
+                .platform
+                .android_ndk
+                .ok_or_else(|| anyhow!("the option android_ndk is missing"))?,
+        })
     }
 }

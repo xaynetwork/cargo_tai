@@ -4,9 +4,9 @@ use anyhow::{bail, Context};
 use cfg_expr::targets::TargetInfo;
 use tracing::debug;
 
-use crate::{task::Options, TaiResult};
+use crate::TaiResult;
 
-use super::tools::AndroidSdk;
+use super::{platform::Options, tools::AndroidSdk};
 
 #[cfg(target_os = "macos")]
 const HOST_ARCH: &str = "darwin-x86_64";
@@ -83,37 +83,39 @@ fn toolchain_suffix(target: &TargetInfo<'static>, host_arch: &str, bin: &str) ->
 }
 
 fn setup_android_deps(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
-    let cc_key = format!("CC_{}", to_env_key(&requested.target));
-    let ar_key = format!("AR_{}", to_env_key(&requested.target));
-    let cxx_key = format!("CXX_{}", to_env_key(&requested.target));
+    let cc_key = format!("CC_{}", to_env_key(&requested.general.compiler.target));
+    let ar_key = format!("AR_{}", to_env_key(&requested.general.compiler.target));
+    let cxx_key = format!("CXX_{}", to_env_key(&requested.general.compiler.target));
 
     // https://github.com/rust-lang/rustup/blob/master/ci/docker/android/Dockerfile
     let cargo_ar_key = format!(
         "CARGO_TARGET_{}_{}",
-        to_cargo_env_key(&requested.target),
+        to_cargo_env_key(&requested.general.compiler.target),
         "AR"
     );
     let cargo_linker_key = format!(
         "CARGO_TARGET_{}_{}",
-        to_cargo_env_key(&requested.target),
+        to_cargo_env_key(&requested.general.compiler.target),
         "LINKER"
     );
 
-    let target_ar = &sdk
-        .ndk
-        .join(toolchain_suffix(&requested.target, &HOST_ARCH, "ar"));
+    let target_ar = &sdk.ndk.join(toolchain_suffix(
+        &requested.general.compiler.target,
+        &HOST_ARCH,
+        "ar",
+    ));
 
     let target_linker = &sdk.ndk.join(clang_suffix(
-        &requested.target,
+        &requested.general.compiler.target,
         &HOST_ARCH,
-        requested.android.api_lvl,
+        requested.android_api_lvl,
         "",
     ));
 
     let target_cxx = &sdk.ndk.join(clang_suffix(
-        &requested.target,
+        &requested.general.compiler.target,
         &HOST_ARCH,
-        requested.android.api_lvl,
+        requested.android_api_lvl,
         "++",
     ));
 

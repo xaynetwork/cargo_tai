@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use anyhow::{anyhow, Error};
 use cfg_expr::targets::{get_builtin_target_by_triple, TargetInfo};
 use structopt::{clap::ArgSettings, StructOpt};
-use tai_lib::task::{self, AndroidOptions, IosOptions, Mode};
+use tai_lib::task::{self, BinaryOptions, CompilerOptions, Mode, PlatformOptions};
 
 #[derive(StructOpt, Debug)]
 pub enum Options {
@@ -32,10 +32,9 @@ Supported targets:
     /// You can find platform version information in Android Studio's Create New Project wizard.
     /// Example:
     ///
-    /// `cargo-tai test --android_api_lvl 20`
+    /// `cargo-tai test --android-api-lvl 21`
     #[structopt(
         long,
-        default_value = "21",
         required_ifs(&[
             ("target", "x86_64-linux-android"),
             ("target", "aarch64-linux-android"),
@@ -43,16 +42,15 @@ Supported targets:
             ("target", "armv7-linux-androideabi"),
         ])
     )]
-    android_api_lvl: u8,
+    android_api_lvl: Option<u8>,
 
     /// The path to the android ndk: only required when "target" is "*-linux-android*"
     ///
     /// Example:
     ///
-    /// `cargo-tai test --android_ndk ~/Library/Android/sdk/ndk/22.1.7171670`
+    /// `cargo-tai test --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670`
     #[structopt(
         long,
-        default_value = "",
         required_ifs(&[
             ("target", "x86_64-linux-android"),
             ("target", "aarch64-linux-android"),
@@ -61,10 +59,10 @@ Supported targets:
         ]),
         env = "ANDROID_NDK_HOME"
     )]
-    android_ndk: PathBuf,
+    android_ndk: Option<PathBuf>,
 
-    #[structopt(long, default_value = "", required_if("target", "aarch64-apple-ios"))]
-    ios_mobile_provision: PathBuf,
+    #[structopt(long, required_if("target", "aarch64-apple-ios"))]
+    ios_mobile_provision: Option<PathBuf>,
 
     /// A comma-separated list of arguments to pass to the app when launching it.
     ///
@@ -126,19 +124,23 @@ impl From<Options> for task::Options {
         };
 
         Self {
-            mode,
-            target: general_opts.target,
-            args: general_opts.args,
-            envs: general_opts.envs,
-            resources: general_opts.resources,
-            android: AndroidOptions {
-                api_lvl: general_opts.android_api_lvl,
-                ndk: general_opts.android_ndk,
+            general: task::GeneralOptions {
+                mode,
+                compiler: CompilerOptions {
+                    target: general_opts.target,
+                    cargo_args: general_opts.cargo_args,
+                },
+                binary: BinaryOptions {
+                    args: general_opts.args,
+                    envs: general_opts.envs,
+                    resources: general_opts.resources,
+                },
             },
-            ios: IosOptions {
-                mobile_provision: general_opts.ios_mobile_provision,
+            platform: PlatformOptions {
+                android_api_lvl: general_opts.android_api_lvl,
+                android_ndk: general_opts.android_ndk,
+                ios_mobile_provision: general_opts.ios_mobile_provision,
             },
-            cargo_args: general_opts.cargo_args,
         }
     }
 }

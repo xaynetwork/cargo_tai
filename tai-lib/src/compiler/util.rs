@@ -6,7 +6,7 @@ use std::{
 use anyhow::{anyhow, bail};
 use cargo_metadata::{camino::Utf8PathBuf, diagnostic::DiagnosticLevel, Artifact, Message};
 
-use crate::{task::Options, TaiResult};
+use crate::{task::CompilerOptions, TaiResult};
 
 use super::BuildUnit;
 
@@ -31,7 +31,7 @@ pub fn is_bench(artifact: Artifact) -> Option<Utf8PathBuf> {
 
 pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
     mut cmd: Command,
-    requested: &Options,
+    requested: &CompilerOptions,
     f: F,
 ) -> TaiResult<Vec<BuildUnit>> {
     let cmd = extend_with_cargo_args(&mut cmd, requested)?;
@@ -75,7 +75,7 @@ pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
 
 pub fn extend_with_cargo_args<'a>(
     cmd: &'a mut Command,
-    requested: &Options,
+    requested: &CompilerOptions,
 ) -> TaiResult<&'a mut Command> {
     cmd.args(&requested.cargo_args);
 

@@ -39,5 +39,5 @@ fn main() -> Result<(), Error> {
         }
     }
 
-    run_mode(&requested_opt)
+    run_mode(requested_opt)
 }
