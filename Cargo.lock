@@ -1023,6 +1023,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_bytes"
+version = "0.11.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16ae07dd2f88a366f15bd0632ba725227018c69a1c8550a927324f8eb8368bb9"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "serde_cbor"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1131,6 +1140,7 @@ name = "tai-lib"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "base64",
  "cargo_metadata",
  "cfg-expr",
  "dirs",
@@ -1139,6 +1149,7 @@ dependencies = [
  "plist",
  "regex",
  "serde",
+ "serde_bytes",
  "serde_json",
  "simctl",
  "tai-util",

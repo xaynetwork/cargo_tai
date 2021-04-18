@@ -31,6 +31,9 @@ pub struct Options {
     // android
     pub android: AndroidOptions,
 
+    // ios
+    pub ios: IosOptions,
+
     // cargo arguments
     pub cargo_args: Vec<String>,
 }
@@ -39,6 +42,11 @@ pub struct Options {
 pub struct AndroidOptions {
     pub api_lvl: u8,
     pub ndk: PathBuf,
+}
+
+#[derive(Debug)]
+pub struct IosOptions {
+    pub mobile_provision: PathBuf,
 }
 
 pub fn run_mode(requested: &Options) -> TaiResult<()> {

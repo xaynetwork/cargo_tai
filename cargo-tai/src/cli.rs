@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use anyhow::{anyhow, Error};
 use cfg_expr::targets::{get_builtin_target_by_triple, TargetInfo};
 use structopt::{clap::ArgSettings, StructOpt};
-use tai_lib::task::{self, AndroidOptions, Mode};
+use tai_lib::task::{self, AndroidOptions, IosOptions, Mode};
 
 #[derive(StructOpt, Debug)]
 pub enum Options {
@@ -62,6 +62,9 @@ Supported targets:
         env = "ANDROID_NDK_HOME"
     )]
     android_ndk: PathBuf,
+
+    #[structopt(long, default_value = "", required_if("target", "aarch64-apple-ios"))]
+    ios_mobile_provision: PathBuf,
 
     /// A comma-separated list of arguments to pass to the app when launching it.
     ///
@@ -131,6 +134,9 @@ impl From<Options> for task::Options {
             android: AndroidOptions {
                 api_lvl: general_opts.android_api_lvl,
                 ndk: general_opts.android_ndk,
+            },
+            ios: IosOptions {
+                mobile_provision: general_opts.ios_mobile_provision,
             },
             cargo_args: general_opts.cargo_args,
         }

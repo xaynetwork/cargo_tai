@@ -21,7 +21,7 @@ use crate::{
     TaiResult,
 };
 
-const APP_ID: &str = "cargo-tai";
+use super::APP_ID;
 
 #[instrument(name = "benches", skip(requested))]
 pub fn run_benches(requested: &Options) -> TaiResult<()> {

@@ -18,7 +18,7 @@ use crate::{
     TaiResult,
 };
 
-pub const APP_NAME: &str = "Dinghy";
+use super::APP_ID;
 
 #[instrument(name = "benches", skip(requested))]
 pub fn run_benches(requested: &Options) -> TaiResult<()> {
@@ -30,6 +30,7 @@ pub fn run_benches(requested: &Options) -> TaiResult<()> {
     };
 
     run(
+        &requested.ios.mobile_provision,
         build_units,
         &Some(args_with_bench),
         &requested.envs,
@@ -42,6 +43,7 @@ pub fn run_tests(requested: &Options) -> TaiResult<()> {
     let build_units = compile_tests(test_command()?, requested)?;
 
     run(
+        &requested.ios.mobile_provision,
         build_units,
         &requested.args,
         &requested.envs,
@@ -49,15 +51,19 @@ pub fn run_tests(requested: &Options) -> TaiResult<()> {
     )
 }
 
-#[instrument(name = "run", skip(build_units))]
-pub fn run(
+#[instrument(name = "run", skip(provision, build_units))]
+pub fn run<P>(
+    provision: P,
     build_units: Vec<BuildUnit>,
     args: &Option<Vec<String>>,
     envs: &Option<Vec<(String, String)>>,
     resources: &Option<Vec<(String, PathBuf)>>,
-) -> TaiResult<()> {
+) -> TaiResult<()>
+where
+    P: AsRef<Path>,
+{
     let device = ios_deploy::list_device()?.unwrap();
-    let sig_settings = find_signing_settings(&device.id)?;
+    let sig_settings = find_signing_settings(&device.id, provision.as_ref())?;
 
     let bundles = create_bundles(build_units, |unit, bundles_root| {
         create_bundle(unit, bundles_root, resources, &sig_settings.app_id)
@@ -92,7 +98,7 @@ where
         Err(err) => {
             bail!(
                 "test {} {:?} failed with: {}",
-                APP_NAME,
+                APP_ID,
                 &bundle_root.as_ref(),
                 err
             )
