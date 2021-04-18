@@ -45,7 +45,7 @@ struct Data(#[serde(with = "serde_bytes")] Vec<u8>);
 pub fn sign_bundle(
     bundle: &BuildBundle,
     settings: &SigningSettings,
-    entitlements: &PathBuf,
+    entitlements: &Path,
 ) -> TaiResult<()> {
     debug!(
         "will sign {:?} using identity: {} and profile: {:?}",
@@ -56,7 +56,7 @@ pub fn sign_bundle(
 }
 
 #[instrument(name = "entitlements", skip(bundles_root, entitlements))]
-pub fn create_entitlements_file(bundles_root: &PathBuf, entitlements: &str) -> TaiResult<PathBuf> {
+pub fn create_entitlements_file(bundles_root: &Path, entitlements: &str) -> TaiResult<PathBuf> {
     let path = bundles_root.join(ENTITLEMENTS_XCENT);
     debug!("create entitlements file: {:?}", path);
 
@@ -73,7 +73,7 @@ pub fn create_entitlements_file(bundles_root: &PathBuf, entitlements: &str) -> T
     Ok(path)
 }
 
-pub fn find_signing_settings<'a, P: AsRef<Path>>(
+pub fn find_signing_settings<P: AsRef<Path>>(
     device_id: &str,
     profile: P,
 ) -> TaiResult<SigningSettings> {
