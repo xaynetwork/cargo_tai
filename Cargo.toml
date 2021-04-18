@@ -3,5 +3,6 @@ members = [
     "cargo-tai",
     "tai-lib",
     "tai-util",
+    "ns-path-utilities-sys",
     "test-project",
 ]

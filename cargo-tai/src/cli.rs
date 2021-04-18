@@ -52,6 +52,7 @@ Supported targets:
     /// `cargo-tai test --android_ndk ~/Library/Android/sdk/ndk/22.1.7171670`
     #[structopt(
         long,
+        default_value = "",
         required_ifs(&[
             ("target", "x86_64-linux-android"),
             ("target", "aarch64-linux-android"),

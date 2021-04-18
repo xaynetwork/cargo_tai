@@ -193,7 +193,7 @@ jobs:
 
   # test-on-ios-simulator:
   #   name: test-on-ios-simulator
-  #   needs: [registry-cache]
+  #   needs: [registry-cache, test]
   #   runs-on: macos-10.15
   #   timeout-minutes: 30
   #   steps:
@@ -247,7 +247,7 @@ jobs:
   test-on-android-emulator:
     name: test-on-android-emulator
     runs-on: ubuntu-20.04
-    needs: registry-cache
+    needs: [registry-cache, test]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
