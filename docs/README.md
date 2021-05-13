@@ -54,7 +54,7 @@ We choose `App` as a template and click `Next`.
 Next, we choose a product name (e.g. `rust-lib`), select a team and choose an unique org identifier.
 Click `Next` to continue.
 
-If you can't choose a team, you'll need to create one first via `Preferences` > `Accounts`> `+`.
+If you can't choose a team, you'll need to create one first via `Preferences` > `Accounts` > `+`.
 
 ![](../assets/project_location.png)
 
@@ -133,7 +133,7 @@ open Documents/target/report/index.html
 # run the benchmarks
 cargo-tai bench --target x86_64-apple-ios -- --release
 
-# find the /Documents folder
+# get the path of the /Documents folder
 xcrun simctl get_app_container booted cargo-tai data
 
 # open the report
@@ -160,6 +160,6 @@ cargo-tai test --target aarch64-linux-android  --android-api-lvl 21 --android-nd
 
 #### Running benchmarks on Android
 
-## Cargo-tai logs
+## cargo-tai logs
 
-If you are interested in what `Cargo-Tai` does, you can increase the log verbosity via `RUST_LOG=debug`.
+If you are interested in what `cargo-tai` does, you can increase the log verbosity via `RUST_LOG=debug`.
