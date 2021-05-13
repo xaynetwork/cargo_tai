@@ -2,8 +2,6 @@
 
 Test and benchmark your Rust library on mobile devices with ease.
 
-**Note**
-
 Much of this project is based on the work of [cargo-dinghy](https://github.com/sonos/dinghy).
 Furthermore, ideas were taken from the following projects:
 
@@ -28,11 +26,19 @@ Furthermore, ideas were taken from the following projects:
 - Xcode
 - [ios-deploy](https://github.com/ios-control/ios-deploy)
 - A valid iOS Development certificate
+- toolchains:
+  - `x86_64-apple-ios`
+  - `aarch64-apple-ios`
 
 ### Android
 
 - [Android Studio](https://developer.android.com/studio)
 - Android NDK
+- toolchains:
+  - `x86_64-linux-android`
+  - `aarch64-linux-android`
+  - `i686-linux-android`
+  - `armv7-linux-androideabi`
 
 ## Tested Configurations
 
@@ -57,19 +63,8 @@ Furthermore, ideas were taken from the following projects:
   - `aarch64-linux-android`
   - `i686-linux-android`
   - `armv7-linux-androideabi`
-
-## Examples
-
-```
-
-
-// run tests on android device
-ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/22.1.7171670 cargo-tai test --target aarch64-linux-android --envs TAI=1 TAI2=22
-
-
-//
-cargo-tai test --target aarch64-apple-ios --args -Z,unstable-options,--report-time -- --release
-```
+  - `x86_64-apple-ios`
+  - `aarch64-apple-ios`
 
 ## Limitations/backward compatibility
 
@@ -86,7 +81,6 @@ cargo-tai test --target aarch64-apple-ios -- --release
 `-------’ `..’ `------------------------’    `.......’
  binary   mode       cargo-tai args          cargo args
 ```
-
 
 ## Setup iOS
 
@@ -107,7 +101,7 @@ security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprov
 <dict>
 ...
   <key>Name</key>
-	<string>iOS Team Provisioning Profile: your.domain.com.rust-lib</string>
+  <string>iOS Team Provisioning Profile: your.domain.com.rust-lib</string>
 ...
 </dict>
 </plist>
@@ -180,3 +174,13 @@ or via the `Finder`
 ![](assets/finder.png)
 
 ## Runnings tests on Android
+
+## Examples
+
+```
+
+
+// run tests on android device
+ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/22.1.7171670 cargo-tai test --target aarch64-linux-android --envs TAI=1 TAI2=22
+
+```
