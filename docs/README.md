@@ -1,4 +1,3 @@
-
 # Documentation
 
 <!--ts-->
@@ -10,11 +9,12 @@
          * [Running tests on iOS](#running-tests-on-ios)
          * [Running benchmarks on iOS](#running-benchmarks-on-ios)
       * [Android](#android)
+         * [Setup (real device only)](#setup-real-device-only-1)
          * [Runnings tests on Android](#runnings-tests-on-android)
          * [Running benchmarks on Android](#running-benchmarks-on-android)
    * [cargo-tai logs](#cargo-tai-logs)
 
-<!-- Added by: robert, at: Fri May 14 14:15:38 CEST 2021 -->
+<!-- Added by: robert, at: Fri May 14 16:20:09 CEST 2021 -->
 
 <!--te-->
 
@@ -89,7 +89,7 @@ If the org identifier + the product name matches the last part of the
 
 #### Running tests on iOS
 
-We are using the `test-project` as an example
+We are using the `test-project` as an example.
 
 **Real device**
 
@@ -116,7 +116,7 @@ cargo-tai test --target x86_64-apple-ios --args test_x86_64_ios, -- --release
 
 #### Running benchmarks on iOS
 
-We are using the `test-project` as an example
+We are using the `test-project` as an example.
 
 **Real device**
 
@@ -157,22 +157,39 @@ which allows the report to be accessed via the `Files` app or via the `Finder`.
 
 ### Android
 
+#### Setup (real device only)
+
+You need to enable `USB file transfer` and `USB debugging`.
+
 #### Runnings tests on Android
 
-We are using the `test-project` as an example
+We are using the `test-project` as an example.
 
 ```shell
 # run the tests and include the test data `test.txt`
-cargo-tai test --target aarch64-linux-android  --android-api-lvl 21 --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670 -r test_txt=./data/test.txt
+cargo-tai test --target aarch64-linux-android --android-api-lvl 21 --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670 -r test_txt=./data/test.txt
 ```
 
 #### Running benchmarks on Android
 
+`cargo-tai` installs a bundle for each test/benchmark binary in its own directory `/data/local/tmp/cargo-tai/<Name of Bundle>`.
+The directory will be deleted after the test/benchmark has been run. If you want to persist the benchmark report, you will need to
+change the path of `CRITERION_HOME` (for example to [`/data/local/tmp/cargo-tai`](../test-project/benches/criterion.rs)).
+
 ```shell
 # run the benchmarks
-cargo-tai bench --target aarch64-linux-android  --android-api-lvl 21 --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670 -- --release
+cargo-tai bench --target aarch64-linux-android --android-api-lvl 21 --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670 -- --release
+
+# get the id of the device
+adb devices
+
+# download the /data/local/tmp/cargo-tai folder
+adb -s <ID> pull /data/local/tmp/cargo-tai .
+
+# open the report
+open cargo-tai/report/index.html
 ```
 
-## cargo-tai logs
+## `cargo-tai` logs
 
 If you are interested in what `cargo-tai` does, you can increase the log verbosity via `RUST_LOG=debug`.

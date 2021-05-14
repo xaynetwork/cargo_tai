@@ -23,6 +23,18 @@ fn main() {
         std::env::set_var("CRITERION_HOME", path);
     }
 
+    #[cfg(target_os = "android")]
+    {
+        let path = std::env::current_exe().expect("current exe path not accessible");
+        let path = path
+            .parent()
+            .map(|p| p.parent())
+            .flatten()
+            .expect("parent folder does not exist");
+        std::fs::create_dir(&path);
+        std::env::set_var("CRITERION_HOME", path);
+    }
+
     benches();
 
     criterion::Criterion::default()
