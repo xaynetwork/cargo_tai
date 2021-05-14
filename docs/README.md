@@ -12,9 +12,9 @@
       * [Android](#android)
          * [Runnings tests on Android](#runnings-tests-on-android)
          * [Running benchmarks on Android](#running-benchmarks-on-android)
-   * [Cargo-tai logs](#cargo-tai-logs)
+   * [cargo-tai logs](#cargo-tai-logs)
 
-<!-- Added by: robert, at: Thu May 13 17:59:27 CEST 2021 -->
+<!-- Added by: robert, at: Fri May 14 14:15:38 CEST 2021 -->
 
 <!--te-->
 
@@ -62,13 +62,17 @@ Choose a location for your project and click on `Create`.
 
 ![](../assets/created_project.png)
 
-As the last step, we start the app on our device via Xcode. This step will install the certificate
-that we have to accept via the phone settings `General` > `Device Management`.
+Finally, we start the app on our device via Xcode. This step will install the certificate
+on the phone that we have to accept via the settings `General` > `Device Management`.
 
+To find the right profile with which the project was created you can use the following command.
 
 ```shell
 security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprovision
 ```
+
+If the org identifier + the product name matches the last part of the
+`string`, you have found the right profile.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -140,25 +144,34 @@ xcrun simctl get_app_container booted cargo-tai data
 open /Users/xayn/Library/Developer/CoreSimulator/Devices/125E4403-E4AA-4AB0-ABC4-1E3C8882CD9F/data/Containers/Data/Application/32EB09BE-493A-456F-AC86-3EB9091129E2/Documents/target/report/index.html
 ```
 
+In `test-project/benches/criterion.rs` we store the benchmark report in `user_documents`
+which allows the report to be accessed via the `Files` app or via the `Finder`.
 
-via the `Files` App
+**`Files` App**
 
-![](assets/bench_data.png)
+![](../assets/bench_data.png)
 
-or via the `Finder`
+**`Finder`**
 
-![](assets/finder.png)
+![](../assets/finder.png)
 
 ### Android
 
 #### Runnings tests on Android
 
+We are using the `test-project` as an example
+
 ```shell
-// run tests on android device
+# run the tests and include the test data `test.txt`
 cargo-tai test --target aarch64-linux-android  --android-api-lvl 21 --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670 -r test_txt=./data/test.txt
 ```
 
 #### Running benchmarks on Android
+
+```shell
+# run the benchmarks
+cargo-tai bench --target aarch64-linux-android  --android-api-lvl 21 --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670 -- --release
+```
 
 ## cargo-tai logs
 

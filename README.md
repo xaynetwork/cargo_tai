@@ -19,6 +19,11 @@ Furthermore, ideas were taken from the following projects:
 - Support for running benchmarks with `criterion` ([example](./test-project/benches/criterion.rs))
 - Bundle resource data that is required for our tests / benchmarks
 
+
+## Documentation
+
+[Documentation](docs/README.md)
+
 ## Host Requirements
 
 ### iOS (macOS only)
