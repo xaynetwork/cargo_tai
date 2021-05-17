@@ -40,7 +40,7 @@ pub fn launch_app<P: AsRef<Path>>(
 
 pub fn list_device() -> TaiResult<Option<Device>> {
     let output = Command::new(IOS_DEPLOY)
-        .args(&["--detect", "--detect", "--timeout", "1", "--json"])
+        .args(&["--detect", "--timeout", "1", "--json"])
         .output()?;
     let devices: Option<Devices> =
         serde_json::from_slice(&output.stdout).map_err(|_| anyhow!("Cannot find any devices"))?;
