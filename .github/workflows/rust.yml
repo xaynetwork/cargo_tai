@@ -37,8 +37,9 @@ jobs:
         uses: actions/cache@v2.1.5
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
           key: ${{ steps.cache-key.outputs.key }}
           restore-keys: ${{ runner.os }}-cargo-registry-${{ steps.get-date.outputs.date }}-
 
@@ -67,8 +68,9 @@ jobs:
         uses: actions/cache@v2.1.5
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
           key: ${{ needs.registry-cache.outputs.cache-key }}
 
       # cargo fmt does not create any artifacts, therefore we don't need to cache the target folder
@@ -96,8 +98,9 @@ jobs:
         uses: actions/cache@v2.1.5
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
           key: ${{ needs.registry-cache.outputs.cache-key }}
 
       - name: Cache build artifacts
@@ -136,8 +139,9 @@ jobs:
         uses: actions/cache@v2.1.5
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
           key: ${{ needs.registry-cache.outputs.cache-key }}
 
       - name: Cache build artifacts
@@ -173,8 +177,9 @@ jobs:
         uses: actions/cache@v2.1.5
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
           key: ${{ needs.registry-cache.outputs.cache-key }}
 
       - name: Cache build artifacts
@@ -213,8 +218,9 @@ jobs:
   #       uses: actions/cache@v2.1.5
   #       with:
   #         path: |
-  #           ~/.cargo/registry
-  #           ~/.cargo/git
+            # ~/.cargo/registry/index
+            # ~/.cargo/registry/cache
+            # ~/.cargo/git/db
   #         key: ${{ needs.registry-cache.outputs.cache-key }}
 
   #     - name: Start iOS simulator
@@ -265,8 +271,9 @@ jobs:
         uses: actions/cache@v2.1.5
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
           key: ${{ needs.registry-cache.outputs.cache-key }}
 
       - name: Cache build artifacts
