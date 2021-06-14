@@ -13,7 +13,7 @@ readme = "../README.md"
 edition = "2018"
 
 [dependencies]
-anyhow = "1.0.40"
+anyhow = "1.0.41"
 base64 = "0.13.0"
 cargo_metadata = "0.13.1"
 cfg-expr = "0.7.4"
