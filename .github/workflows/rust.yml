@@ -6,6 +6,7 @@ on:
 env:
   RUST_STABLE: 1.52.1
   RUST_NIGHTLY: nightly-2021-05-10
+  ACTION_CHECKOUT: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
 permissions:
   contents: read
@@ -26,7 +27,7 @@ jobs:
       cache-date: ${{ steps.get-date.outputs.date }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+        uses: ${{ env.ACTION_CHECKOUT }}
 
       # We want to create a new cache after a week. Otherwise, the cache will
       # take up too much space by caching old dependencies
