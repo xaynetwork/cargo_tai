@@ -8,10 +8,10 @@ env:
   RUST_NIGHTLY: nightly-2021-05-10
 
 jobs:
-  registry-cache:
+  cargo-registry-cache:
     # we use the latest stable rustc + cargo version that is already installed on the image
     # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md#rust-tools
-    name: cargo-fetch
+    name: cargo-registry-cache
     runs-on: ubuntu-20.04
     timeout-minutes: 5
     outputs:
@@ -19,7 +19,7 @@ jobs:
       cache-date: ${{ steps.get-date.outputs.date }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
       # We want to create a new cache after a week. Otherwise, the cache will
       # take up too much space by caching old dependencies
@@ -31,33 +31,32 @@ jobs:
       - name: Generate cargo registry cache key
         id: cache-key
         shell: bash
-        run: echo "::set-output name=key::$(echo ${{ runner.os }}-cargo-registry-${{ steps.get-date.outputs.date }}-${{ hashFiles('**/Cargo.lock') }})"
+        run: echo "::set-output name=key::$(echo ${{ runner.os }}-${{ github.job }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('**/Cargo.lock') }})"
 
       - name: Restore cargo registry ${{ steps.cache-key.outputs.key }} cache
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
         with:
           path: |
             ~/.cargo/registry/index
             ~/.cargo/registry/cache
             ~/.cargo/git/db
           key: ${{ steps.cache-key.outputs.key }}
-          restore-keys: ${{ runner.os }}-cargo-registry-${{ steps.get-date.outputs.date }}-
+          restore-keys: ${{ runner.os }}-${{ github.job }}-${{ steps.get-date.outputs.date }}-
 
       - name: Fetch dependencies
         run: cargo fetch
 
-  format:
-    name: cargo-fmt
-    needs: registry-cache
+  cargo-format:
+    name: cargo-format
+    needs: cargo-registry-cache
     runs-on: ubuntu-20.04
     timeout-minutes: 10
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
       - name: Install ${{ env.RUST_NIGHTLY }} toolchain
-        id: rust-toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           profile: minimal
           toolchain: ${{ env.RUST_NIGHTLY }}
@@ -65,50 +64,50 @@ jobs:
           default: true
 
       - name: Use cached cargo registry
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
         with:
           path: |
             ~/.cargo/registry/index
             ~/.cargo/registry/cache
             ~/.cargo/git/db
-          key: ${{ needs.registry-cache.outputs.cache-key }}
+          key: ${{ needs.cargo-registry-cache.outputs.cache-key }}
 
       # cargo fmt does not create any artifacts, therefore we don't need to cache the target folder
       - name: cargo fmt
         run: cargo fmt --all -- --check
 
-  check:
+  cargo-check:
     name: cargo-check
-    needs: registry-cache
+    needs: cargo-registry-cache
     runs-on: ubuntu-20.04
     timeout-minutes: 20
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
       - name: Install ${{ env.RUST_STABLE }} toolchain
         id: rust-toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           profile: minimal
           toolchain: ${{ env.RUST_STABLE }}
           default: true
 
       - name: Use cached cargo registry
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
         with:
           path: |
             ~/.cargo/registry/index
             ~/.cargo/registry/cache
             ~/.cargo/git/db
-          key: ${{ needs.registry-cache.outputs.cache-key }}
+          key: ${{ needs.cargo-registry-cache.outputs.cache-key }}
 
       - name: Cache build artifacts
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
         with:
           path: ${{ github.workspace }}/target
-          key: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.rustc }}-check-${{ needs.registry-cache.outputs.cache-date }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.rustc }}-check-${{ needs.registry-cache.outputs.cache-date }}-
+          key: ${{ runner.os }}-${{ steps.rust-toolchain.outputs.rustc }}-${{ github.job }}-${{ needs.cargo-registry-cache.outputs.cache-date }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-${{ steps.rust-toolchain.outputs.rustc }}-${{ github.job }}-${{ needs.cargo-registry-cache.outputs.cache-date }}-
 
       - name: cargo check
         env:
@@ -117,18 +116,18 @@ jobs:
           cargo check --all-targets
           cargo check --all-targets --all-features
 
-  clippy:
+  cargo-clippy:
     name: cargo-clippy
-    needs: [registry-cache, check]
+    needs: [cargo-registry-cache, cargo-check]
     runs-on: ubuntu-20.04
     timeout-minutes: 20
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
       - name: Install ${{ env.RUST_STABLE }} toolchain
         id: rust-toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           profile: minimal
           toolchain: ${{ env.RUST_STABLE }}
@@ -136,58 +135,58 @@ jobs:
           default: true
 
       - name: Use cached cargo registry
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
         with:
           path: |
             ~/.cargo/registry/index
             ~/.cargo/registry/cache
             ~/.cargo/git/db
-          key: ${{ needs.registry-cache.outputs.cache-key }}
+          key: ${{ needs.cargo-registry-cache.outputs.cache-key }}
 
       - name: Cache build artifacts
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
         with:
           path: ${{ github.workspace }}/target
-          key: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.rustc }}-clippy-${{ needs.registry-cache.outputs.cache-date }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.rustc }}-clippy-${{ needs.registry-cache.outputs.cache-date }}-
+          key: ${{ runner.os }}-${{ steps.rust-toolchain.outputs.rustc }}-${{ github.job }}-${{ needs.cargo-registry-cache.outputs.cache-date }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-${{ steps.rust-toolchain.outputs.rustc }}-${{ github.job }}-${{ needs.cargo-registry-cache.outputs.cache-date }}-
 
       - name: cargo clippy
         run: |
           cargo clippy --all-targets -- --deny warnings
           cargo clippy --all-targets --all-features -- --deny warnings
 
-  test:
+  cargo-test:
     name: cargo-test
-    needs: [registry-cache, check]
+    needs: [cargo-registry-cache, cargo-check]
     runs-on: ubuntu-20.04
     timeout-minutes: 20
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
       - name: Install ${{ env.RUST_STABLE }} toolchain
         id: rust-toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           profile: minimal
           toolchain: ${{ env.RUST_STABLE }}
           default: true
 
       - name: Use cached cargo registry
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
         with:
           path: |
             ~/.cargo/registry/index
             ~/.cargo/registry/cache
             ~/.cargo/git/db
-          key: ${{ needs.registry-cache.outputs.cache-key }}
+          key: ${{ needs.cargo-registry-cache.outputs.cache-key }}
 
       - name: Cache build artifacts
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
         with:
           path: ${{ github.workspace }}/target
-          key: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.rustc }}-tests-${{ needs.registry-cache.outputs.cache-date }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.rustc }}-tests-${{ needs.registry-cache.outputs.cache-date }}-
+          key: ${{ runner.os }}-${{ steps.rust-toolchain.outputs.rustc }}-${{ github.job }}-${{ needs.cargo-registry-cache.outputs.cache-date }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-${{ steps.rust-toolchain.outputs.rustc }}-${{ github.job }}-${{ needs.cargo-registry-cache.outputs.cache-date }}-
 
       - name: Run tests
         env:
@@ -196,71 +195,71 @@ jobs:
           cargo test --workspace --exclude test-project
           cargo test --all-targets --all-features --workspace --exclude test-project
 
-  # test-on-ios-simulator:
-  #   name: test-on-ios-simulator
-  #   needs: [registry-cache, test]
-  #   runs-on: macos-10.15
-  #   timeout-minutes: 30
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v2
+  test-on-ios-simulator:
+    name: test-on-ios-simulator
+    needs: [cargo-registry-cache, cargo-test]
+    runs-on: macos-10.15
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
-  #     - name: Install ${{ env.RUST_STABLE }} toolchain
-  #       id: rust-toolchain
-  #       uses: actions-rs/toolchain@v1
-  #       with:
-  #         profile: minimal
-  #         toolchain: ${{ env.RUST_STABLE }}
-  #         target: x86_64-apple-ios
-  #         default: true
+      - name: Install ${{ env.RUST_STABLE }} toolchain
+        id: rust-toolchain
+        uses: actions-rs/toolchain@v16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
+        with:
+          profile: minimal
+          toolchain: ${{ env.RUST_STABLE }}
+          target: x86_64-apple-ios
+          default: true
 
-  #     - name: Use cached cargo registry
-  #       uses: actions/cache@v2.1.6
-  #       with:
-  #         path: |
-            # ~/.cargo/registry/index
-            # ~/.cargo/registry/cache
-            # ~/.cargo/git/db
-  #         key: ${{ needs.registry-cache.outputs.cache-key }}
+      - name: Use cached cargo registry
+        uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+          key: ${{ needs.cargo-registry-cache.outputs.cache-key }}
 
-  #     - name: Start iOS simulator
-  #       run: |
-  #         xcrun simctl create "Test Device" "iPhone 12 Pro" iOS14.4
-  #         xcrun simctl boot "Test Device"
+      - name: Start iOS simulator
+        run: |
+          xcrun simctl create "Test Device" "iPhone 12 Pro" iOS14.4
+          xcrun simctl boot "Test Device"
 
-  #     - name: Cache build artifacts
-  #       uses: actions/cache@v2.1.6
-  #       with:
-  #         path: ${{ github.workspace }}/target
-  #         key: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.rustc }}-test-on-ios-simulator-${{ needs.registry-cache.outputs.cache-date }}-${{ hashFiles('**/Cargo.lock') }}
-  #         restore-keys: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.rustc }}-test-on-ios-simulator-${{ needs.registry-cache.outputs.cache-date }}-
+      - name: Cache build artifacts
+        uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
+        with:
+          path: ${{ github.workspace }}/target
+          key: ${{ runner.os }}-${{ steps.rust-toolchain.outputs.rustc }}-${{ github.job }}-${{ needs.cargo-registry-cache.outputs.cache-date }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-${{ steps.rust-toolchain.outputs.rustc }}-${{ github.job }}-${{ needs.cargo-registry-cache.outputs.cache-date }}-
 
-  #     - name: Install cargo-tai
-  #       run: cargo install --path cargo-tai --debug
+      - name: Install cargo-tai
+        run: cargo install --path cargo-tai --debug
 
-  #     - name: Run iOS test
-  #       working-directory: ${{ github.workspace }}/test-project
-  #       env:
-  #         RUST_LOG: "tai=trace"
-  #       run: cargo-tai test --target x86_64-apple-ios -r test_txt=./data/test.txt --args -Z,unstable-options,--report-time
+      - name: Run iOS test
+        working-directory: ${{ github.workspace }}/test-project
+        env:
+          RUST_LOG: "tai=trace"
+        run: cargo-tai test --target x86_64-apple-ios -r test_txt=./data/test.txt --args -Z,unstable-options,--report-time
 
-  #     - name: Run iOS benchmark
-  #       working-directory: ${{ github.workspace }}/test-project
-  #       env:
-  #         RUST_LOG: "tai=trace"
-  #       run: cargo-tai bench --target x86_64-apple-ios -- --release
+      - name: Run iOS benchmark
+        working-directory: ${{ github.workspace }}/test-project
+        env:
+          RUST_LOG: "tai=trace"
+        run: cargo-tai bench --target x86_64-apple-ios -- --release
 
   test-on-android-emulator:
     name: test-on-android-emulator
     runs-on: ubuntu-20.04
-    needs: [registry-cache, test]
+    needs: [cargo-registry-cache, cargo-test]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
       - name: Install ${{ env.RUST_STABLE }} toolchain
         id: rust-toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           profile: minimal
           toolchain: ${{ env.RUST_STABLE }}
@@ -268,26 +267,26 @@ jobs:
           default: true
 
       - name: Use cached cargo registry
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
         with:
           path: |
             ~/.cargo/registry/index
             ~/.cargo/registry/cache
             ~/.cargo/git/db
-          key: ${{ needs.registry-cache.outputs.cache-key }}
+          key: ${{ needs.cargo-registry-cache.outputs.cache-key }}
 
       - name: Cache build artifacts
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
         with:
           path: ${{ github.workspace }}/target
-          key: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.rustc }}-test-on-ios-simulator-${{ needs.registry-cache.outputs.cache-date }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-${{ steps.rust-toolchain.outputs.rustc }}-test-on-ios-simulator-${{ needs.registry-cache.outputs.cache-date }}-
+          key: ${{ runner.os }}-${{ steps.rust-toolchain.outputs.rustc }}-${{ github.job }}-${{ needs.cargo-registry-cache.outputs.cache-date }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-${{ steps.rust-toolchain.outputs.rustc }}-${{ github.job }}-${{ needs.cargo-registry-cache.outputs.cache-date }}-
 
       - name: Install cargo-tai
         run: cargo install --path cargo-tai --debug
 
       - name: Run android tests and benchmarks
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@226f26251f06f2df1115cdd9620ea6517a46fdc8 # v2.17.0
         env:
           RUST_LOG: "tai=trace"
         with:
