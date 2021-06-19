@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
       - name: Install ${{ env.RUST_NIGHTLY }} toolchain
-        uses: actions-rs/toolchain@v16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           profile: minimal
           toolchain: ${{ env.RUST_NIGHTLY }}
@@ -93,7 +93,7 @@ jobs:
 
       - name: Install ${{ env.RUST_STABLE }} toolchain
         id: rust-toolchain
-        uses: actions-rs/toolchain@v16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           profile: minimal
           toolchain: ${{ env.RUST_STABLE }}
@@ -133,7 +133,7 @@ jobs:
 
       - name: Install ${{ env.RUST_STABLE }} toolchain
         id: rust-toolchain
-        uses: actions-rs/toolchain@v16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           profile: minimal
           toolchain: ${{ env.RUST_STABLE }}
@@ -172,7 +172,7 @@ jobs:
 
       - name: Install ${{ env.RUST_STABLE }} toolchain
         id: rust-toolchain
-        uses: actions-rs/toolchain@v16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           profile: minimal
           toolchain: ${{ env.RUST_STABLE }}
@@ -212,7 +212,7 @@ jobs:
 
       - name: Install ${{ env.RUST_STABLE }} toolchain
         id: rust-toolchain
-        uses: actions-rs/toolchain@v16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           profile: minimal
           toolchain: ${{ env.RUST_STABLE }}
@@ -265,7 +265,7 @@ jobs:
 
       - name: Install ${{ env.RUST_STABLE }} toolchain
         id: rust-toolchain
-        uses: actions-rs/toolchain@v16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           profile: minimal
           toolchain: ${{ env.RUST_STABLE }}
