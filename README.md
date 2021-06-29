@@ -17,7 +17,7 @@ Furthermore, ideas were taken from the following projects:
 
 - Run tests or benchmarks on iOS (simulator/real device) and Android (emulator/real device)
 - Support for running benchmarks with `criterion` ([example](./test-project/benches/criterion.rs))
-- Bundle resource data that is required for our tests / benchmarks
+- Bundle resource data that is required for your tests / benchmarks
 
 
 ## Documentation
