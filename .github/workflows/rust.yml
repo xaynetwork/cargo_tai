@@ -4,8 +4,8 @@ on:
   push:
 
 env:
-  RUST_STABLE: 1.52.1
-  RUST_NIGHTLY: nightly-2021-05-10
+  RUST_STABLE: 1.53.0
+  RUST_NIGHTLY: nightly-2021-03-23
 
 permissions:
   contents: read
