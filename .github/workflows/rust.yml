@@ -293,7 +293,7 @@ jobs:
         run: cargo install --path cargo-tai --debug
 
       - name: Run android tests and benchmarks
-        uses: reactivecircus/android-emulator-runner@ac874f3db5eccbb177697a00f8f609695ac2b15e # v2.18.0
+        uses: reactivecircus/android-emulator-runner@ac874f3db5eccbb177697a00f8f609695ac2b15e # v2.19.0
         env:
           RUST_LOG: "tai=trace"
         with:
