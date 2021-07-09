@@ -1,6 +1,5 @@
 # Documentation
 
-<!--ts-->
 * [Documentation](#documentation)
    * [Installation](#installation)
    * [Usage](#usage)
@@ -13,10 +12,6 @@
          * [Runnings tests on Android](#runnings-tests-on-android)
          * [Running benchmarks on Android](#running-benchmarks-on-android)
    * [cargo-tai logs](#cargo-tai-logs)
-
-<!-- Added by: robert, at: Fri May 14 16:20:09 CEST 2021 -->
-
-<!--te-->
 
 ## Installation
 
