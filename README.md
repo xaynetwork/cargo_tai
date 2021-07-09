@@ -15,9 +15,9 @@ Furthermore, ideas were taken from the following projects:
 
 ## Features
 
-- Run tests or benchmarks on iOS (simulator/real device) and Android (emulator/real device)
-- Support for running benchmarks with `criterion` ([example](./test-project/benches/criterion.rs))
-- Bundle resource data that is required for your tests / benchmarks
+- Run tests or benchmarks on iOS (simulator/real device) and Android (emulator/real device).
+- Support for running benchmarks with `criterion` ([example](./test-project/benches/criterion.rs)).
+- Bundle resource data that is required for your tests/benchmarks.
 
 ## Documentation
 
@@ -75,7 +75,7 @@ Furthermore, ideas were taken from the following projects:
 
 ## Limitations/Backwards Compatibility
 
-- Tests and benchmarks can only be run on one device
+- Tests and benchmarks can only be run on one device.
   - (cargo-tai will use the first device that is returned by `adb devices -l`, `xcrun simctl list -j devices available booted` or `ios-deploy -c --json`)
-- There are currently no plans to add support for older versions of Xcode and other tools
-- Resource data is included in all test/benchmark binary bundles even if they are not needed
+- There are currently no plans to add support for older versions of Xcode and other tools.
+- Resource data is included in all test/benchmark binary bundles even if they are not needed.
