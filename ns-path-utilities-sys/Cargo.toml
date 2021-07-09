@@ -1,10 +1,10 @@
 [package]
 name = "ns-path-utilities-sys"
 version = "0.0.1"
-authors = ["Robert Steiner <robertt.debug@gmail.com>"]
-license = "MIT/Apache-2.0"
+authors = ["Xayn Engineering <engineering@xaynet.dev>"]
+license = "Apache-2.0"
 description = "Mobile-testing made easier"
-repository = "https://github.com/Robert-Steiner/cargo-tai"
+repository = "https://github.com/xaynetwork/cargo_tai"
 keywords = [
     "test", "mobile", "ios", "android", "cargo"
 ]
