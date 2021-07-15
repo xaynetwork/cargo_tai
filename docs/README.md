@@ -15,7 +15,11 @@
 
 ## Installation
 
-`cargo install --git`
+```shell
+cargo install --git https://github.com/xaynetwork/cargo_tai
+# or
+cargo install --git ssh://git@github.com/xaynetwork/cargo_tai
+```
 
 ## Usage
 
