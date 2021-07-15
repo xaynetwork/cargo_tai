@@ -15,7 +15,7 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0.42"
 base64 = "0.13.0"
-cargo_metadata = "0.13.1"
+cargo_metadata = "0.14.0"
 cfg-expr = "0.7.4"
 serde = "1.0.126"
 serde_bytes = "0.11.5"
