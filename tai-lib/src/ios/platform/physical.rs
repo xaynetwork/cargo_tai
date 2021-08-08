@@ -100,9 +100,9 @@ where
         }
         Err(err) => {
             bail!(
-                "test {} {:?} failed with: {}",
+                "test {} {} failed with: {}",
                 APP_ID,
-                &bundle_root.as_ref(),
+                &bundle_root.as_ref().display(),
                 err
             )
         }

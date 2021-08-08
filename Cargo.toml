@@ -1,8 +1,8 @@
 [workspace]
 members = [
     "cargo-tai",
+    "ns-path-utilities-sys",
     "tai-lib",
     "tai-util",
-    "ns-path-utilities-sys",
     "test-project",
 ]

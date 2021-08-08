@@ -28,13 +28,13 @@ pub fn create_bundle<P: AsRef<Path>>(
     let bundle_root = version_root.join(format!("{}.app", APP_DISPLAY_NAME));
 
     create_dir_all(&bundle_root)
-        .with_context(|| format!("Failed to create bundle root {:?}", bundle_root))?;
-    debug!("create dir: {:?}", bundle_root);
+        .with_context(|| format!("Failed to create bundle root {}", bundle_root.display()))?;
+    debug!("create dir: {}", bundle_root.display());
 
     let to = bundle_root.join(&unit.name);
     copy(&unit.executable, &to)
-        .with_context(|| format!("Failed to copy executable {:?}", unit.executable))?;
-    debug!("copy {:?} to {:?}", &unit.executable, to);
+        .with_context(|| format!("Failed to copy executable {}", unit.executable.display()))?;
+    debug!("copy {} to {}", &unit.executable.display(), to.display());
 
     create_plist(&bundle_root, &unit, app_id)
         .with_context(|| format!("Failed to create {}", INFO_PLIST))?;
@@ -71,7 +71,7 @@ fn create_plist<P: AsRef<Path>>(
 ) -> TaiResult<PathBuf> {
     let path = bundle_root.as_ref().join(INFO_PLIST);
 
-    debug!("create file: {:?}", path);
+    debug!("create file: {}", path.display());
     let plist = File::create(&path)?;
     plist::to_writer_xml(
         plist,

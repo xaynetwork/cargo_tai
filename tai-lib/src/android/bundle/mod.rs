@@ -20,10 +20,10 @@ pub fn create_bundle<P: AsRef<Path>>(
     let bundle_root = bundles_root.as_ref().join(&unit.name);
 
     create_dir_all(&bundle_root)?;
-    debug!("create dir: {:?}", bundle_root);
+    debug!("create dir: {}", bundle_root.display());
     let to = bundle_root.join(&unit.name);
     copy(&unit.executable, &to)?;
-    debug!("copy {:?} to {:?}", &unit.executable, to);
+    debug!("copy {} to {}", &unit.executable.display(), to.display());
     copy_resources(&bundle_root, resources)?;
 
     Ok(BuildBundle {

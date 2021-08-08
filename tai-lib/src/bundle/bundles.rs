@@ -53,17 +53,21 @@ pub fn copy_resources<P: AsRef<Path>>(
     if let Some(resources) = resources {
         debug!("copy resources");
         let test_data_root = bundle_root.as_ref().join(tai_util::DATA_DIR_NAME);
-        create_dir(&test_data_root)
-            .with_context(|| format!("Failed to create resource root {:?}", test_data_root))?;
-        debug!("create dir: {:?}", test_data_root);
+        create_dir(&test_data_root).with_context(|| {
+            format!(
+                "Failed to create resource root {}",
+                test_data_root.display()
+            )
+        })?;
+        debug!("create dir: {}", test_data_root.display());
 
         let copied: TaiResult<Vec<()>> = resources
             .iter()
             .map(|(id, local_path)| {
                 let remote_path = test_data_root.join(id);
                 copy(local_path, &remote_path)
-                    .with_context(|| format!("Failed to copy resource {:?}", local_path))?;
-                debug!("copy {:?} to {:?}", local_path, remote_path);
+                    .with_context(|| format!("Failed to copy resource {}", local_path.display()))?;
+                debug!("copy {} to {}", local_path.display(), remote_path.display());
                 Ok(())
             })
             .collect();

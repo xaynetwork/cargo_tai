@@ -8,11 +8,10 @@ repository = "https://github.com/xaynetwork/cargo_tai"
 keywords = [
     "test", "mobile", "ios", "android", "cargo"
 ]
-categories = [ "development-tools::cargo-plugins", "development-tools::testing" , "development-tools::profiling" ]
+categories = ["development-tools::cargo-plugins", "development-tools::testing", "development-tools::profiling"]
 readme = "../README.md"
 edition = "2018"
 publish = false
-
 
 [dependencies]
 # sodiumoxide = "0.2.6"

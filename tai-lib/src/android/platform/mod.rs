@@ -87,10 +87,14 @@ fn install_and_launch(
     adb::mkdir(sdk, device, &remote_workdir)?;
 
     let remote_root = remote_workdir.join(&bundle.root.file_name().unwrap());
-    debug!("copy from: {:?} to: {:?}", bundle.root, remote_root);
+    debug!(
+        "copy from: {} to: {}",
+        bundle.root.display(),
+        remote_root.display()
+    );
     adb::sync(sdk, device, &bundle.root, &remote_root)?;
     let remote_exe = remote_root.join(&bundle.build_unit.name);
-    debug!("chmod {:?}", remote_exe);
+    debug!("chmod {}", remote_exe.display());
     adb::chmod(sdk, device, &remote_exe)?;
 
     let envs_as_string = if let Some(envs) = envs {
