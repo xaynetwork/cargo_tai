@@ -3,17 +3,19 @@ mod test;
 
 use std::path::PathBuf;
 
-use bench::run_benches;
+use bench::{run_bench, run_benches};
 use cfg_expr::targets::TargetInfo;
-use test::run_tests;
+use test::{run_test, run_tests};
 use tracing::debug;
 
 use crate::TaiResult;
 
 #[derive(Debug)]
 pub enum Mode {
-    Test,
     Bench,
+    Test,
+    Benches,
+    Tests,
 }
 
 #[derive(Debug)]
@@ -56,7 +58,9 @@ pub struct PlatformOptions {
 pub fn run_mode(requested: Options) -> TaiResult<()> {
     debug!("run with options:\n{:?}", requested);
     match requested.general.mode {
-        Mode::Test => run_tests(requested),
-        Mode::Bench => run_benches(requested),
+        Mode::Bench => run_bench(requested),
+        Mode::Test => run_test(requested),
+        Mode::Benches => run_benches(requested),
+        Mode::Tests => run_tests(requested),
     }
 }
