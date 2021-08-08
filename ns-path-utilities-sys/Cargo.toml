@@ -13,7 +13,7 @@ readme = "../README.md"
 edition = "2018"
 
 [build-dependencies]
-bindgen = "0.58.1"
+bindgen = "0.59.1"
 
 [target.'cfg(target_os = "ios")'.dependencies]
 objc = "0.2.7"
