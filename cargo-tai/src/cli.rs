@@ -7,8 +7,14 @@ use tai_lib::task::{self, BinaryOptions, CompilerOptions, Mode, PlatformOptions}
 
 #[derive(StructOpt, Debug)]
 pub enum Options {
+    #[structopt(about = "Benchmark only the specified bench target")]
     Bench(GeneralOptions),
+    #[structopt(about = "Test only the specified test target")]
     Test(GeneralOptions),
+    #[structopt(about = "Benchmark all benches")]
+    Benches(GeneralOptions),
+    #[structopt(about = "Test all tests")]
+    Tests(GeneralOptions),
 }
 
 #[derive(StructOpt, Debug)]
@@ -121,6 +127,8 @@ impl From<Options> for task::Options {
         let (mode, general_opts) = match opt {
             Options::Bench(opts) => (Mode::Bench, opts),
             Options::Test(opts) => (Mode::Test, opts),
+            Options::Benches(opts) => (Mode::Benches, opts),
+            Options::Tests(opts) => (Mode::Tests, opts),
         };
 
         Self {

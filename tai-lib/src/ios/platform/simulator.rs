@@ -3,6 +3,7 @@ use std::{
     fs::File,
     io::{BufRead, BufReader, Write},
     path::{Path, PathBuf},
+    process::Command,
 };
 
 use anyhow::{anyhow, bail, Error};
@@ -15,7 +16,7 @@ use crate::{
     compiler::{compile_benches, compile_tests, BuildUnit},
     ios::{
         bundle::bundler::create_bundle,
-        compiler::{bench_command, test_command},
+        compiler::{bench_command, benches_command, test_command, tests_command},
         tools::{lldb, xcrun},
     },
     task::{self, GeneralOptions},
@@ -24,9 +25,29 @@ use crate::{
 
 use super::APP_ID;
 
+#[instrument(name = "bench", skip(requested))]
+pub fn run_bench(requested: Options) -> TaiResult<()> {
+    compile_and_run_benches(requested, bench_command()?)
+}
+
 #[instrument(name = "benches", skip(requested))]
 pub fn run_benches(requested: Options) -> TaiResult<()> {
-    let build_units = compile_benches(bench_command()?, &requested.general.compiler)?;
+    compile_and_run_benches(requested, benches_command()?)
+}
+
+#[instrument(name = "test", skip(requested))]
+pub fn run_test(requested: Options) -> TaiResult<()> {
+    compile_and_run_tests(requested, test_command()?)
+}
+
+#[instrument(name = "tests", skip(requested))]
+pub fn run_tests(requested: Options) -> TaiResult<()> {
+    compile_and_run_tests(requested, tests_command()?)
+}
+
+#[instrument(skip(requested, cmd))]
+fn compile_and_run_benches(requested: Options, cmd: Command) -> TaiResult<()> {
+    let build_units = compile_benches(cmd, &requested.general.compiler)?;
 
     let mut args_with_bench = vec!["--bench".to_string()];
     if let Some(ref args) = requested.general.binary.args {
@@ -41,9 +62,9 @@ pub fn run_benches(requested: Options) -> TaiResult<()> {
     )
 }
 
-#[instrument(name = "tests", skip(requested))]
-pub fn run_tests(requested: Options) -> TaiResult<()> {
-    let build_units = compile_tests(test_command()?, &requested.general.compiler)?;
+#[instrument(skip(requested, cmd))]
+fn compile_and_run_tests(requested: Options, cmd: Command) -> TaiResult<()> {
+    let build_units = compile_tests(cmd, &requested.general.compiler)?;
 
     run(
         build_units,

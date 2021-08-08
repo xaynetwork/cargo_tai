@@ -1,5 +1,5 @@
 use anyhow::{anyhow, bail};
-use std::{convert::TryFrom, io::Write, path::PathBuf};
+use std::{convert::TryFrom, io::Write, path::PathBuf, process::Command};
 use tracing::{debug, instrument};
 
 const ANDROID_REMOTE_WORKDIR: &str = "/data/local/tmp/cargo-tai";
@@ -15,15 +15,35 @@ use crate::{
     TaiResult,
 };
 
-use super::compiler::{bench_command, test_command};
+use super::compiler::{bench_command, benches_command, test_command, tests_command};
+
+#[instrument(name = "bench", skip(requested))]
+pub fn run_bench(requested: Options) -> TaiResult<()> {
+    let sdk = AndroidSdk::derive_sdk(&requested.android_ndk)?;
+    compile_and_run_benches(&sdk, &requested, bench_command(&sdk, &requested)?)
+}
 
 #[instrument(name = "benches", skip(requested))]
 pub fn run_benches(requested: Options) -> TaiResult<()> {
     let sdk = AndroidSdk::derive_sdk(&requested.android_ndk)?;
-    let build_units = compile_benches(
-        bench_command(&sdk, &requested)?,
-        &requested.general.compiler,
-    )?;
+    compile_and_run_benches(&sdk, &requested, benches_command(&sdk, &requested)?)
+}
+
+#[instrument(name = "test", skip(requested))]
+pub fn run_test(requested: Options) -> TaiResult<()> {
+    let sdk = AndroidSdk::derive_sdk(&requested.android_ndk)?;
+    compile_and_run_tests(&sdk, &requested, test_command(&sdk, &requested)?)
+}
+
+#[instrument(name = "tests", skip(requested))]
+pub fn run_tests(requested: Options) -> TaiResult<()> {
+    let sdk = AndroidSdk::derive_sdk(&requested.android_ndk)?;
+    compile_and_run_tests(&sdk, &requested, tests_command(&sdk, &requested)?)
+}
+
+#[instrument(skip(sdk, requested, cmd))]
+fn compile_and_run_benches(sdk: &AndroidSdk, requested: &Options, cmd: Command) -> TaiResult<()> {
+    let build_units = compile_benches(cmd, &requested.general.compiler)?;
 
     let mut args_with_bench = vec!["--bench".to_string()];
     if let Some(ref args) = requested.general.binary.args {
@@ -31,7 +51,7 @@ pub fn run_benches(requested: Options) -> TaiResult<()> {
     };
 
     run(
-        &sdk,
+        sdk,
         build_units,
         &Some(args_with_bench),
         &requested.general.binary.envs,
@@ -39,13 +59,12 @@ pub fn run_benches(requested: Options) -> TaiResult<()> {
     )
 }
 
-#[instrument(name = "tests", skip(requested))]
-pub fn run_test(requested: Options) -> TaiResult<()> {
-    let sdk = AndroidSdk::derive_sdk(&requested.android_ndk)?;
-    let build_units = compile_tests(test_command(&sdk, &requested)?, &requested.general.compiler)?;
+#[instrument(skip(sdk, requested, cmd))]
+fn compile_and_run_tests(sdk: &AndroidSdk, requested: &Options, cmd: Command) -> TaiResult<()> {
+    let build_units = compile_tests(cmd, &requested.general.compiler)?;
 
     run(
-        &sdk,
+        sdk,
         build_units,
         &requested.general.binary.args,
         &requested.general.binary.envs,

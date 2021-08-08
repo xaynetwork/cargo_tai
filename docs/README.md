@@ -24,8 +24,8 @@ cargo install --git ssh://git@github.com/xaynetwork/cargo_tai
 ## Usage
 
 ```
-cargo-tai test --target aarch64-apple-ios -- --release
-`-------’ `..’ `------------------------’    `.......’
+cargo-tai tests --target aarch64-apple-ios -- --release
+`-------’ `...’ `------------------------’    `.......’
  binary   mode       cargo-tai args          cargo args
 ```
 
@@ -93,24 +93,28 @@ We are using the `test-project` as an example.
 **Real device**
 
 ```shell
-# run the tests and include the test data `test.txt`
-cargo-tai test --target aarch64-apple-ios -r test_txt=./data/test.txt --ios-mobile-provision ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprovision
+# run all test binaries (unit/integration) and include the test data `test.txt`
+cargo-tai tests --target aarch64-apple-ios -r test_txt=./data/test.txt --ios-mobile-provision ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprovision
 
-# compile the tests in release mode
-cargo-tai test --target aarch64-apple-ios --ios-mobile-provision ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprovision -- --release
+# compile and run all test binaries in release mode
+cargo-tai tests --target aarch64-apple-ios -r test_txt=./data/test.txt --ios-mobile-provision ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprovision -- --release
 ```
 
 **Simulator**
 
 ```shell
-# run the tests and include the test data `test.txt`
-cargo-tai test --target x86_64-apple-ios
+# run all test binaries and include the test data `test.txt`
+cargo-tai tests --target x86_64-apple-ios -r test_txt=./data/test.txt
 
-# pass additional arguments to the test binaries
-cargo-tai test --target x86_64-apple-ios --args -Z,unstable-options,--report-time
+# pass additional arguments to all test binaries
+cargo-tai tests --target x86_64-apple-ios -r test_txt=./data/test.txt --args -Z,unstable-options,--report-time
+
+# run a specific integration test binary
+# https://doc.rust-lang.org/cargo/reference/cargo-targets.html#integration-tests
+cargo-tai test --target x86_64-apple-ios --args test_x86_64_ios, -- integration
 
 # run a specific test in release mode
-cargo-tai test --target x86_64-apple-ios --args test_x86_64_ios, -- --release
+cargo-tai tests --target x86_64-apple-ios --args test_x86_64_ios, -- --release
 ```
 
 #### Running benchmarks on iOS
@@ -120,8 +124,10 @@ We are using the `test-project` as an example.
 **Real device**
 
 ```shell
-# run the benchmarks
-cargo-tai bench --target aarch64-apple-ios --ios-mobile-provision ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprovision -- --release
+# run all benchmark binaries
+cargo-tai benches --target aarch64-apple-ios --ios-mobile-provision ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprovision
+# or run a specific benchmark binary
+cargo-tai bench --target aarch64-apple-ios --ios-mobile-provision ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprovision -- criterion
 
 # download the /Documents folder
 ios-deploy --bundle_id 'your.domain.com.rust-lib' --download=/Documents --to .
@@ -133,8 +139,8 @@ open Documents/target/report/index.html
 **Simulator**
 
 ```shell
-# run the benchmarks
-cargo-tai bench --target x86_64-apple-ios -- --release
+# run all benchmark binaries
+cargo-tai benches --target x86_64-apple-ios
 
 # get the path of the /Documents folder
 xcrun simctl get_app_container booted cargo-tai data
@@ -165,8 +171,8 @@ You need to enable `USB file transfer` and `USB debugging`.
 We are using the `test-project` as an example.
 
 ```shell
-# run the tests and include the test data `test.txt`
-cargo-tai test --target aarch64-linux-android --android-api-lvl 21 --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670 -r test_txt=./data/test.txt
+# run all test binaries (unit/integration) and include the test data `test.txt`
+cargo-tai tests --target aarch64-linux-android --android-api-lvl 21 --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670 -r test_txt=./data/test.txt
 ```
 
 #### Running benchmarks on Android
@@ -176,8 +182,8 @@ The directory will be deleted after the test/benchmark has been run. If you want
 change the path of `CRITERION_HOME` (for example to [`/data/local/tmp/cargo-tai`](../test-project/benches/criterion.rs)).
 
 ```shell
-# run the benchmarks
-cargo-tai bench --target aarch64-linux-android --android-api-lvl 21 --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670 -- --release
+# run all benchmark binaries
+cargo-tai benches --target aarch64-linux-android --android-api-lvl 21 --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670
 
 # get the id of the device
 adb devices
