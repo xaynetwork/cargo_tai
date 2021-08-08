@@ -76,7 +76,7 @@ where
     bundles
         .bundles
         .iter()
-        .try_for_each(|bundle| sign_bundle(&bundle, &sig_settings, &entitlements))?;
+        .try_for_each(|bundle| sign_bundle(bundle, &sig_settings, &entitlements))?;
 
     bundles
         .bundles

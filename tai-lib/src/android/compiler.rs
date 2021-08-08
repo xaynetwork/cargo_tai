@@ -101,25 +101,25 @@ fn setup_android_deps(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Comman
 
     let target_ar = &sdk.ndk.join(toolchain_suffix(
         &requested.general.compiler.target,
-        &HOST_ARCH,
+        HOST_ARCH,
         "ar",
     ));
 
     let target_linker = &sdk.ndk.join(clang_suffix(
         &requested.general.compiler.target,
-        &HOST_ARCH,
+        HOST_ARCH,
         requested.android_api_lvl,
         "",
     ));
 
     let target_cxx = &sdk.ndk.join(clang_suffix(
         &requested.general.compiler.target,
-        &HOST_ARCH,
+        HOST_ARCH,
         requested.android_api_lvl,
         "++",
     ));
 
-    check_if_utils_exists(&[&target_ar, &target_linker, &target_cxx])
+    check_if_utils_exists(&[target_ar, target_linker, target_cxx])
         .with_context(|| "Did you choose the right Android API level?")?;
 
     debug!("{}={}", cc_key, target_linker.display());
