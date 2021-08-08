@@ -5,7 +5,8 @@ use std::{
     time::SystemTime,
 };
 
-use anyhow::{anyhow, bail};
+use anyhow::{anyhow, bail, Context};
+use chrono::{DateTime, Utc};
 use openssl::{nid::Nid, x509::X509};
 use serde::Deserialize;
 use tracing::{debug, instrument};
@@ -48,8 +49,10 @@ pub fn sign_bundle(
     entitlements: &Path,
 ) -> TaiResult<()> {
     debug!(
-        "will sign {:?} using identity: {} and profile: {:?}",
-        bundle.root, settings.identity_name, settings.provision
+        "will sign {} using identity: {} and profile: {}",
+        bundle.root.display(),
+        settings.identity_name,
+        settings.provision.display()
     );
 
     codesign::sign(&settings.identity_name, &entitlements, &bundle.root)
@@ -58,7 +61,7 @@ pub fn sign_bundle(
 #[instrument(name = "entitlements", skip(bundles_root, entitlements))]
 pub fn create_entitlements_file(bundles_root: &Path, entitlements: &str) -> TaiResult<PathBuf> {
     let path = bundles_root.join(ENTITLEMENTS_XCENT);
-    debug!("create entitlements file: {:?}", path);
+    debug!("create entitlements file: {}", path.display());
 
     let mut plist = File::create(&path)?;
     writeln!(plist, r#"<?xml version="1.0" encoding="UTF-8"?>"#)?;
@@ -78,7 +81,12 @@ pub fn find_signing_settings<P: AsRef<Path>>(
     profile: P,
 ) -> TaiResult<SigningSettings> {
     let output = security::decode_cms(profile.as_ref())?.stdout;
-    let mobile_provision: MobileProvision = plist::from_bytes(&output)?;
+    let mobile_provision: MobileProvision = plist::from_bytes(&output).with_context(|| {
+        format!(
+            "Failed to load mobile profile: {}",
+            profile.as_ref().display()
+        )
+    })?;
 
     let cert_decoded = &mobile_provision
         .developer_certificates
@@ -95,7 +103,10 @@ pub fn find_signing_settings<P: AsRef<Path>>(
 
     let expiration_date: SystemTime = mobile_provision.expiration_date.into();
     if expiration_date < SystemTime::now() {
-        bail!("profile expired on: {:?}", expiration_date);
+        bail!(
+            "profile expired on: {}",
+            <DateTime<Utc>>::from(expiration_date)
+        );
     }
 
     if !mobile_provision

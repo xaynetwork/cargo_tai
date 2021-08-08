@@ -8,14 +8,14 @@ repository = "https://github.com/xaynetwork/cargo_tai"
 keywords = [
     "test", "mobile", "ios", "android", "cargo"
 ]
-categories = [ "development-tools::cargo-plugins", "development-tools::testing" ]
+categories = ["development-tools::cargo-plugins", "development-tools::testing"]
 readme = "../README.md"
 edition = "2018"
 
 [dependencies]
 anyhow = "1.0.42"
 cfg-expr = "0.8.1"
-tracing = "0.1.26"
-tracing-subscriber = "0.2.19"
 structopt = "0.3.22"
 tai-lib = { path = "../tai-lib", features = ["ios"] }
+tracing = "0.1.26"
+tracing-subscriber = "0.2.19"

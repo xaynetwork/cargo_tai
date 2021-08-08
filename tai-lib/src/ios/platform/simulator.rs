@@ -87,7 +87,7 @@ fn install_and_launch<P: AsRef<Path>>(
         .uninstall(APP_ID)
         .map_err(|_| anyhow!("failed to uninstall: {}", APP_ID))?;
 
-    info!("install: {:?}", bundle_root);
+    info!("install: {}", bundle_root.display());
     device
         .install(bundle_root.as_ref())
         .map_err(|_| anyhow!("failed to install: {}", APP_ID))?;
@@ -100,9 +100,9 @@ fn install_and_launch<P: AsRef<Path>>(
         }
         ec => {
             bail!(
-                "test {} {:?} failed with exit code: {}",
+                "test {} {} failed with exit code: {}",
                 APP_ID,
-                bundle_root,
+                bundle_root.display(),
                 ec
             )
         }
@@ -146,7 +146,7 @@ fn create_lldb_script(app_pid: &str) -> Result<(PathBuf, TempDir), Error> {
         app_pid = app_pid,
     ))?;
 
-    debug!("temp lldb-script: {:?}", path);
+    debug!("temp lldb-script: {}", path.display());
     Ok((path, temp_dir))
 }
 
