@@ -61,7 +61,7 @@ pub fn run(
     envs: &Option<Vec<(String, String)>>,
     resources: &Option<Vec<(String, PathBuf)>>,
 ) -> TaiResult<()> {
-    let devices = adb::devices(&sdk)?
+    let devices = adb::devices(sdk)?
         .pop()
         .ok_or_else(|| anyhow!("no android device available"))?;
 
@@ -72,7 +72,7 @@ pub fn run(
     bundles
         .bundles
         .iter()
-        .try_for_each(|bundle| install_and_launch(&sdk, &devices.id, &bundle, args, envs))
+        .try_for_each(|bundle| install_and_launch(sdk, &devices.id, bundle, args, envs))
 }
 
 #[instrument(name = "install_launch", skip(sdk, bundle))]
@@ -84,11 +84,11 @@ fn install_and_launch(
     envs: &Option<Vec<(String, String)>>,
 ) -> TaiResult<()> {
     let remote_workdir = PathBuf::from(ANDROID_REMOTE_WORKDIR);
-    adb::mkdir(&sdk, device, &remote_workdir)?;
+    adb::mkdir(sdk, device, &remote_workdir)?;
 
     let remote_root = remote_workdir.join(&bundle.root.file_name().unwrap());
     debug!("copy from: {:?} to: {:?}", bundle.root, remote_root);
-    adb::sync(&sdk, device, &bundle.root, &remote_root)?;
+    adb::sync(sdk, device, &bundle.root, &remote_root)?;
     let remote_exe = remote_root.join(&bundle.build_unit.name);
     debug!("chmod {:?}", remote_exe);
     adb::chmod(sdk, device, &remote_exe)?;
@@ -110,11 +110,11 @@ fn install_and_launch(
         args = args.as_ref().unwrap_or(&vec![]).join(" ")
     );
 
-    let result = adb::run(&sdk, device, &start_script)?;
+    let result = adb::run(sdk, device, &start_script)?;
     let _ = std::io::stdout().write(result.stdout.as_slice());
     let _ = std::io::stderr().write(result.stderr.as_slice());
 
-    adb::rm(&sdk, device, &remote_root)?;
+    adb::rm(sdk, device, &remote_root)?;
 
     if result.status.success() {
         Ok(())
