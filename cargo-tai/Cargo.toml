@@ -13,7 +13,7 @@ readme = "../README.md"
 edition = "2018"
 
 [dependencies]
-anyhow = "1.0.42"
+anyhow = "1.0.43"
 cfg-expr = "0.8.1"
 structopt = "0.3.22"
 tai-lib = { path = "../tai-lib", features = ["ios"] }
