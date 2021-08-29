@@ -17,7 +17,7 @@ pub fn launch_app<P: AsRef<Path>>(
     envs: &Option<Vec<(String, String)>>,
 ) -> TaiResult<()> {
     let mut cmd = Command::new(IOS_DEPLOY);
-    cmd.args(&["--noninteractive", "--debug"]);
+    cmd.args(&["--noninteractive", "--debug", "--no-wifi"]);
 
     if let Some(args) = args {
         cmd.args(&["--args", &args.join(" ")]);
@@ -38,23 +38,24 @@ pub fn launch_app<P: AsRef<Path>>(
         .expect_success(&format!("{} command failed", IOS_DEPLOY))
 }
 
-pub fn list_device() -> TaiResult<Option<Device>> {
+pub fn list_device() -> TaiResult<Vec<Device>> {
     let output = Command::new(IOS_DEPLOY)
-        .args(&["--detect", "--timeout", "1", "--json"])
+        .args(&["--detect", "--timeout", "1", "--json", "--no-wifi"])
         .output()?;
-    let devices: Option<Devices> =
-        serde_json::from_slice(&output.stdout).map_err(|_| anyhow!("Cannot find any devices"))?;
-    if let Some(devices) = devices {
-        Ok(Some(devices.device))
-    } else {
-        Ok(None)
-    }
+    // ios-deploy does not emit a valid json array, therefore we need to manipulate the output first
+    let output = format!(
+        "[ {} ]",
+        String::from_utf8_lossy(&output.stdout).replace("}{", "},{")
+    );
+
+    let devices: Vec<Devices> = serde_json::from_str(&output)
+        .map_err(|_| anyhow!("Failed to deserialize ios_deploy output"))?;
+
+    Ok(devices.into_iter().map(|device| device.device).collect())
 }
 
 #[derive(Deserialize, Debug)]
-struct Devices {
-    #[serde(rename = "Event")]
-    event: String,
+pub struct Devices {
     #[serde(rename = "Device")]
     device: Device,
 }

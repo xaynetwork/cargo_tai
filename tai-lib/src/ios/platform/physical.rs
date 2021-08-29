@@ -86,7 +86,10 @@ pub fn run<P>(
 where
     P: AsRef<Path>,
 {
-    let device = ios_deploy::list_device()?.unwrap();
+    let devices = ios_deploy::list_device()?;
+    let device = devices
+        .first()
+        .ok_or_else(|| anyhow!("Cannot find any devices"))?;
     let sig_settings = find_signing_settings(&device.id, provision.as_ref())?;
 
     let bundles = create_bundles(build_units, |unit, bundles_root| {

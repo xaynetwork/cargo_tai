@@ -7,7 +7,10 @@ const ANDROID_REMOTE_WORKDIR: &str = "/data/local/tmp/cargo-tai";
 use crate::{
     android::{
         bundle::create_bundle,
-        tools::{adb, AndroidSdk},
+        tools::{
+            adb::{self, Device},
+            AndroidSdk,
+        },
     },
     bundle::{create_bundles, BuildBundle},
     compiler::{compile_benches, compile_tests, BuildUnit},
@@ -52,6 +55,7 @@ fn compile_and_run_benches(sdk: &AndroidSdk, requested: &Options, cmd: Command) 
 
     run(
         sdk,
+        requested,
         build_units,
         &Some(args_with_bench),
         &requested.general.binary.envs,
@@ -65,6 +69,7 @@ fn compile_and_run_tests(sdk: &AndroidSdk, requested: &Options, cmd: Command) ->
 
     run(
         sdk,
+        requested,
         build_units,
         &requested.general.binary.args,
         &requested.general.binary.envs,
@@ -72,15 +77,19 @@ fn compile_and_run_tests(sdk: &AndroidSdk, requested: &Options, cmd: Command) ->
     )
 }
 
-#[instrument(name = "run", skip(sdk, build_units))]
+#[instrument(name = "run", skip(sdk, build_units, requested))]
 pub fn run(
     sdk: &AndroidSdk,
+    requested: &Options,
     build_units: Vec<BuildUnit>,
     args: &Option<Vec<String>>,
     envs: &Option<Vec<(String, String)>>,
     resources: &Option<Vec<(String, PathBuf)>>,
 ) -> TaiResult<()> {
     let devices = adb::devices(sdk)?
+        .into_iter()
+        .filter(|device| device.arch == requested.general.compiler.target.arch)
+        .collect::<Vec<Device>>()
         .pop()
         .ok_or_else(|| anyhow!("no android device available"))?;
 
