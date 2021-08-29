@@ -16,28 +16,24 @@ const HOST_ARCH: &str = "linux-x86_64";
 pub fn benches_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
     let mut cmd = setup_android_deps(sdk, requested)?;
     cmd.args(&["build", "--release", "--benches"]);
-
     Ok(cmd)
 }
 
 pub fn tests_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
     let mut cmd = setup_android_deps(sdk, requested)?;
     cmd.args(&["build", "--tests"]);
-
     Ok(cmd)
 }
 
 pub fn bench_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
     let mut cmd = setup_android_deps(sdk, requested)?;
     cmd.args(&["build", "--release", "--bench"]);
-
     Ok(cmd)
 }
 
 pub fn test_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
     let mut cmd = setup_android_deps(sdk, requested)?;
     cmd.args(&["build", "--test"]);
-
     Ok(cmd)
 }
 
