@@ -1,7 +1,7 @@
 use anyhow::Error;
 
 use structopt::StructOpt;
-use tai_lib::task::{self, run_mode};
+use tai_lib::task::{self, run_task};
 
 mod cli;
 
@@ -39,5 +39,5 @@ fn main() -> Result<(), Error> {
         }
     }
 
-    run_mode(requested_opt)
+    run_task(requested_opt)
 }

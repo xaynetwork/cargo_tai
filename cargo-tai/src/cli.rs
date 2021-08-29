@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use anyhow::{anyhow, Error};
 use cfg_expr::targets::{get_builtin_target_by_triple, TargetInfo};
 use structopt::{clap::ArgSettings, StructOpt};
-use tai_lib::task::{self, BinaryOptions, CompilerOptions, Mode, PlatformOptions};
+use tai_lib::task::{self, BinaryOptions, CompilerOptions, PlatformOptions, Task};
 
 #[derive(StructOpt, Debug)]
 pub enum Options {
@@ -124,16 +124,16 @@ fn parse_target(src: &str) -> Result<TargetInfo<'static>, Error> {
 
 impl From<Options> for task::Options {
     fn from(opt: Options) -> Self {
-        let (mode, general_opts) = match opt {
-            Options::Bench(opts) => (Mode::Bench, opts),
-            Options::Test(opts) => (Mode::Test, opts),
-            Options::Benches(opts) => (Mode::Benches, opts),
-            Options::Tests(opts) => (Mode::Tests, opts),
+        let (task, general_opts) = match opt {
+            Options::Bench(opts) => (Task::Bench, opts),
+            Options::Test(opts) => (Task::Test, opts),
+            Options::Benches(opts) => (Task::Benches, opts),
+            Options::Tests(opts) => (Task::Tests, opts),
         };
 
         Self {
             general: task::GeneralOptions {
-                mode,
+                task,
                 compiler: CompilerOptions {
                     target: general_opts.target,
                     cargo_args: general_opts.cargo_args,

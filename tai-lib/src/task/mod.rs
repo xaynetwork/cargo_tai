@@ -1,17 +1,13 @@
-mod bench;
-mod test;
+use std::{convert::TryInto, path::PathBuf};
 
-use std::path::PathBuf;
-
-use bench::{run_bench, run_benches};
-use cfg_expr::targets::TargetInfo;
-use test::{run_test, run_tests};
+use anyhow::bail;
+use cfg_expr::targets::{Arch, Os, TargetInfo};
 use tracing::debug;
 
-use crate::TaiResult;
+use crate::{android, ios, TaiResult};
 
 #[derive(Debug)]
-pub enum Mode {
+pub enum Task {
     Bench,
     Test,
     Benches,
@@ -27,7 +23,7 @@ pub struct Options {
 
 #[derive(Debug)]
 pub struct GeneralOptions {
-    pub mode: Mode,
+    pub task: Task,
     pub compiler: CompilerOptions,
     pub binary: BinaryOptions,
 }
@@ -55,12 +51,32 @@ pub struct PlatformOptions {
     pub ios_mobile_provision: Option<PathBuf>,
 }
 
-pub fn run_mode(requested: Options) -> TaiResult<()> {
+pub fn run_task(mut requested: Options) -> TaiResult<()> {
     debug!("run with options:\n{:?}", requested);
-    match requested.general.mode {
-        Mode::Bench => run_bench(requested),
-        Mode::Test => run_test(requested),
-        Mode::Benches => run_benches(requested),
-        Mode::Tests => run_tests(requested),
+
+    if let Task::Bench | Task::Benches = requested.general.task {
+        let mut args_with_bench = vec!["--bench".to_string()];
+        if let Some(ref args) = requested.general.binary.args {
+            args_with_bench.extend_from_slice(args);
+        };
+
+        requested.general.binary.args = Some(args_with_bench);
+    }
+
+    match (
+        requested.general.compiler.target.arch,
+        requested.general.compiler.target.os,
+    ) {
+        #[cfg(feature = "ios")]
+        (Arch::aarch64, Some(Os::ios)) => ios::platform::physical::run_task(requested.try_into()?),
+        #[cfg(feature = "ios")]
+        (Arch::x86_64, Some(Os::ios)) => ios::platform::simulator::run_task(requested.try_into()?),
+        (Arch::aarch64 | Arch::arm | Arch::x86 | Arch::x86_64, Some(Os::android)) => {
+            android::platform::run_task(requested.try_into()?)
+        }
+        _ => bail!(
+            "unsupported target: {:?}",
+            requested.general.compiler.target
+        ),
     }
 }
