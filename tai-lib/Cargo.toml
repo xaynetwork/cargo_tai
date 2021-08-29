@@ -27,7 +27,7 @@ tracing = "0.1.26"
 
 # ios feature
 chrono = { version = "0.4.19", optional = true }
-openssl = { version = "0.10.35", optional = true }
+openssl = { version = "0.10.36", optional = true }
 plist = { version = "1.2.1", optional = true }
 simctl = { version = "0.1.1", optional = true }
 tempdir = { version = "0.3.7", optional = true }
