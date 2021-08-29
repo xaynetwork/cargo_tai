@@ -83,7 +83,7 @@ pub fn find_signing_settings<P: AsRef<Path>>(
     let output = security::decode_cms(profile.as_ref())?.stdout;
     let mobile_provision: MobileProvision = plist::from_bytes(&output).with_context(|| {
         format!(
-            "Failed to load mobile profile: {}",
+            "Failed to load provisioning profile: {}",
             profile.as_ref().display()
         )
     })?;
@@ -104,7 +104,7 @@ pub fn find_signing_settings<P: AsRef<Path>>(
     let expiration_date: SystemTime = mobile_provision.expiration_date.into();
     if expiration_date < SystemTime::now() {
         bail!(
-            "profile expired on: {}",
+            "provisioning profile expired on: {}",
             <DateTime<Utc>>::from(expiration_date)
         );
     }
@@ -114,7 +114,7 @@ pub fn find_signing_settings<P: AsRef<Path>>(
         .iter()
         .any(|d| d == device_id)
     {
-        bail!("device: {} not in profile", device_id);
+        bail!("device: {} not in provisioning profile", device_id);
     }
 
     let entitlements = String::from_utf8(output)?
