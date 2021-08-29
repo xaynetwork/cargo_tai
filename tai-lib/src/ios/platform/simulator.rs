@@ -8,7 +8,7 @@ use std::{
 
 use anyhow::{anyhow, bail, Error};
 use simctl::{get_app_container::Container, Device};
-use tempdir::TempDir;
+use tempfile::TempDir;
 use tracing::{debug, info, instrument};
 
 use crate::{
@@ -158,7 +158,7 @@ fn launch_app(
 fn create_lldb_script(app_pid: &str) -> Result<(PathBuf, TempDir), Error> {
     // Attaching to the processes needs to be done in a script, not a
     // commandline parameter or lldb will say "no simulators found".
-    let temp_dir = TempDir::new(app_pid)?;
+    let temp_dir = tempfile::Builder::new().prefix(app_pid).tempdir()?;
     let path = temp_dir.path().join("lldb-script");
 
     let mut file = File::create(&path)?;
