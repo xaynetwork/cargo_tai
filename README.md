@@ -75,7 +75,7 @@ Furthermore, ideas were taken from the following projects:
 
 ## Limitations/Backwards Compatibility
 
-- Tests and benchmarks can only be run on one device.
-  - (cargo-tai will use the first device that is returned by `adb devices -l`, `xcrun simctl list -j devices available booted` or `ios-deploy --detect --json --no-wifi`)
+- Tests and benchmarks can only be run on one iOS device.
+  - (cargo-tai will use the first device that is returned by `ios-deploy --detect --json --no-wifi`)
 - There are currently no plans to add support for older versions of Xcode and other tools.
 - Resource data is included in all test/benchmark binary bundles even if they are not needed.

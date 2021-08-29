@@ -15,6 +15,10 @@
 
 ## Installation
 
+**Minimum Supported Rust Version**
+
+- 1.53.0
+
 ```shell
 cargo install --git https://github.com/xaynetwork/cargo_tai
 # or
