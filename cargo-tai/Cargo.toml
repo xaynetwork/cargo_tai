@@ -15,7 +15,7 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0.43"
 cfg-expr = "0.8.1"
-structopt = "0.3.22"
+structopt = "0.3.23"
 tai-lib = { path = "../tai-lib", features = ["ios"] }
 tracing = "0.1.26"
 tracing-subscriber = "0.2.20"
