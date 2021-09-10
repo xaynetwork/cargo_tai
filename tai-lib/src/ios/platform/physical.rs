@@ -25,7 +25,7 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
             Task::CreateSignedBundles(CreateSignedBundles),
             Task::RunOnPhysicalDevice(RunOnPhysicalDevice),
         ],
-        Context::new(requested),
+        Context::new(requested)?,
     )?;
     Ok(())
 }

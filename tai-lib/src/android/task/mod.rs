@@ -8,7 +8,7 @@ pub mod task;
 
 pub use self::{
     build_build_units::BuildBuildUnit,
-    context::Context,
+    context::{Context, Options},
     create_bundles::CreateBundles,
     find_android_sdk::FindAndroidSdk,
     list_devices::ListDevices,

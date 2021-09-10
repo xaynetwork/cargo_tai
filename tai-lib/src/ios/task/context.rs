@@ -1,4 +1,7 @@
-use std::path::PathBuf;
+use std::{
+    convert::{TryFrom, TryInto},
+    path::PathBuf,
+};
 
 use anyhow::anyhow;
 
@@ -6,7 +9,7 @@ use crate::{
     bundle::BuildBundles,
     compiler::BuildUnit,
     ios::{bundle::signing::SigningSettings, tools::ios_deploy},
-    options::Options,
+    options::{self, GeneralOptions},
     TaiResult,
 };
 
@@ -20,15 +23,15 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(requested: Options) -> Self {
-        Self {
-            requested: requested,
+    pub fn new(requested: options::Options) -> TaiResult<Self> {
+        Ok(Self {
+            requested: requested.try_into()?,
             devices: None,
             simulators: None,
             build_units: None,
             signing_settings: None,
             build_bundles: None,
-        }
+        })
     }
 
     pub fn devices(&self) -> TaiResult<&Vec<ios_deploy::Device>> {
@@ -63,9 +66,25 @@ impl Context {
 
     pub fn mobile_provision(&self) -> TaiResult<&PathBuf> {
         self.requested
-            .platform
-            .ios_mobile_provision
+            .mobile_provision
             .as_ref()
             .ok_or_else(|| anyhow!("no mobile provision found"))
+    }
+}
+
+pub struct Options {
+    pub general: GeneralOptions,
+
+    pub mobile_provision: Option<PathBuf>,
+}
+
+impl TryFrom<options::Options> for Options {
+    type Error = anyhow::Error;
+
+    fn try_from(opt: options::Options) -> Result<Self, Self::Error> {
+        Ok(Self {
+            general: opt.general,
+            mobile_provision: opt.platform.ios_mobile_provision,
+        })
     }
 }

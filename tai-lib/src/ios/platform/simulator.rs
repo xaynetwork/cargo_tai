@@ -16,7 +16,7 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
             Task::CreateBundles(CreateBundles),
             Task::RunOnSimulators(RunOnSimulators),
         ],
-        Context::new(requested),
+        Context::new(requested)?,
     )?;
     Ok(())
 }

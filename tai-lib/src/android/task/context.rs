@@ -1,10 +1,15 @@
+use std::{
+    convert::{TryFrom, TryInto},
+    path::PathBuf,
+};
+
 use anyhow::anyhow;
 
 use crate::{
     android::tools::{adb::Device, AndroidSdk},
     bundle::BuildBundles,
     compiler::BuildUnit,
-    options::Options,
+    options::{self, GeneralOptions},
     TaiResult,
 };
 
@@ -17,14 +22,14 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(requested: Options) -> Self {
-        Self {
-            requested,
+    pub fn new(requested: options::Options) -> TaiResult<Self> {
+        Ok(Self {
+            requested: requested.try_into()?,
             android_sdk: None,
             devices: None,
             build_units: None,
             build_bundles: None,
-        }
+        })
     }
 
     pub fn devices(&self) -> TaiResult<&Vec<Device>> {
@@ -49,5 +54,30 @@ impl Context {
         self.android_sdk
             .as_ref()
             .ok_or_else(|| anyhow!("no android SDK found"))
+    }
+}
+
+pub struct Options {
+    pub general: GeneralOptions,
+
+    pub android_api_lvl: u8,
+    pub android_ndk: PathBuf,
+}
+
+impl TryFrom<options::Options> for Options {
+    type Error = anyhow::Error;
+
+    fn try_from(opt: options::Options) -> Result<Self, Self::Error> {
+        Ok(Self {
+            general: opt.general,
+            android_api_lvl: opt
+                .platform
+                .android_api_lvl
+                .ok_or_else(|| anyhow!("the option android_api_lvl is missing"))?,
+            android_ndk: opt
+                .platform
+                .android_ndk
+                .ok_or_else(|| anyhow!("the option android_ndk is missing"))?,
+        })
     }
 }

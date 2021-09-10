@@ -22,7 +22,7 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
             Task::ListDevices(ListDevices),
             Task::RunOnDevices(RunOnDevices),
         ],
-        Context::new(requested),
+        Context::new(requested)?,
     )?;
     Ok(())
 }
