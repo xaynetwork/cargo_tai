@@ -1,12 +1,10 @@
-use std::convert::TryInto;
-
 use anyhow::bail;
 use cfg_expr::targets::{Arch, Os};
 use tracing::debug;
 
 use crate::{android, ios, options::Options, TaiResult};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Command {
     Bench,
     Test,
@@ -35,7 +33,7 @@ pub fn run_command(mut requested: Options) -> TaiResult<()> {
         #[cfg(feature = "ios")]
         (Arch::x86_64, Some(Os::ios)) => ios::platform::simulator::run_command(requested),
         (Arch::aarch64 | Arch::arm | Arch::x86 | Arch::x86_64, Some(Os::android)) => {
-            android::platform::run_command(requested.try_into()?)
+            android::platform::run_command(requested)
         }
         _ => bail!(
             "unsupported target: {:?}",

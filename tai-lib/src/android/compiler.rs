@@ -6,7 +6,7 @@ use tracing::debug;
 
 use crate::TaiResult;
 
-use super::{platform::Options, tools::AndroidSdk};
+use super::{task::build_buildunits::Options, tools::AndroidSdk};
 
 #[cfg(target_os = "macos")]
 const HOST_ARCH: &str = "darwin-x86_64";

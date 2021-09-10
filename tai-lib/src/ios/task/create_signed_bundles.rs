@@ -36,7 +36,7 @@ impl Task for CreateSignedBundles {
         bundles
             .bundles
             .iter()
-            .try_for_each(|bundle| sign_bundle(bundle, &sig_settings, &entitlements))?;
+            .try_for_each(|bundle| sign_bundle(bundle, sig_settings, &entitlements))?;
 
         context.build_bundles = Some(bundles);
 

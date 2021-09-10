@@ -1,11 +1,6 @@
 use anyhow::anyhow;
 
-use crate::{
-    bundle::create_bundles,
-    ios::{bundle::bundler::create_bundle, platform::APP_ID},
-    task::Task,
-    TaiResult,
-};
+use crate::{android::bundle::create_bundle, bundle::create_bundles, task::Task, TaiResult};
 
 use super::Context;
 
@@ -23,7 +18,7 @@ impl Task for CreateBundles {
         let resources = &context.requested.general.binary.resources;
 
         let bundles = create_bundles(build_units, |unit, root| {
-            create_bundle(unit, root, resources, APP_ID)
+            create_bundle(unit, root, resources)
         })?;
 
         context.build_bundles = Some(bundles);
