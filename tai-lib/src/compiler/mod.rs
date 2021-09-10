@@ -12,7 +12,7 @@ pub struct BuildUnit {
     pub target: TargetInfo<'static>,
 }
 
-use crate::{task::CompilerOptions, TaiResult};
+use crate::{options::CompilerOptions, TaiResult};
 
 pub fn compile_tests(cmd: Command, requested: &CompilerOptions) -> TaiResult<Vec<BuildUnit>> {
     compile(cmd, requested, is_test)

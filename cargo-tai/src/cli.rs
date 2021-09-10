@@ -3,7 +3,10 @@ use std::path::PathBuf;
 use anyhow::{anyhow, Error};
 use cfg_expr::targets::{get_builtin_target_by_triple, TargetInfo};
 use structopt::{clap::ArgSettings, StructOpt};
-use tai_lib::task::{self, BinaryOptions, CompilerOptions, PlatformOptions, Task};
+use tai_lib::{
+    command::Command,
+    options::{self, BinaryOptions, CompilerOptions, PlatformOptions},
+};
 
 #[derive(StructOpt, Debug)]
 pub enum Options {
@@ -122,18 +125,18 @@ fn parse_target(src: &str) -> Result<TargetInfo<'static>, Error> {
     Ok(target.to_owned())
 }
 
-impl From<Options> for task::Options {
+impl From<Options> for options::Options {
     fn from(opt: Options) -> Self {
-        let (task, general_opts) = match opt {
-            Options::Bench(opts) => (Task::Bench, opts),
-            Options::Test(opts) => (Task::Test, opts),
-            Options::Benches(opts) => (Task::Benches, opts),
-            Options::Tests(opts) => (Task::Tests, opts),
+        let (command, general_opts) = match opt {
+            Options::Bench(opts) => (Command::Bench, opts),
+            Options::Test(opts) => (Command::Test, opts),
+            Options::Benches(opts) => (Command::Benches, opts),
+            Options::Tests(opts) => (Command::Tests, opts),
         };
 
         Self {
-            general: task::GeneralOptions {
-                task,
+            general: options::GeneralOptions {
+                command,
                 compiler: CompilerOptions {
                     target: general_opts.target,
                     cargo_args: general_opts.cargo_args,

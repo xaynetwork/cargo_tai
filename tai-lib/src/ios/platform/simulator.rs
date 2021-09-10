@@ -17,14 +17,14 @@ use crate::{
         platform::compile_build_units,
         tools::{lldb, xcrun},
     },
-    task::{self, BinaryOptions, GeneralOptions},
+    options::{self, BinaryOptions, GeneralOptions},
     TaiResult,
 };
 
 use super::APP_ID;
 
 #[instrument(name = "build_and_run", skip(requested))]
-pub fn run_task(requested: Options) -> TaiResult<()> {
+pub fn run_command(requested: Options) -> TaiResult<()> {
     let build_units = compile_build_units(&requested.general)?;
 
     let bundles = create_bundles(build_units, |unit, root| {
@@ -174,10 +174,10 @@ pub struct Options {
     pub general: GeneralOptions,
 }
 
-impl TryFrom<task::Options> for Options {
+impl TryFrom<options::Options> for Options {
     type Error = anyhow::Error;
 
-    fn try_from(opt: task::Options) -> Result<Self, Self::Error> {
+    fn try_from(opt: options::Options) -> Result<Self, Self::Error> {
         Ok(Self {
             general: opt.general,
         })

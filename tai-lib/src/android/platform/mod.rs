@@ -17,27 +17,28 @@ use crate::{
         },
     },
     bundle::{create_bundles, BuildBundle},
+    command::Command,
     compiler::{compile_benches, compile_tests},
-    task::{self, BinaryOptions, GeneralOptions, Task},
+    options::{self, BinaryOptions, GeneralOptions},
     TaiResult,
 };
 
 use super::compiler::{bench_command, benches_command, test_command, tests_command};
 
 #[instrument(name = "build_and_run", skip(requested))]
-pub fn run_task(requested: Options) -> TaiResult<()> {
+pub fn run_command(requested: Options) -> TaiResult<()> {
     let sdk = AndroidSdk::derive_sdk(&requested.android_ndk)?;
 
-    let cmd = match requested.general.task {
-        Task::Bench => bench_command(&sdk, &requested)?,
-        Task::Test => test_command(&sdk, &requested)?,
-        Task::Benches => benches_command(&sdk, &requested)?,
-        Task::Tests => tests_command(&sdk, &requested)?,
+    let cmd = match requested.general.command {
+        Command::Bench => bench_command(&sdk, &requested)?,
+        Command::Test => test_command(&sdk, &requested)?,
+        Command::Benches => benches_command(&sdk, &requested)?,
+        Command::Tests => tests_command(&sdk, &requested)?,
     };
 
-    let build_units = match requested.general.task {
-        Task::Bench | Task::Benches => compile_benches(cmd, &requested.general.compiler)?,
-        Task::Test | Task::Tests => compile_tests(cmd, &requested.general.compiler)?,
+    let build_units = match requested.general.command {
+        Command::Bench | Command::Benches => compile_benches(cmd, &requested.general.compiler)?,
+        Command::Test | Command::Tests => compile_tests(cmd, &requested.general.compiler)?,
     };
 
     let bundles = create_bundles(build_units, |unit, root| {
@@ -135,10 +136,10 @@ pub struct Options {
     pub android_ndk: PathBuf,
 }
 
-impl TryFrom<task::Options> for Options {
+impl TryFrom<options::Options> for Options {
     type Error = anyhow::Error;
 
-    fn try_from(opt: task::Options) -> Result<Self, Self::Error> {
+    fn try_from(opt: options::Options) -> Result<Self, Self::Error> {
         Ok(Self {
             general: opt.general,
             android_api_lvl: opt

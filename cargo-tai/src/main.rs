@@ -1,7 +1,7 @@
 use anyhow::Error;
 
 use structopt::StructOpt;
-use tai_lib::task::{self, run_task};
+use tai_lib::{command::run_command, options};
 
 mod cli;
 
@@ -18,7 +18,7 @@ fn main() -> Result<(), Error> {
         .init();
 
     let opt = Options::from_args();
-    let requested_opt: task::Options = opt.into();
+    let requested_opt: options::Options = opt.into();
 
     #[cfg(not(target_os = "macos"))]
     {
@@ -39,5 +39,5 @@ fn main() -> Result<(), Error> {
         }
     }
 
-    run_task(requested_opt)
+    run_command(requested_opt)
 }
