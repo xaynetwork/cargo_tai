@@ -16,7 +16,7 @@ pub fn create_bundles(
 ) -> TaiResult<BuildBundles> {
     let unit = units.get(0).ok_or_else(|| anyhow!("no units to bundle"))?;
     let root = unit
-        .executable
+        .artifact
         .parent()
         .map(|p| p.parent())
         .flatten()

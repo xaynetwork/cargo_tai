@@ -8,11 +8,13 @@ use util::{compile, is_bench, is_test};
 #[derive(Debug)]
 pub struct BuildUnit {
     pub name: String,
-    pub executable: PathBuf,
+    pub artifact: PathBuf,
     pub target: TargetInfo<'static>,
 }
 
 use crate::{options::CompilerOptions, TaiResult};
+
+use self::util::is_static_lib;
 
 pub fn compile_tests(cmd: Command, requested: &CompilerOptions) -> TaiResult<Vec<BuildUnit>> {
     compile(cmd, requested, is_test)
@@ -20,4 +22,8 @@ pub fn compile_tests(cmd: Command, requested: &CompilerOptions) -> TaiResult<Vec
 
 pub fn compile_benches(cmd: Command, requested: &CompilerOptions) -> TaiResult<Vec<BuildUnit>> {
     compile(cmd, requested, is_bench)
+}
+
+pub fn compile_static_lib(cmd: Command, requested: &CompilerOptions) -> TaiResult<Vec<BuildUnit>> {
+    compile(cmd, requested, is_static_lib)
 }

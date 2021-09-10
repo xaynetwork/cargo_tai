@@ -25,3 +25,9 @@ pub fn test_command() -> TaiResult<Command> {
     cmd.args(&["build", "--test"]);
     Ok(cmd)
 }
+
+pub fn build_lib_command() -> TaiResult<Command> {
+    let mut cmd = Command::new("cargo");
+    cmd.args(&["build"]);
+    Ok(cmd)
+}

@@ -32,9 +32,9 @@ pub fn create_bundle<P: AsRef<Path>>(
     debug!("create dir: {}", bundle_root.display());
 
     let to = bundle_root.join(&unit.name);
-    copy(&unit.executable, &to)
-        .with_context(|| format!("Failed to copy executable {}", unit.executable.display()))?;
-    debug!("copy {} to {}", &unit.executable.display(), to.display());
+    copy(&unit.artifact, &to)
+        .with_context(|| format!("Failed to copy artifact {}", unit.artifact.display()))?;
+    debug!("copy {} to {}", &unit.artifact.display(), to.display());
 
     create_plist(&bundle_root, &unit, app_id)
         .with_context(|| format!("Failed to create {}", INFO_PLIST))?;

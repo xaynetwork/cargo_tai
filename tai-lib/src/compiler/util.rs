@@ -29,6 +29,17 @@ pub fn is_bench(artifact: Artifact) -> Option<Utf8PathBuf> {
     }
 }
 
+pub fn is_static_lib(mut artifact: Artifact) -> Option<Utf8PathBuf> {
+    if let (Some(path), true) = (
+        artifact.filenames.pop(),
+        artifact.target.kind.contains(&String::from("staticlib")),
+    ) {
+        Some(path)
+    } else {
+        None
+    }
+}
+
 pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
     mut cmd: Command,
     requested: &CompilerOptions,
@@ -53,7 +64,7 @@ pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
                             .file_name()
                             .ok_or_else(|| anyhow!("build artifact should have a name"))?
                             .to_string(),
-                        executable: path.into(),
+                        artifact: path.into(),
                         target: requested.target.clone(),
                     };
                     acc.push(unit);

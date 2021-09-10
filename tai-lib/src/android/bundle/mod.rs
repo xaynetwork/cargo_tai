@@ -22,8 +22,8 @@ pub fn create_bundle<P: AsRef<Path>>(
     create_dir_all(&bundle_root)?;
     debug!("create dir: {}", bundle_root.display());
     let to = bundle_root.join(&unit.name);
-    copy(&unit.executable, &to)?;
-    debug!("copy {} to {}", &unit.executable.display(), to.display());
+    copy(&unit.artifact, &to)?;
+    debug!("copy {} to {}", &unit.artifact.display(), to.display());
     copy_resources(&bundle_root, resources)?;
 
     Ok(BuildBundle {
