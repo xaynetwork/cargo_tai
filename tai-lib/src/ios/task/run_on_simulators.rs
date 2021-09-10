@@ -27,21 +27,13 @@ impl Task for RunOnSimulators {
     type Context = Context;
 
     fn run(&self, context: Self::Context) -> TaiResult<Self::Context> {
-        let bundles = context
-            .build_bundles
-            .as_ref()
-            .ok_or_else(|| anyhow!("no bundles"))?;
+        let bundles = context.build_bundles()?;
 
-        context
-            .simulators
-            .as_ref()
-            .ok_or_else(|| anyhow!("no simulators"))?
-            .iter()
-            .try_for_each(|simulator| {
-                bundles.bundles.iter().try_for_each(|bundle| {
-                    install_and_launch(simulator, &bundle.root, &context.requested.general.binary)
-                })
-            })?;
+        context.simulators()?.iter().try_for_each(|simulator| {
+            bundles.bundles.iter().try_for_each(|bundle| {
+                install_and_launch(simulator, &bundle.root, &context.requested.general.binary)
+            })
+        })?;
         Ok(context)
     }
 }

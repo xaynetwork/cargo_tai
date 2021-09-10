@@ -1,7 +1,20 @@
-use crate::{bundle::BuildBundles, compiler::BuildUnit, options::Options, TaiResult};
+mod build_app;
+mod build_build_units;
+mod build_xcode_test;
+mod context;
+mod create_bundles;
+mod create_signed_bundles;
+mod create_xcode_project;
+mod list_physical_devices;
+mod list_simulators;
+mod read_signing_settings;
+mod run_on_physical_device;
+mod run_on_simulators;
+mod task;
 
-use self::{
-    build_buildunits::BuildBuildUnit,
+pub use self::{
+    build_build_units::BuildBuildUnit,
+    context::Context,
     create_bundles::CreateBundles,
     create_signed_bundles::CreateSignedBundles,
     list_physical_devices::ListPhysicalDevices,
@@ -9,52 +22,52 @@ use self::{
     read_signing_settings::ReadSigningSettings,
     run_on_physical_device::RunOnPhysicalDevice,
     run_on_simulators::RunOnSimulators,
+    task::Task,
 };
 
-use super::{bundle::signing::SigningSettings, tools::ios_deploy};
+// fn build_for_native_tests() -> TaiResult<()>{
+//     // build_dir
+//     //     template
+//     //         bindings
+//     //         ...
+//     //     xc_project
+//     //         build-app
+//     //         build-test
 
-pub mod build_buildunits;
-pub mod create_bundles;
-pub mod create_signed_bundles;
-pub mod list_physical_devices;
-pub mod list_simulators;
-pub mod read_signing_settings;
-pub mod run_on_physical_device;
-pub mod run_on_simulators;
+//     const XCODEGEN_PROJECT_SPEC: &str = "project.yml";
+//     // compile -> lib_name
+//     let lib_name = "test-paradise.a";
 
-pub struct Context {
-    pub requested: Options,
-    pub devices: Option<Vec<ios_deploy::Device>>,
-    pub simulators: Option<Vec<simctl::Device>>,
-    pub build_units: Option<Vec<BuildUnit>>,
-    pub signing_settings: Option<SigningSettings>,
-    pub build_bundles: Option<BuildBundles>,
-}
+//     let build_dir = std::path::Path::new("");
+//     let ios_template_dir = std::path::Path::new("");
 
-pub enum Task {
-    ListPhysicalDevices(ListPhysicalDevices),
-    ListSimulators(ListSimulators),
-    BuildBuildUnit(BuildBuildUnit),
-    ReadSigningSettings(ReadSigningSettings),
-    CreateBundles(CreateBundles),
-    CreateSignedBundles(CreateSignedBundles),
-    RunOnPhysicalDevice(RunOnPhysicalDevice),
-    RunOnSimulators(RunOnSimulators),
-}
+//     // copy template into build dir
+//     std::fs::copy(ios_template_dir, build_dir)?;
 
-impl crate::task::Task for Task {
-    type Context = Context;
+//     // generate project spec
+//     let mut spec = build_dir.to_path_buf();
+//     spec.push("template");
+//     spec.push(XCODEGEN_PROJECT_SPEC);
 
-    fn run(&self, context: Self::Context) -> TaiResult<Self::Context> {
-        match self {
-            Task::ListPhysicalDevices(task) => task.run(context),
-            Task::ListSimulators(task) => task.run(context),
-            Task::BuildBuildUnit(task) => task.run(context),
-            Task::ReadSigningSettings(task) => task.run(context),
-            Task::CreateBundles(task) => task.run(context),
-            Task::CreateSignedBundles(task) => task.run(context),
-            Task::RunOnPhysicalDevice(task) => task.run(context),
-            Task::RunOnSimulators(task) => task.run(context),
-        }
-    }
-}
+//     let mut project_dir = build_dir.to_path_buf();
+//     project_dir.push("xc_project");
+
+//     // generate xcode project
+//     xcodegen::generate(&spec, &project_dir)?;
+
+//     // build app
+//     let mut data_path_build_app = project_dir.clone();
+//     data_path_build_app.push("build");
+//     xcodebuild::build(&project_dir, lib_name, data_path_build_app)?;
+
+//     // build test
+//     let mut data_path_build_test = project_dir.clone();
+//     data_path_build_test.push("build_test");
+//     xcodebuild::build_for_testing(&project_dir, lib_name, data_path_build_test)?;
+
+//     // build ipa
+//     // Build/Products/Release-iphoneos/
+
+//     // copy to output dir
+//     Ok(())
+// }

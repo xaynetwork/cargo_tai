@@ -3,7 +3,8 @@ use std::{
     path::PathBuf,
 };
 
-use super::Context;
+use anyhow::anyhow;
+
 use crate::{
     android::compiler::{bench_command, benches_command, test_command, tests_command},
     command::Command,
@@ -12,7 +13,8 @@ use crate::{
     task::Task,
     TaiResult,
 };
-use anyhow::anyhow;
+
+use super::Context;
 
 pub struct BuildBuildUnit;
 
@@ -21,10 +23,7 @@ impl Task for BuildBuildUnit {
 
     fn run(&self, mut context: Self::Context) -> TaiResult<Self::Context> {
         let requested: Options = context.requested.clone().try_into()?;
-        let sdk = context
-            .android_sdk
-            .as_ref()
-            .ok_or_else(|| anyhow!("no android sdk"))?;
+        let sdk = context.android_sdk()?;
         let general_opt = &context.requested.general;
 
         let cmd = match general_opt.command {

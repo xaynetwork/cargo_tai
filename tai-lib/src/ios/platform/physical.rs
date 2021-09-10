@@ -2,12 +2,12 @@ use tracing::instrument;
 
 use crate::{
     ios::task::{
-        build_buildunits::BuildBuildUnit,
-        create_signed_bundles::CreateSignedBundles,
-        list_physical_devices::ListPhysicalDevices,
-        read_signing_settings::ReadSigningSettings,
-        run_on_physical_device::RunOnPhysicalDevice,
+        BuildBuildUnit,
         Context,
+        CreateSignedBundles,
+        ListPhysicalDevices,
+        ReadSigningSettings,
+        RunOnPhysicalDevice,
         Task,
     },
     options::Options,
@@ -25,14 +25,7 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
             Task::CreateSignedBundles(CreateSignedBundles),
             Task::RunOnPhysicalDevice(RunOnPhysicalDevice),
         ],
-        Context {
-            requested,
-            devices: None,
-            simulators: None,
-            build_units: None,
-            signing_settings: None,
-            build_bundles: None,
-        },
+        Context::new(requested),
     )?;
     Ok(())
 }

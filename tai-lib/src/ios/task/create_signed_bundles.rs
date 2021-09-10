@@ -1,5 +1,3 @@
-use anyhow::anyhow;
-
 use crate::{
     bundle::create_bundles,
     ios::bundle::{
@@ -18,14 +16,8 @@ impl Task for CreateSignedBundles {
     type Context = Context;
 
     fn run(&self, mut context: Self::Context) -> TaiResult<Self::Context> {
-        let build_units = context
-            .build_units
-            .take()
-            .ok_or_else(|| anyhow!("no units to bundle"))?;
-        let sig_settings = context
-            .signing_settings
-            .as_ref()
-            .ok_or_else(|| anyhow!("no signing settings"))?;
+        let build_units = context.take_build_units()?;
+        let sig_settings = context.signing_settings()?;
         let resources = &context.requested.general.binary.resources;
 
         let bundles = create_bundles(build_units, |unit, bundles_root| {

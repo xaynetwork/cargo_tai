@@ -11,18 +11,11 @@ impl Task for ReadSigningSettings {
 
     fn run(&self, mut context: Self::Context) -> TaiResult<Self::Context> {
         let device = context
-            .devices
-            .as_ref()
-            .map(|d| d.first())
-            .flatten()
+            .devices()?
+            .first()
             .ok_or_else(|| anyhow!("no devices"))?;
 
-        let mobile_provision = &context
-            .requested
-            .platform
-            .ios_mobile_provision
-            .as_ref()
-            .ok_or_else(|| anyhow!("the option mobile_provision is missing"))?;
+        let mobile_provision = context.mobile_provision()?;
 
         let sig_settings = find_signing_settings(&device.id, mobile_provision)?;
         context.signing_settings = Some(sig_settings);

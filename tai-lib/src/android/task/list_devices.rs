@@ -1,4 +1,4 @@
-use anyhow::{anyhow, bail};
+use anyhow::bail;
 
 use crate::{
     android::tools::adb::{self, Device},
@@ -14,10 +14,7 @@ impl Task for ListDevices {
     type Context = Context;
 
     fn run(&self, mut context: Self::Context) -> TaiResult<Self::Context> {
-        let sdk = context
-            .android_sdk
-            .as_ref()
-            .ok_or_else(|| anyhow!("no android sdk"))?;
+        let sdk = context.android_sdk()?;
 
         let devices = adb::devices(sdk)?
             .into_iter()

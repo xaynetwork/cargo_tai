@@ -1,4 +1,3 @@
-use super::Context;
 use crate::{
     command::Command,
     compiler::{compile_benches, compile_tests},
@@ -6,6 +5,8 @@ use crate::{
     task::Task,
     TaiResult,
 };
+
+use super::Context;
 
 pub struct BuildBuildUnit;
 

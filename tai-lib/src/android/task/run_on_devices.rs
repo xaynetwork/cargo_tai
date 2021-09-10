@@ -3,7 +3,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use anyhow::{anyhow, bail};
+use anyhow::bail;
 use tracing::{debug, instrument};
 
 use crate::{
@@ -24,31 +24,14 @@ impl Task for RunOnDevices {
     type Context = Context;
 
     fn run(&self, context: Self::Context) -> TaiResult<Self::Context> {
-        let sdk = context
-            .android_sdk
-            .as_ref()
-            .ok_or_else(|| anyhow!("no android sdk"))?;
+        let sdk = context.android_sdk()?;
+        let bundles = context.build_bundles()?;
 
-        let bundles = context
-            .build_bundles
-            .as_ref()
-            .ok_or_else(|| anyhow!("no bundles"))?;
-
-        context
-            .devices
-            .as_ref()
-            .ok_or_else(|| anyhow!("no android devices"))?
-            .iter()
-            .try_for_each(|device| {
-                bundles.bundles.iter().try_for_each(|bundle| {
-                    install_and_run_bundle(
-                        sdk,
-                        &device.id,
-                        bundle,
-                        &context.requested.general.binary,
-                    )
-                })
-            })?;
+        context.devices()?.iter().try_for_each(|device| {
+            bundles.bundles.iter().try_for_each(|bundle| {
+                install_and_run_bundle(sdk, &device.id, bundle, &context.requested.general.binary)
+            })
+        })?;
         Ok(context)
     }
 }

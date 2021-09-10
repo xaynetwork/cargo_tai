@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use anyhow::{anyhow, bail};
+use anyhow::bail;
 use tracing::{info, instrument};
 
 use crate::{
@@ -19,9 +19,7 @@ impl Task for RunOnPhysicalDevice {
 
     fn run(&self, context: Self::Context) -> TaiResult<Self::Context> {
         context
-            .build_bundles
-            .as_ref()
-            .ok_or_else(|| anyhow!("no bundles"))?
+            .build_bundles()?
             .bundles
             .iter()
             .try_for_each(|bundle| {
