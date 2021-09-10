@@ -8,5 +8,6 @@ pub mod compiler;
 #[cfg(feature = "ios")]
 pub mod ios;
 pub mod options;
+pub mod task;
 
 type TaiResult<T> = Result<T, Error>;

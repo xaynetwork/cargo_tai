@@ -31,13 +31,9 @@ pub fn run_command(mut requested: Options) -> TaiResult<()> {
         requested.general.compiler.target.os,
     ) {
         #[cfg(feature = "ios")]
-        (Arch::aarch64, Some(Os::ios)) => {
-            ios::platform::physical::run_command(requested.try_into()?)
-        }
+        (Arch::aarch64, Some(Os::ios)) => ios::platform::physical::run_command(requested),
         #[cfg(feature = "ios")]
-        (Arch::x86_64, Some(Os::ios)) => {
-            ios::platform::simulator::run_command(requested.try_into()?)
-        }
+        (Arch::x86_64, Some(Os::ios)) => ios::platform::simulator::run_command(requested),
         (Arch::aarch64 | Arch::arm | Arch::x86 | Arch::x86_64, Some(Os::android)) => {
             android::platform::run_command(requested.try_into()?)
         }
