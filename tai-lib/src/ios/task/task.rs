@@ -5,6 +5,7 @@ use super::{
     Context,
     CreateBundles,
     CreateSignedBundles,
+    GetProjectMetadata,
     ListPhysicalDevices,
     ListSimulators,
     ReadSigningSettings,
@@ -21,6 +22,7 @@ pub enum Task {
     CreateSignedBundles(CreateSignedBundles),
     RunOnPhysicalDevice(RunOnPhysicalDevice),
     RunOnSimulators(RunOnSimulators),
+    GetProjectMetadata(GetProjectMetadata),
 }
 
 impl crate::task::Task for Task {
@@ -36,6 +38,7 @@ impl crate::task::Task for Task {
             Task::CreateSignedBundles(task) => task.run(context),
             Task::RunOnPhysicalDevice(task) => task.run(context),
             Task::RunOnSimulators(task) => task.run(context),
+            Task::GetProjectMetadata(task) => task.run(context),
         }
     }
 }

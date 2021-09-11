@@ -1,49 +1,29 @@
 use std::{
-    fs::{copy, create_dir, remove_dir_all},
+    fs::{copy, create_dir, create_dir_all},
     path::{Path, PathBuf},
 };
 
-use anyhow::{anyhow, bail, Context, Error};
+use anyhow::{Context, Error};
 use tracing::debug;
 
-use crate::{compiler::BuildUnit, TaiResult};
+use crate::{compiler::BuildUnit, task::ProjectMetadata, TaiResult};
 
-use super::{BuildBundle, BuildBundles, BUNDLES_ROOT_NAME};
+use super::{BuildBundle, BuildBundles};
 
 pub fn create_bundles(
     units: Vec<BuildUnit>,
+    project_metadata: &ProjectMetadata,
     f: impl Fn(BuildUnit, &PathBuf) -> TaiResult<BuildBundle>,
 ) -> TaiResult<BuildBundles> {
-    let unit = units.get(0).ok_or_else(|| anyhow!("no units to bundle"))?;
-    let root = unit
-        .artifact
-        .parent()
-        .map(|p| p.parent())
-        .flatten()
-        .ok_or_else(|| anyhow!("cannot find bundle root"))?
-        .to_path_buf();
-
-    let bundles_root = root.join(BUNDLES_ROOT_NAME);
-
-    match (bundles_root.is_dir(), bundles_root.is_file()) {
-        (false, false) => create_dir(&bundles_root)?,
-        (true, false) => {
-            remove_dir_all(&bundles_root)?;
-            create_dir(&bundles_root)?;
-        }
-        (false, true) => bail!("bundle root is a file"),
-        _ => unreachable!(),
-    };
+    let tai_target_dir = project_metadata.tai_target_dir();
+    create_dir_all(&tai_target_dir)?;
 
     let bundles = units
         .into_iter()
-        .map(|unit| f(unit, &bundles_root))
+        .map(|unit| f(unit, &tai_target_dir))
         .collect::<Result<Vec<_>, Error>>()?;
 
-    Ok(BuildBundles {
-        root: bundles_root,
-        bundles,
-    })
+    Ok(BuildBundles { bundles })
 }
 
 pub fn copy_resources<P: AsRef<Path>>(
@@ -53,7 +33,7 @@ pub fn copy_resources<P: AsRef<Path>>(
     if let Some(resources) = resources {
         debug!("copy resources");
         let test_data_root = bundle_root.as_ref().join(tai_util::DATA_DIR_NAME);
-        create_dir(&test_data_root).with_context(|| {
+        create_dir_all(&test_data_root).with_context(|| {
             format!(
                 "Failed to create resource root {}",
                 test_data_root.display()

@@ -24,7 +24,10 @@ pub fn create_bundle<P: AsRef<Path>>(
     resources: &Option<Vec<(String, PathBuf)>>,
     app_id: &str,
 ) -> TaiResult<BuildBundle> {
-    let version_root = bundles_root.as_ref().join(&unit.name);
+    let version_root = bundles_root
+        .as_ref()
+        .join(unit.target.triple)
+        .join(&unit.name);
     let bundle_root = version_root.join(format!("{}.app", APP_DISPLAY_NAME));
 
     create_dir_all(&bundle_root)

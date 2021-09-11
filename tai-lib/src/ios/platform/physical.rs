@@ -5,6 +5,7 @@ use crate::{
         BuildBuildUnit,
         Context,
         CreateSignedBundles,
+        GetProjectMetadata,
         ListPhysicalDevices,
         ReadSigningSettings,
         RunOnPhysicalDevice,
@@ -19,6 +20,7 @@ use crate::{
 pub fn run_command(requested: Options) -> TaiResult<()> {
     Runner::execute(
         &[
+            Task::GetProjectMetadata(GetProjectMetadata),
             Task::BuildBuildUnit(BuildBuildUnit),
             Task::ListPhysicalDevices(ListPhysicalDevices),
             Task::ReadSigningSettings(ReadSigningSettings),

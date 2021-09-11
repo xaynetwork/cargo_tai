@@ -20,10 +20,15 @@ impl Task for CreateSignedBundles {
         let sig_settings = context.signing_settings()?;
         let resources = &context.requested.general.binary.resources;
 
-        let bundles = create_bundles(build_units, |unit, bundles_root| {
-            create_bundle(unit, bundles_root, resources, &sig_settings.app_id)
-        })?;
-        let entitlements = create_entitlements_file(&bundles.root, &sig_settings.entitlements)?;
+        let bundles = create_bundles(
+            build_units,
+            context.project_metadata()?,
+            |unit, bundles_root| create_bundle(unit, bundles_root, resources, &sig_settings.app_id),
+        )?;
+        let entitlements = create_entitlements_file(
+            &context.project_metadata()?.tai_target_dir(),
+            &sig_settings.entitlements,
+        )?;
 
         bundles
             .bundles

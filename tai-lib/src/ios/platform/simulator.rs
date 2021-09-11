@@ -1,7 +1,15 @@
 use tracing::instrument;
 
 use crate::{
-    ios::task::{BuildBuildUnit, Context, CreateBundles, ListSimulators, RunOnSimulators, Task},
+    ios::task::{
+        BuildBuildUnit,
+        Context,
+        CreateBundles,
+        GetProjectMetadata,
+        ListSimulators,
+        RunOnSimulators,
+        Task,
+    },
     options::Options,
     task::Runner,
     TaiResult,
@@ -11,6 +19,7 @@ use crate::{
 pub fn run_command(requested: Options) -> TaiResult<()> {
     Runner::execute(
         &[
+            Task::GetProjectMetadata(GetProjectMetadata),
             Task::BuildBuildUnit(BuildBuildUnit),
             Task::ListSimulators(ListSimulators),
             Task::CreateBundles(CreateBundles),

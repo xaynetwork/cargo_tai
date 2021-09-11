@@ -10,6 +10,7 @@ use crate::{
     bundle::BuildBundles,
     compiler::BuildUnit,
     options::{self, GeneralOptions},
+    task::ProjectMetadata,
     TaiResult,
 };
 
@@ -19,6 +20,7 @@ pub struct Context {
     pub devices: Option<Vec<Device>>,
     pub build_units: Option<Vec<BuildUnit>>,
     pub build_bundles: Option<BuildBundles>,
+    pub project_metadata: Option<ProjectMetadata>,
 }
 
 impl Context {
@@ -29,6 +31,7 @@ impl Context {
             devices: None,
             build_units: None,
             build_bundles: None,
+            project_metadata: None,
         })
     }
 
@@ -54,6 +57,12 @@ impl Context {
         self.android_sdk
             .as_ref()
             .ok_or_else(|| anyhow!("no android SDK found"))
+    }
+
+    pub fn project_metadata(&self) -> TaiResult<&ProjectMetadata> {
+        self.project_metadata
+            .as_ref()
+            .ok_or_else(|| anyhow!("no project metadata found"))
     }
 }
 

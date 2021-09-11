@@ -17,7 +17,10 @@ pub fn create_bundle<P: AsRef<Path>>(
     bundles_root: P,
     resources: &Option<Vec<(String, PathBuf)>>,
 ) -> TaiResult<BuildBundle> {
-    let bundle_root = bundles_root.as_ref().join(&unit.name);
+    let bundle_root = bundles_root
+        .as_ref()
+        .join(unit.target.triple)
+        .join(&unit.name);
 
     create_dir_all(&bundle_root)?;
     debug!("create dir: {}", bundle_root.display());

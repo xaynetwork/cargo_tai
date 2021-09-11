@@ -7,6 +7,7 @@ use super::task::{
     Context,
     CreateBundles,
     FindAndroidSdk,
+    GetProjectMetadata,
     ListDevices,
     RunOnDevices,
     Task,
@@ -17,6 +18,7 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
     Runner::execute(
         &[
             Task::FindAndroidSdk(FindAndroidSdk),
+            Task::GetProjectMetadata(GetProjectMetadata),
             Task::BuildBuildUnit(BuildBuildUnit),
             Task::CreateBundles(CreateBundles),
             Task::ListDevices(ListDevices),

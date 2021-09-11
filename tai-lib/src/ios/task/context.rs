@@ -10,6 +10,7 @@ use crate::{
     compiler::BuildUnit,
     ios::{bundle::signing::SigningSettings, tools::ios_deploy},
     options::{self, GeneralOptions},
+    task::ProjectMetadata,
     TaiResult,
 };
 
@@ -20,6 +21,7 @@ pub struct Context {
     pub build_units: Option<Vec<BuildUnit>>,
     pub signing_settings: Option<SigningSettings>,
     pub build_bundles: Option<BuildBundles>,
+    pub project_metadata: Option<ProjectMetadata>,
 }
 
 impl Context {
@@ -31,6 +33,7 @@ impl Context {
             build_units: None,
             signing_settings: None,
             build_bundles: None,
+            project_metadata: None,
         })
     }
 
@@ -69,6 +72,12 @@ impl Context {
             .mobile_provision
             .as_ref()
             .ok_or_else(|| anyhow!("no mobile provision found"))
+    }
+
+    pub fn project_metadata(&self) -> TaiResult<&ProjectMetadata> {
+        self.project_metadata
+            .as_ref()
+            .ok_or_else(|| anyhow!("no project metadata found"))
     }
 }
 
