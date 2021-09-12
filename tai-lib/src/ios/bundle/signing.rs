@@ -58,9 +58,9 @@ pub fn sign_bundle(
     codesign::sign(&settings.identity_name, &entitlements, &bundle.root)
 }
 
-#[instrument(name = "entitlements", skip(bundles_root, entitlements))]
-pub fn create_entitlements_file(bundles_root: &Path, entitlements: &str) -> TaiResult<PathBuf> {
-    let path = bundles_root.join(ENTITLEMENTS_XCENT);
+#[instrument(name = "entitlements", skip(dest, entitlements))]
+pub fn create_entitlements_file(dest: &Path, entitlements: &str) -> TaiResult<PathBuf> {
+    let path = dest.join(ENTITLEMENTS_XCENT);
     debug!("create entitlements file: {}", path.display());
 
     let mut plist = File::create(&path)?;

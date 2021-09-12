@@ -1,10 +1,13 @@
 use crate::TaiResult;
 
 use super::{
+    BuildApp,
     BuildBuildUnit,
+    BuildXCodeTest,
     Context,
     CreateBundles,
     CreateSignedBundles,
+    CreateXCodeProject,
     GetProjectMetadata,
     ListPhysicalDevices,
     ListSimulators,
@@ -23,6 +26,9 @@ pub enum Task {
     RunOnPhysicalDevice(RunOnPhysicalDevice),
     RunOnSimulators(RunOnSimulators),
     GetProjectMetadata(GetProjectMetadata),
+    CreateXCodeProject(CreateXCodeProject),
+    BuildXCodeTest(BuildXCodeTest),
+    BuildApp(BuildApp),
 }
 
 impl crate::task::Task for Task {
@@ -39,6 +45,9 @@ impl crate::task::Task for Task {
             Task::RunOnPhysicalDevice(task) => task.run(context),
             Task::RunOnSimulators(task) => task.run(context),
             Task::GetProjectMetadata(task) => task.run(context),
+            Task::CreateXCodeProject(task) => task.run(context),
+            Task::BuildXCodeTest(task) => task.run(context),
+            Task::BuildApp(task) => task.run(context),
         }
     }
 }

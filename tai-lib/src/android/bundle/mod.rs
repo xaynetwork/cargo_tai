@@ -1,5 +1,5 @@
 use std::{
-    fs::{copy, create_dir_all},
+    fs::{copy, create_dir_all, remove_dir_all},
     path::{Path, PathBuf},
 };
 
@@ -21,6 +21,10 @@ pub fn create_bundle<P: AsRef<Path>>(
         .as_ref()
         .join(unit.target.triple)
         .join(&unit.name);
+
+    if bundle_root.exists() {
+        remove_dir_all(&bundle_root)?;
+    }
 
     create_dir_all(&bundle_root)?;
     debug!("create dir: {}", bundle_root.display());

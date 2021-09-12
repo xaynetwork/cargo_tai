@@ -26,7 +26,7 @@ impl Task for CreateSignedBundles {
             |unit, bundles_root| create_bundle(unit, bundles_root, resources, &sig_settings.app_id),
         )?;
         let entitlements = create_entitlements_file(
-            &context.project_metadata()?.tai_target_dir(),
+            &context.project_metadata()?.ios_dir(),
             &sig_settings.entitlements,
         )?;
 

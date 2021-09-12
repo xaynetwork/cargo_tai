@@ -1,5 +1,5 @@
 use std::{
-    fs::{copy, create_dir, create_dir_all},
+    fs::{copy, create_dir_all},
     path::{Path, PathBuf},
 };
 

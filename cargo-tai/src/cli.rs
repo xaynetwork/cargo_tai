@@ -18,6 +18,8 @@ pub enum Options {
     Benches(GeneralOptions),
     #[structopt(about = "Test all tests")]
     Tests(GeneralOptions),
+    #[structopt(about = "...")]
+    Build(GeneralOptions),
 }
 
 #[derive(StructOpt, Debug)]
@@ -89,7 +91,7 @@ Supported targets:
     #[structopt(short, long, parse(try_from_str = parse_key_val))]
     envs: Option<Vec<(String, String)>>,
 
-    /// Ressources to include in the app. Format: `id=local_path`
+    /// Resources to include in the app. Format: `id=local_path`
     ///
     /// Example:
     ///
@@ -132,6 +134,7 @@ impl From<Options> for options::Options {
             Options::Test(opts) => (Command::Test, opts),
             Options::Benches(opts) => (Command::Benches, opts),
             Options::Tests(opts) => (Command::Tests, opts),
+            Options::Build(opts) => (Command::Build, opts),
         };
 
         Self {

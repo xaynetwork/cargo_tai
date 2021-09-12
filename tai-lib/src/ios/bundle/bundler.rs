@@ -1,5 +1,5 @@
 use std::{
-    fs::{copy, create_dir_all, File},
+    fs::{copy, create_dir_all, remove_dir_all, File},
     path::{Path, PathBuf},
 };
 
@@ -28,6 +28,12 @@ pub fn create_bundle<P: AsRef<Path>>(
         .as_ref()
         .join(unit.target.triple)
         .join(&unit.name);
+
+    if version_root.exists() {
+        remove_dir_all(&version_root)
+            .with_context(|| format!("Failed to remove old bundle {}", version_root.display()))?;
+    }
+
     let bundle_root = version_root.join(format!("{}.app", APP_DISPLAY_NAME));
 
     create_dir_all(&bundle_root)

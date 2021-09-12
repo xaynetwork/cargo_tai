@@ -1,7 +1,13 @@
 use crate::{
     command::Command,
-    compiler::{compile_benches, compile_tests},
-    ios::compiler::{bench_command, benches_command, test_command, tests_command},
+    compiler::{compile_benches, compile_static_lib, compile_tests},
+    ios::compiler::{
+        bench_command,
+        benches_command,
+        build_lib_command,
+        test_command,
+        tests_command,
+    },
     task::Task,
     TaiResult,
 };
@@ -21,10 +27,12 @@ impl Task for BuildBuildUnit {
             Command::Test => test_command()?,
             Command::Benches => benches_command()?,
             Command::Tests => tests_command()?,
+            Command::Build => build_lib_command()?,
         };
         let build_units = match general_opt.command {
             Command::Bench | Command::Benches => compile_benches(cmd, &general_opt.compiler)?,
             Command::Test | Command::Tests => compile_tests(cmd, &general_opt.compiler)?,
+            Command::Build => compile_static_lib(cmd, &general_opt.compiler)?,
         };
         context.build_units = Some(build_units);
 

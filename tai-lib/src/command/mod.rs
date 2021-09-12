@@ -10,6 +10,7 @@ pub enum Command {
     Test,
     Benches,
     Tests,
+    Build,
 }
 
 pub fn run_command(mut requested: Options) -> TaiResult<()> {

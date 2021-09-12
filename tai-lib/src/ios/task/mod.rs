@@ -15,10 +15,13 @@ mod task;
 use crate::task::project_metadata;
 
 pub use self::{
+    build_app::BuildApp,
     build_build_units::BuildBuildUnit,
+    build_xcode_test::BuildXCodeTest,
     context::Context,
     create_bundles::CreateBundles,
     create_signed_bundles::CreateSignedBundles,
+    create_xcode_project::CreateXCodeProject,
     list_physical_devices::ListPhysicalDevices,
     list_simulators::ListSimulators,
     read_signing_settings::ReadSigningSettings,
@@ -33,11 +36,13 @@ impl crate::task::Task for GetProjectMetadata {
     type Context = Context;
 
     fn run(&self, mut context: Self::Context) -> crate::TaiResult<Self::Context> {
-        let mut cargo_args = context.requested.general.compiler.cargo_args.iter();
+        let cargo_args = context.requested.general.compiler.cargo_args.iter();
 
         // https://docs.rs/cargo_metadata/0.14.0/cargo_metadata/#examples
-        let manifest_path = match cargo_args.next() {
-            Some(p) if p == "--manifest-path" => cargo_args
+        let mut cargo_metadata_args =
+            cargo_args.skip_while(|val| !val.starts_with("--manifest-path"));
+        let manifest_path = match cargo_metadata_args.next() {
+            Some(p) if p == "--manifest-path" => cargo_metadata_args
                 .next()
                 .ok_or_else(|| anyhow::anyhow!("no manifest"))?
                 .into(),

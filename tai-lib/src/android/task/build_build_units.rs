@@ -22,11 +22,13 @@ impl Task for BuildBuildUnit {
             Command::Test => test_command(sdk, &context.requested)?,
             Command::Benches => benches_command(sdk, &context.requested)?,
             Command::Tests => tests_command(sdk, &context.requested)?,
+            Command::Build => todo!(),
         };
 
         let build_units = match general_opt.command {
             Command::Bench | Command::Benches => compile_benches(cmd, &general_opt.compiler)?,
             Command::Test | Command::Tests => compile_tests(cmd, &general_opt.compiler)?,
+            Command::Build => todo!(),
         };
         context.build_units = Some(build_units);
 
