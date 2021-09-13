@@ -1,0 +1,39 @@
+name: cargoTai
+
+options:
+  deploymentTarget:
+    iOS: 13.0
+
+configs:
+  debug: debug
+  release: release
+
+targets:
+  cargoTai:
+    type: application
+    platform: iOS
+    sources:
+      - path: cargoTai
+      - path: bindings
+    settings:
+      PRODUCT_NAME: {{data.app_name}}
+      PRODUCT_BUNDLE_IDENTIFIER: {{data.app_bundle_id}}
+      ARCHS: [arm64, x86_64]
+      ENABLE_BITCODE: false
+      LIBRARY_SEARCH_PATHS[sdk=iphoneos*]: $(inherited) "{{data.target_dir}}/aarch64-apple-ios/$(CONFIGURATION)"
+      LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]: $(inherited) "{{data.target_dir}}/x86_64-apple-ios/$(CONFIGURATION)"
+      SWIFT_OBJC_BRIDGING_HEADER: {{data.template_dir}}/bindings/cargoTai-Bridging-Header.h
+      CODE_SIGNING_ALLOWED: NO
+    dependencies:
+      - framework: {{data.lib_name}}
+        embed: false
+      - sdk: Security.framework
+  cargoTaiTest:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: cargoTaiTest
+    dependencies:
+      - target: cargoTai
+    settings:
+      CODE_SIGNING_ALLOWED: NO

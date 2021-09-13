@@ -18,6 +18,7 @@ publish = false
 
 [lib]
 bench = false
+crate-type = ["staticlib"]
 
 [dev-dependencies]
 criterion = "0.3"

@@ -12,7 +12,10 @@ mod run_on_physical_device;
 mod run_on_simulators;
 mod task;
 
-use crate::task::project_metadata;
+use crate::{
+    project::{CargoOptions, ProjectMetadata},
+    tools::cargo_metadata,
+};
 
 pub use self::{
     build_app::BuildApp,
@@ -36,22 +39,10 @@ impl crate::task::Task for GetProjectMetadata {
     type Context = Context;
 
     fn run(&self, mut context: Self::Context) -> crate::TaiResult<Self::Context> {
-        let cargo_args = context.requested.general.compiler.cargo_args.iter();
+        let cargo_args = &context.requested.general.compiler.cargo_args;
+        let meta = ProjectMetadata::from_cargo_args(cargo_args)?;
 
-        // https://docs.rs/cargo_metadata/0.14.0/cargo_metadata/#examples
-        let mut cargo_metadata_args =
-            cargo_args.skip_while(|val| !val.starts_with("--manifest-path"));
-        let manifest_path = match cargo_metadata_args.next() {
-            Some(p) if p == "--manifest-path" => cargo_metadata_args
-                .next()
-                .ok_or_else(|| anyhow::anyhow!("no manifest"))?
-                .into(),
-            Some(p) => p.trim_start_matches("--manifest-path=").into(),
-            None => std::env::current_dir()?.join("Cargo.toml"),
-        };
-
-        context.project_metadata = Some(project_metadata(manifest_path)?);
-
+        context.project_metadata = Some(meta);
         Ok(context)
     }
 }

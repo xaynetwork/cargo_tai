@@ -1,35 +1,33 @@
-use std::{
-    path::Path,
-    process::{Command, Output},
-};
+use std::{path::Path, process::Command};
 
-use anyhow::anyhow;
-
-use crate::TaiResult;
+use crate::{command_ext::ExitStatusExt, project::Profile, TaiResult};
 
 const XCODEBUILD: &str = "xcodebuild";
 
 pub fn build<P: AsRef<Path>, D: AsRef<Path>>(
     project: P,
     scheme: &str,
+    profile: &Profile,
     data_path: D,
-) -> TaiResult<Output> {
+) -> TaiResult<()> {
     Command::new(XCODEBUILD)
-        .arg("-workspace")
+        .arg("-project")
         .arg(project.as_ref())
         .arg("-scheme")
         .arg(scheme)
+        .arg("-configuration")
+        .arg(profile.as_str())
         .arg("-derivedDataPath")
         .arg(data_path.as_ref())
-        .output()
-        .map_err(|err| anyhow!("{}", err))
+        .status()?
+        .expect_success("failed to xcode")
 }
 
 pub fn build_for_testing<P: AsRef<Path>, D: AsRef<Path>>(
     project: P,
     scheme: &str,
     data_path: D,
-) -> TaiResult<Output> {
+) -> TaiResult<()> {
     Command::new(XCODEBUILD)
         .arg("-project")
         .arg(project.as_ref())
@@ -37,10 +35,8 @@ pub fn build_for_testing<P: AsRef<Path>, D: AsRef<Path>>(
         .arg(scheme)
         .arg("-derivedDataPath")
         .arg(data_path.as_ref())
-        // .arg("-sdk")
-        // .arg("iphoneos")
         .arg("build-for-testing")
         // .arg("-allowProvisioningUpdate")
-        .output()
-        .map_err(|err| anyhow!("{}", err))
+        .status()?
+        .expect_success("failed to xcode")
 }

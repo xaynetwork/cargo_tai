@@ -10,9 +10,11 @@ use crate::{
     compiler::BuildUnit,
     ios::{bundle::signing::SigningSettings, tools::ios_deploy},
     options::{self, GeneralOptions},
-    task::ProjectMetadata,
+    project::ProjectMetadata,
     TaiResult,
 };
+
+use super::create_xcode_project::XCodeProject;
 
 pub struct Context {
     pub requested: Options,
@@ -22,6 +24,7 @@ pub struct Context {
     pub signing_settings: Option<SigningSettings>,
     pub build_bundles: Option<BuildBundles>,
     pub project_metadata: Option<ProjectMetadata>,
+    pub xcode_project: Option<XCodeProject>,
 }
 
 impl Context {
@@ -34,6 +37,7 @@ impl Context {
             signing_settings: None,
             build_bundles: None,
             project_metadata: None,
+            xcode_project: None,
         })
     }
 
@@ -76,6 +80,12 @@ impl Context {
 
     pub fn project_metadata(&self) -> TaiResult<&ProjectMetadata> {
         self.project_metadata
+            .as_ref()
+            .ok_or_else(|| anyhow!("no project metadata found"))
+    }
+
+    pub fn xcode_project(&self) -> TaiResult<&XCodeProject> {
+        self.xcode_project
             .as_ref()
             .ok_or_else(|| anyhow!("no project metadata found"))
     }

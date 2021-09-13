@@ -2,18 +2,18 @@ use tracing::{info, instrument};
 
 use crate::{
     command::Command,
-    ios::task::{
-        BuildApp,
-        BuildBuildUnit,
-        BuildXCodeTest,
-        Context,
-        CreateSignedBundles,
-        CreateXCodeProject,
-        GetProjectMetadata,
-        ListPhysicalDevices,
-        ReadSigningSettings,
-        RunOnPhysicalDevice,
-        Task,
+    ios::{
+        platform::tasks_for_build_cmd,
+        task::{
+            BuildBuildUnit,
+            Context,
+            CreateSignedBundles,
+            GetProjectMetadata,
+            ListPhysicalDevices,
+            ReadSigningSettings,
+            RunOnPhysicalDevice,
+            Task,
+        },
     },
     options::Options,
     task::Runner,
@@ -39,17 +39,7 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
             )?;
         }
         Command::Build => {
-            Runner::execute(
-                &[
-                    Task::GetProjectMetadata(GetProjectMetadata),
-                    Task::BuildBuildUnit(BuildBuildUnit),
-                    Task::ReadSigningSettings(ReadSigningSettings),
-                    Task::CreateXCodeProject(CreateXCodeProject),
-                    Task::BuildXCodeTest(BuildXCodeTest),
-                    Task::BuildApp(BuildApp),
-                ],
-                Context::new(requested)?,
-            )?;
+            Runner::execute(&tasks_for_build_cmd(), Context::new(requested)?)?;
         }
     }
     Ok(())

@@ -1,3 +1,8 @@
+#[no_mangle]
+pub extern "C" fn run_cargo_tai_runner() -> i32 {
+    0
+}
+
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]

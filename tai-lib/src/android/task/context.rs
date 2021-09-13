@@ -10,7 +10,7 @@ use crate::{
     bundle::BuildBundles,
     compiler::BuildUnit,
     options::{self, GeneralOptions},
-    task::ProjectMetadata,
+    project::ProjectMetadata,
     TaiResult,
 };
 
