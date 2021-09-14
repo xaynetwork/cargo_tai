@@ -1,3 +1,5 @@
+use std::convert::TryFrom;
+
 use tracing::{info, instrument};
 
 use crate::{
@@ -35,11 +37,11 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
                     Task::CreateSignedBundles(CreateSignedBundles),
                     Task::RunOnPhysicalDevice(RunOnPhysicalDevice),
                 ],
-                Context::new(requested)?,
+                Context::try_from(requested)?,
             )?;
         }
         Command::Build => {
-            Runner::execute(&tasks_for_build_cmd(), Context::new(requested)?)?;
+            Runner::execute(&tasks_for_build_cmd(), Context::try_from(requested)?)?;
         }
     }
     Ok(())

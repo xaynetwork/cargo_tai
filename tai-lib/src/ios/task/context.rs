@@ -28,19 +28,6 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(requested: options::Options) -> TaiResult<Self> {
-        Ok(Self {
-            requested: requested.try_into()?,
-            devices: None,
-            simulators: None,
-            build_units: None,
-            signing_settings: None,
-            build_bundles: None,
-            project_metadata: None,
-            xcode_project: None,
-        })
-    }
-
     pub fn devices(&self) -> TaiResult<&Vec<ios_deploy::Device>> {
         self.devices
             .as_ref()
@@ -91,6 +78,23 @@ impl Context {
     }
 }
 
+impl TryFrom<options::Options> for Context {
+    type Error = anyhow::Error;
+
+    fn try_from(opts: options::Options) -> Result<Self, Self::Error> {
+        Ok(Self {
+            requested: opts.try_into()?,
+            devices: None,
+            simulators: None,
+            build_units: None,
+            signing_settings: None,
+            build_bundles: None,
+            project_metadata: None,
+            xcode_project: None,
+        })
+    }
+}
+
 pub struct Options {
     pub general: GeneralOptions,
 
@@ -100,10 +104,10 @@ pub struct Options {
 impl TryFrom<options::Options> for Options {
     type Error = anyhow::Error;
 
-    fn try_from(opt: options::Options) -> Result<Self, Self::Error> {
+    fn try_from(opts: options::Options) -> Result<Self, Self::Error> {
         Ok(Self {
-            general: opt.general,
-            mobile_provision: opt.platform.ios_mobile_provision,
+            general: opts.general,
+            mobile_provision: opts.platform.ios_mobile_provision,
         })
     }
 }
