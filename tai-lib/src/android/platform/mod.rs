@@ -1,13 +1,18 @@
 use tracing::instrument;
 
-use crate::{options::Options, task::Runner, TaiResult};
+use crate::{
+    common::{
+        options::Options,
+        task::{get_project_metadata::GetProjectMetadata, Runner},
+    },
+    TaiResult,
+};
 
 use super::task::{
     BuildBuildUnit,
     Context,
     CreateBundles,
     FindAndroidSdk,
-    GetProjectMetadata,
     ListDevices,
     RunOnDevices,
     Task,

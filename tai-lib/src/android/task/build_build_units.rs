@@ -1,8 +1,10 @@
 use crate::{
     android::compiler::{bench_command, benches_command, test_command, tests_command},
-    command::Command,
-    compiler::{compile_benches, compile_tests},
-    task::Task,
+    common::{
+        command::Command,
+        compiler::{compile_benches, compile_tests},
+        task::Task,
+    },
     TaiResult,
 };
 
@@ -10,10 +12,8 @@ use super::Context;
 
 pub struct BuildBuildUnit;
 
-impl Task for BuildBuildUnit {
-    type Context = Context;
-
-    fn run(&self, mut context: Self::Context) -> TaiResult<Self::Context> {
+impl Task<Context> for BuildBuildUnit {
+    fn run(&self, mut context: Context) -> TaiResult<Context> {
         let sdk = context.android_sdk()?;
         let general_opt = &context.requested.general;
 

@@ -1,15 +1,13 @@
 use anyhow::bail;
 
-use crate::{ios::tools::ios_deploy, task::Task, TaiResult};
+use crate::{common::task::Task, ios::tools::ios_deploy, TaiResult};
 
 use super::Context;
 
 pub struct ListPhysicalDevices;
 
-impl Task for ListPhysicalDevices {
-    type Context = Context;
-
-    fn run(&self, mut context: Self::Context) -> TaiResult<Self::Context> {
+impl Task<Context> for ListPhysicalDevices {
+    fn run(&self, mut context: Context) -> TaiResult<Context> {
         let devices = ios_deploy::list_device()?;
         if devices.is_empty() {
             bail!("no iOS device available");

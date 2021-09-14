@@ -2,7 +2,7 @@ use anyhow::bail;
 
 use crate::{
     android::tools::adb::{self, Device},
-    task::Task,
+    common::task::Task,
     TaiResult,
 };
 
@@ -10,10 +10,8 @@ use super::Context;
 
 pub struct ListDevices;
 
-impl Task for ListDevices {
-    type Context = Context;
-
-    fn run(&self, mut context: Self::Context) -> TaiResult<Self::Context> {
+impl Task<Context> for ListDevices {
+    fn run(&self, mut context: Context) -> TaiResult<Context> {
         let sdk = context.android_sdk()?;
 
         let devices = adb::devices(sdk)?

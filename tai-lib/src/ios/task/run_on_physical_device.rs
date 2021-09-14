@@ -4,9 +4,8 @@ use anyhow::bail;
 use tracing::{info, instrument};
 
 use crate::{
+    common::{options::BinaryOptions, task::Task},
     ios::{platform::APP_ID, tools::ios_deploy},
-    options::BinaryOptions,
-    task::Task,
     TaiResult,
 };
 
@@ -14,10 +13,8 @@ use super::Context;
 
 pub struct RunOnPhysicalDevice;
 
-impl Task for RunOnPhysicalDevice {
-    type Context = Context;
-
-    fn run(&self, context: Self::Context) -> TaiResult<Self::Context> {
+impl Task<Context> for RunOnPhysicalDevice {
+    fn run(&self, context: Context) -> TaiResult<Context> {
         context
             .build_bundles()?
             .bundles

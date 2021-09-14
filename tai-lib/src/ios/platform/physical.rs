@@ -3,22 +3,23 @@ use std::convert::TryFrom;
 use tracing::{info, instrument};
 
 use crate::{
-    command::Command,
+    common::{
+        command::Command,
+        options::Options,
+        task::{get_project_metadata::GetProjectMetadata, Runner},
+    },
     ios::{
         platform::tasks_for_build_cmd,
         task::{
             BuildBuildUnit,
             Context,
             CreateSignedBundles,
-            GetProjectMetadata,
             ListPhysicalDevices,
             ReadSigningSettings,
             RunOnPhysicalDevice,
             Task,
         },
     },
-    options::Options,
-    task::Runner,
     TaiResult,
 };
 

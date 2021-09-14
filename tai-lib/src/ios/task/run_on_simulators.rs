@@ -10,12 +10,11 @@ use tempfile::TempDir;
 use tracing::{debug, info, instrument};
 
 use crate::{
+    common::{options::BinaryOptions, task::Task},
     ios::{
         platform::APP_ID,
         tools::{lldb, xcrun},
     },
-    options::BinaryOptions,
-    task::Task,
     TaiResult,
 };
 
@@ -23,10 +22,8 @@ use super::Context;
 
 pub struct RunOnSimulators;
 
-impl Task for RunOnSimulators {
-    type Context = Context;
-
-    fn run(&self, context: Self::Context) -> TaiResult<Self::Context> {
+impl Task<Context> for RunOnSimulators {
+    fn run(&self, context: Context) -> TaiResult<Context> {
         let bundles = context.build_bundles()?;
 
         context.simulators()?.iter().try_for_each(|simulator| {

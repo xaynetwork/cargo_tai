@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::tools::cargo_metadata;
+use crate::common::tools::cargo_metadata;
 use cargo_metadata::Metadata;
 
 use crate::TaiResult;

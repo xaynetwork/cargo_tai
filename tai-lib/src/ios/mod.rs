@@ -1,5 +1,5 @@
 mod bundle;
 mod compiler;
 pub(crate) mod platform;
-mod task;
+pub mod task;
 mod tools;

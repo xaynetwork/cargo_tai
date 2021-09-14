@@ -1,10 +1,9 @@
 use crate::{
-    bundle::create_bundles,
+    common::{bundle::create_bundles, task::Task},
     ios::bundle::{
         bundler::create_bundle,
         signing::{create_entitlements_file, sign_bundle},
     },
-    task::Task,
     TaiResult,
 };
 
@@ -12,10 +11,8 @@ use super::Context;
 
 pub struct CreateSignedBundles;
 
-impl Task for CreateSignedBundles {
-    type Context = Context;
-
-    fn run(&self, mut context: Self::Context) -> TaiResult<Self::Context> {
+impl Task<Context> for CreateSignedBundles {
+    fn run(&self, mut context: Context) -> TaiResult<Context> {
         let build_units = context.take_build_units()?;
         let sig_settings = context.signing_settings()?;
         let resources = &context.requested.general.binary.resources;

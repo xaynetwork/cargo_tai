@@ -1,6 +1,9 @@
 use std::{path::Path, process::Command};
 
-use crate::{command_ext::ExitStatusExt, project::Profile, TaiResult};
+use crate::{
+    common::{project::Profile, tools::command_ext::ExitStatusExt},
+    TaiResult,
+};
 
 const XCODEBUILD: &str = "xcodebuild";
 

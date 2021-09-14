@@ -9,8 +9,10 @@ use serde::Serialize;
 use tracing::{debug, instrument};
 
 use crate::{
-    bundle::{copy_resources, BuildBundle},
-    compiler::BuildUnit,
+    common::{
+        bundle::{copy_resources, BuildBundle},
+        compiler::BuildUnit,
+    },
     TaiResult,
 };
 

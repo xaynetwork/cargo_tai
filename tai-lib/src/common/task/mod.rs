@@ -1,17 +1,17 @@
 use crate::TaiResult;
 
-pub trait Task {
-    type Context;
+pub mod get_project_metadata;
 
-    fn run(&self, context: Self::Context) -> TaiResult<Self::Context>;
+pub trait Task<C> {
+    fn run(&self, context: C) -> TaiResult<C>;
 }
 
 pub struct Runner;
 
 impl Runner {
-    pub fn execute<T>(tasks: &[T], context: T::Context) -> TaiResult<T::Context>
+    pub fn execute<T, C>(tasks: &[T], context: C) -> TaiResult<C>
     where
-        T: Task,
+        T: Task<C>,
     {
         let mut context = context;
 

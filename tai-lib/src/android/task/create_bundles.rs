@@ -1,13 +1,15 @@
-use crate::{android::bundle::create_bundle, bundle::create_bundles, task::Task, TaiResult};
+use crate::{
+    android::bundle::create_bundle,
+    common::{bundle::create_bundles, task::Task},
+    TaiResult,
+};
 
 use super::Context;
 
 pub struct CreateBundles;
 
-impl Task for CreateBundles {
-    type Context = Context;
-
-    fn run(&self, mut context: Self::Context) -> TaiResult<Self::Context> {
+impl Task<Context> for CreateBundles {
+    fn run(&self, mut context: Context) -> TaiResult<Context> {
         let build_units = context.take_build_units()?;
         let resources = &context.requested.general.binary.resources;
 

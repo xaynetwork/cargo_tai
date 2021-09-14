@@ -1,11 +1,6 @@
-use super::task::{
-    BuildApp,
-    BuildBuildUnit,
-    BuildXCodeTest,
-    CreateXCodeProject,
-    GetProjectMetadata,
-    Task,
-};
+use crate::common::task::get_project_metadata::GetProjectMetadata;
+
+use super::task::{BuildApp, BuildBuildUnit, BuildXCodeTest, CreateXCodeProject, Task};
 
 pub mod physical;
 pub mod simulator;

@@ -1,6 +1,6 @@
 use crate::{
+    common::task::Task,
     ios::tools::xcodebuild::{self},
-    task::Task,
     TaiResult,
 };
 
@@ -10,10 +10,8 @@ const BUILD_DIR: &str = "build";
 
 pub struct BuildApp;
 
-impl Task for BuildApp {
-    type Context = Context;
-
-    fn run(&self, context: Self::Context) -> TaiResult<Self::Context> {
+impl Task<Context> for BuildApp {
+    fn run(&self, context: Context) -> TaiResult<Context> {
         let project_meta = context.project_metadata()?;
         let xcode_project = context.xcode_project()?;
         let data_path = project_meta.ios_dir().join(BUILD_DIR);

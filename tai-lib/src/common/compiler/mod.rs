@@ -12,7 +12,7 @@ pub struct BuildUnit {
     pub target: TargetInfo<'static>,
 }
 
-use crate::{options::CompilerOptions, TaiResult};
+use crate::{common::options::CompilerOptions, TaiResult};
 
 use self::util::is_static_lib;
 

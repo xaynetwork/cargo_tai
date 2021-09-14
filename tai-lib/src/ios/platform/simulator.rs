@@ -3,18 +3,12 @@ use std::convert::TryFrom;
 use tracing::instrument;
 
 use crate::{
-    command::Command,
-    ios::task::{
-        BuildBuildUnit,
-        Context,
-        CreateBundles,
-        GetProjectMetadata,
-        ListSimulators,
-        RunOnSimulators,
-        Task,
+    common::{
+        command::Command,
+        options::Options,
+        task::{get_project_metadata::GetProjectMetadata, Runner},
     },
-    options::Options,
-    task::Runner,
+    ios::task::{BuildBuildUnit, Context, CreateBundles, ListSimulators, RunOnSimulators, Task},
     TaiResult,
 };
 

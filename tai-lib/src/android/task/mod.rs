@@ -15,17 +15,3 @@ pub use self::{
     run_on_devices::RunOnDevices,
     task::Task,
 };
-
-pub struct GetProjectMetadata;
-
-impl crate::task::Task for GetProjectMetadata {
-    type Context = Context;
-
-    fn run(&self, mut context: Self::Context) -> crate::TaiResult<Self::Context> {
-        let cargo_args = &context.requested.general.compiler.cargo_args;
-        let meta = crate::project::ProjectMetadata::from_cargo_args(cargo_args)?;
-
-        context.project_metadata = Some(meta);
-        Ok(context)
-    }
-}

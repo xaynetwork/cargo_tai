@@ -6,11 +6,13 @@ use std::{
 use anyhow::anyhow;
 
 use crate::{
-    bundle::BuildBundles,
-    compiler::BuildUnit,
+    common::{
+        bundle::BuildBundles,
+        compiler::BuildUnit,
+        options::{self, GeneralOptions},
+        project::ProjectMetadata,
+    },
     ios::{bundle::signing::SigningSettings, tools::ios_deploy},
-    options::{self, GeneralOptions},
-    project::ProjectMetadata,
     TaiResult,
 };
 

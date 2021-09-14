@@ -7,10 +7,12 @@ use anyhow::anyhow;
 
 use crate::{
     android::tools::{adb::Device, AndroidSdk},
-    bundle::BuildBundles,
-    compiler::BuildUnit,
-    options::{self, GeneralOptions},
-    project::ProjectMetadata,
+    common::{
+        bundle::BuildBundles,
+        compiler::BuildUnit,
+        options::{self, GeneralOptions},
+        project::ProjectMetadata,
+    },
     TaiResult,
 };
 

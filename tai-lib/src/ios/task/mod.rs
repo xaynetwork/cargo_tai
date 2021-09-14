@@ -12,11 +12,6 @@ mod run_on_physical_device;
 mod run_on_simulators;
 mod task;
 
-use crate::{
-    project::{CargoOptions, ProjectMetadata},
-    tools::cargo_metadata,
-};
-
 pub use self::{
     build_app::BuildApp,
     build_build_units::BuildBuildUnit,
@@ -32,20 +27,6 @@ pub use self::{
     run_on_simulators::RunOnSimulators,
     task::Task,
 };
-
-pub struct GetProjectMetadata;
-
-impl crate::task::Task for GetProjectMetadata {
-    type Context = Context;
-
-    fn run(&self, mut context: Self::Context) -> crate::TaiResult<Self::Context> {
-        let cargo_args = &context.requested.general.compiler.cargo_args;
-        let meta = ProjectMetadata::from_cargo_args(cargo_args)?;
-
-        context.project_metadata = Some(meta);
-        Ok(context)
-    }
-}
 
 // fn build_for_native_tests() -> TaiResult<()>{
 //     // build_dir

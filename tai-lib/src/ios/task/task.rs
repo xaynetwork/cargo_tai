@@ -1,4 +1,4 @@
-use crate::TaiResult;
+use crate::{common::task::get_project_metadata::GetProjectMetadata, TaiResult};
 
 use super::{
     BuildApp,
@@ -8,7 +8,6 @@ use super::{
     CreateBundles,
     CreateSignedBundles,
     CreateXCodeProject,
-    GetProjectMetadata,
     ListPhysicalDevices,
     ListSimulators,
     ReadSigningSettings,
@@ -31,10 +30,8 @@ pub enum Task {
     BuildApp(BuildApp),
 }
 
-impl crate::task::Task for Task {
-    type Context = Context;
-
-    fn run(&self, context: Self::Context) -> TaiResult<Self::Context> {
+impl crate::common::task::Task<Context> for Task {
+    fn run(&self, context: Context) -> TaiResult<Context> {
         match self {
             Task::ListPhysicalDevices(task) => task.run(context),
             Task::ListSimulators(task) => task.run(context),

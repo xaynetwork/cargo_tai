@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use cfg_expr::targets::TargetInfo;
 
-use crate::command::Command;
+use crate::common::command::Command;
 
 #[derive(Debug, Clone)]
 pub struct Options {

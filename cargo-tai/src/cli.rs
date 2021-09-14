@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use anyhow::{anyhow, Error};
 use cfg_expr::targets::{get_builtin_target_by_triple, TargetInfo};
 use structopt::{clap::ArgSettings, StructOpt};
-use tai_lib::{
+use tai_lib::common::{
     command::Command,
     options::{self, BinaryOptions, CompilerOptions, PlatformOptions},
 };

@@ -1,7 +1,7 @@
 use anyhow::Error;
 
 use structopt::StructOpt;
-use tai_lib::{command::run_command, options};
+use tai_lib::common::{command::run_command, options};
 
 mod cli;
 

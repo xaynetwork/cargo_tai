@@ -8,11 +8,11 @@ use serde::Serialize;
 use serde_json::value::Map;
 
 use crate::{
+    common::task::Task,
     ios::{
         platform::APP_ID,
         tools::{rsync::rsync, xcodegen},
     },
-    task::Task,
     TaiResult,
 };
 
@@ -23,10 +23,8 @@ const APP_NAME: &str = "cargoTai";
 
 pub struct CreateXCodeProject;
 
-impl Task for CreateXCodeProject {
-    type Context = Context;
-
-    fn run(&self, mut context: Self::Context) -> TaiResult<Self::Context> {
+impl Task<Context> for CreateXCodeProject {
+    fn run(&self, mut context: Context) -> TaiResult<Context> {
         let lib_name = context
             .take_build_units()?
             .first()

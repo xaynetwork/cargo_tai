@@ -7,7 +7,7 @@ use anyhow::anyhow;
 use cfg_expr::targets::Arch;
 use once_cell::sync::OnceCell;
 
-use crate::{command_ext::ExitStatusExt, TaiResult};
+use crate::{common::tools::command_ext::ExitStatusExt, TaiResult};
 
 use super::AndroidSdk;
 

@@ -8,9 +8,7 @@ use tracing::{debug, instrument};
 
 use crate::{
     android::tools::{adb, AndroidSdk},
-    bundle::BuildBundle,
-    options::BinaryOptions,
-    task::Task,
+    common::{bundle::BuildBundle, options::BinaryOptions, task::Task},
     TaiResult,
 };
 
@@ -20,10 +18,8 @@ const ANDROID_REMOTE_WORKDIR: &str = "/data/local/tmp/cargo-tai";
 
 pub struct RunOnDevices;
 
-impl Task for RunOnDevices {
-    type Context = Context;
-
-    fn run(&self, context: Self::Context) -> TaiResult<Self::Context> {
+impl Task<Context> for RunOnDevices {
+    fn run(&self, context: Context) -> TaiResult<Context> {
         let sdk = context.android_sdk()?;
         let bundles = context.build_bundles()?;
 

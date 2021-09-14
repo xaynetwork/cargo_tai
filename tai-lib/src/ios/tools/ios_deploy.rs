@@ -7,7 +7,7 @@ use std::{
 use anyhow::anyhow;
 use serde::{Deserialize, Deserializer};
 
-use crate::{command_ext::ExitStatusExt, TaiResult};
+use crate::{common::tools::command_ext::ExitStatusExt, TaiResult};
 
 const IOS_DEPLOY: &str = "ios-deploy";
 

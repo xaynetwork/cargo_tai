@@ -1,15 +1,13 @@
 use anyhow::anyhow;
 
-use crate::{ios::bundle::signing::find_signing_settings, task::Task, TaiResult};
+use crate::{common::task::Task, ios::bundle::signing::find_signing_settings, TaiResult};
 
 use super::Context;
 
 pub struct ReadSigningSettings;
 
-impl Task for ReadSigningSettings {
-    type Context = Context;
-
-    fn run(&self, mut context: Self::Context) -> TaiResult<Self::Context> {
+impl Task<Context> for ReadSigningSettings {
+    fn run(&self, mut context: Context) -> TaiResult<Context> {
         let device = context
             .devices()?
             .first()

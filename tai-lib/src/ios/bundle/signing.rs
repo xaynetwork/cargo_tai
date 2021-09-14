@@ -12,7 +12,7 @@ use serde::Deserialize;
 use tracing::{debug, instrument};
 
 use crate::{
-    bundle::BuildBundle,
+    common::bundle::BuildBundle,
     ios::tools::{codesign, security},
     TaiResult,
 };

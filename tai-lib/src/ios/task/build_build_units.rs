@@ -1,8 +1,12 @@
 use cfg_expr::targets::{get_builtin_target_by_triple, TargetInfo};
 
 use crate::{
-    command::Command,
-    compiler::{compile_benches, compile_static_lib, compile_tests, BuildUnit},
+    common::{
+        command::Command,
+        compiler::{compile_benches, compile_static_lib, compile_tests, BuildUnit},
+        options::CompilerOptions,
+        task::Task,
+    },
     ios::compiler::{
         bench_command,
         benches_command,
@@ -10,8 +14,6 @@ use crate::{
         test_command,
         tests_command,
     },
-    options::CompilerOptions,
-    task::Task,
     TaiResult,
 };
 
@@ -19,10 +21,8 @@ use super::Context;
 
 pub struct BuildBuildUnit;
 
-impl Task for BuildBuildUnit {
-    type Context = Context;
-
-    fn run(&self, mut context: Self::Context) -> TaiResult<Self::Context> {
+impl Task<Context> for BuildBuildUnit {
+    fn run(&self, mut context: Context) -> TaiResult<Context> {
         let general_opt = &context.requested.general;
 
         let build_units = if let Command::Build = general_opt.command {

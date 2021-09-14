@@ -1,5 +1,5 @@
 mod bundle;
 mod compiler;
 pub mod platform;
-mod task;
+pub mod task;
 mod tools;

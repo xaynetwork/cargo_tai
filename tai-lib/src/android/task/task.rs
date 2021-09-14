@@ -1,14 +1,6 @@
-use crate::TaiResult;
+use crate::{common::task::get_project_metadata::GetProjectMetadata, TaiResult};
 
-use super::{
-    BuildBuildUnit,
-    Context,
-    CreateBundles,
-    FindAndroidSdk,
-    GetProjectMetadata,
-    ListDevices,
-    RunOnDevices,
-};
+use super::{BuildBuildUnit, Context, CreateBundles, FindAndroidSdk, ListDevices, RunOnDevices};
 
 pub enum Task {
     FindAndroidSdk(FindAndroidSdk),
@@ -19,10 +11,8 @@ pub enum Task {
     GetProjectMetadata(GetProjectMetadata),
 }
 
-impl crate::task::Task for Task {
-    type Context = Context;
-
-    fn run(&self, context: Self::Context) -> TaiResult<Self::Context> {
+impl crate::common::task::Task<Context> for Task {
+    fn run(&self, context: Context) -> TaiResult<Context> {
         match self {
             Task::FindAndroidSdk(task) => task.run(context),
             Task::ListDevices(task) => task.run(context),

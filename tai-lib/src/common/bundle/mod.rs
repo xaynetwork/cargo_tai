@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::compiler::BuildUnit;
+use crate::common::compiler::BuildUnit;
 
 mod bundles;
 

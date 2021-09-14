@@ -6,7 +6,10 @@ use std::{
 use anyhow::{Context, Error};
 use tracing::debug;
 
-use crate::{compiler::BuildUnit, project::ProjectMetadata, TaiResult};
+use crate::{
+    common::{compiler::BuildUnit, project::ProjectMetadata},
+    TaiResult,
+};
 
 use super::{BuildBundle, BuildBundles};
 
