@@ -108,4 +108,8 @@ impl XCodeProject {
     pub fn path(&self) -> PathBuf {
         self.root.join(format!("{}.xcodeproj", self.app_name))
     }
+
+    pub fn xctest_name(&self) -> String {
+        format!("{}Test", self.app_name)
+    }
 }

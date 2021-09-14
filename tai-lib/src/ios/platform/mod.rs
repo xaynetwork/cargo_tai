@@ -1,13 +1,20 @@
 use crate::common::task::get_project_metadata::GetProjectMetadata;
 
-use super::task::{BuildApp, BuildBuildUnit, BuildXCodeTest, CreateXCodeProject, Task};
+use super::task::{
+    BuildApp,
+    BuildBuildUnit,
+    BuildXCodeTest,
+    CopyTestProducts,
+    CreateXCodeProject,
+    Task,
+};
 
 pub mod physical;
 pub mod simulator;
 
 pub const APP_ID: &str = "cargo-tai";
 
-fn tasks_for_build_cmd() -> [Task; 5] {
+fn tasks_for_build_cmd() -> [Task; 6] {
     [
         Task::GetProjectMetadata(GetProjectMetadata),
         Task::BuildBuildUnit(BuildBuildUnit),
@@ -15,5 +22,6 @@ fn tasks_for_build_cmd() -> [Task; 5] {
         Task::CreateXCodeProject(CreateXCodeProject),
         Task::BuildApp(BuildApp),
         Task::BuildXCodeTest(BuildXCodeTest),
+        Task::CopyTestProducts(CopyTestProducts),
     ]
 }

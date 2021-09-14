@@ -5,6 +5,7 @@ use super::{
     BuildBuildUnit,
     BuildXCodeTest,
     Context,
+    CopyTestProducts,
     CreateBundles,
     CreateSignedBundles,
     CreateXCodeProject,
@@ -28,6 +29,7 @@ pub enum Task {
     CreateXCodeProject(CreateXCodeProject),
     BuildXCodeTest(BuildXCodeTest),
     BuildApp(BuildApp),
+    CopyTestProducts(CopyTestProducts),
 }
 
 impl crate::common::task::Task<Context> for Task {
@@ -45,6 +47,7 @@ impl crate::common::task::Task<Context> for Task {
             Task::CreateXCodeProject(task) => task.run(context),
             Task::BuildXCodeTest(task) => task.run(context),
             Task::BuildApp(task) => task.run(context),
+            Task::CopyTestProducts(task) => task.run(context),
         }
     }
 }

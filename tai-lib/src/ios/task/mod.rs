@@ -2,6 +2,7 @@ mod build_app;
 mod build_build_units;
 mod build_xcode_test;
 mod context;
+mod copy_test_products;
 mod create_bundles;
 mod create_signed_bundles;
 mod create_xcode_project;
@@ -17,6 +18,7 @@ pub use self::{
     build_build_units::BuildBuildUnit,
     build_xcode_test::BuildXCodeTest,
     context::Context,
+    copy_test_products::CopyTestProducts,
     create_bundles::CreateBundles,
     create_signed_bundles::CreateSignedBundles,
     create_xcode_project::CreateXCodeProject,
@@ -27,50 +29,3 @@ pub use self::{
     run_on_simulators::RunOnSimulators,
     task::Task,
 };
-
-// fn build_for_native_tests() -> TaiResult<()>{
-//     // build_dir
-//     //     template
-//     //         bindings
-//     //         ...
-//     //     xc_project
-//     //         build-app
-//     //         build-test
-
-//     const XCODEGEN_PROJECT_SPEC: &str = "project.yml";
-//     // compile -> lib_name
-//     let lib_name = "test-paradise.a";
-
-//     let build_dir = std::path::Path::new("");
-//     let ios_template_dir = std::path::Path::new("");
-
-//     // copy template into build dir
-//     std::fs::copy(ios_template_dir, build_dir)?;
-
-//     // generate project spec
-//     let mut spec = build_dir.to_path_buf();
-//     spec.push("template");
-//     spec.push(XCODEGEN_PROJECT_SPEC);
-
-//     let mut project_dir = build_dir.to_path_buf();
-//     project_dir.push("xc_project");
-
-//     // generate xcode project
-//     xcodegen::generate(&spec, &project_dir)?;
-
-//     // build app
-//     let mut data_path_build_app = project_dir.clone();
-//     data_path_build_app.push("build");
-//     xcodebuild::build(&project_dir, lib_name, data_path_build_app)?;
-
-//     // build test
-//     let mut data_path_build_test = project_dir.clone();
-//     data_path_build_test.push("build_test");
-//     xcodebuild::build_for_testing(&project_dir, lib_name, data_path_build_test)?;
-
-//     // build ipa
-//     // Build/Products/Release-iphoneos/
-
-//     // copy to output dir
-//     Ok(())
-// }

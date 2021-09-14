@@ -6,3 +6,4 @@ pub mod security;
 pub mod xcodebuild;
 pub mod xcodegen;
 pub mod xcrun;
+pub mod zip;

@@ -79,3 +79,4 @@ Furthermore, ideas were taken from the following projects:
   - (cargo-tai will use the first device that is returned by `ios-deploy --detect --json --no-wifi`)
 - There are currently no plans to add support for older versions of Xcode and other tools.
 - Resource data is included in all test/benchmark binary bundles even if they are not needed.
+- support for `aarch64-apple-ios-sim` and `armv7-apple-ios` is currently not implemented

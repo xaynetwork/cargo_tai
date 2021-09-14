@@ -18,8 +18,9 @@ targets:
     settings:
       PRODUCT_NAME: {{data.app_name}}
       PRODUCT_BUNDLE_IDENTIFIER: {{data.app_bundle_id}}
-      ARCHS: [arm64, x86_64]
       ENABLE_BITCODE: false
+      EXCLUDED_ARCHS[sdk=iphoneos*]: armv7
+      EXCLUDED_ARCHS[sdk=iphonesimulator*]: arm64
       LIBRARY_SEARCH_PATHS[sdk=iphoneos*]: $(inherited) "{{data.target_dir}}/aarch64-apple-ios/$(CONFIGURATION)"
       LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]: $(inherited) "{{data.target_dir}}/x86_64-apple-ios/$(CONFIGURATION)"
       SWIFT_OBJC_BRIDGING_HEADER: {{data.template_dir}}/bindings/cargoTai-Bridging-Header.h
@@ -36,4 +37,6 @@ targets:
     dependencies:
       - target: cargoTai
     settings:
+      EXCLUDED_ARCHS[sdk=iphoneos*]: armv7
+      EXCLUDED_ARCHS[sdk=iphonesimulator*]: arm64
       CODE_SIGNING_ALLOWED: NO

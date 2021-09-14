@@ -27,6 +27,8 @@ pub struct Context {
     pub build_bundles: Option<BuildBundles>,
     pub project_metadata: Option<ProjectMetadata>,
     pub xcode_project: Option<XCodeProject>,
+    pub xcode_product: Option<PathBuf>,
+    pub xcode_test_product: Option<PathBuf>,
 }
 
 impl Context {
@@ -76,7 +78,19 @@ impl Context {
     pub fn xcode_project(&self) -> TaiResult<&XCodeProject> {
         self.xcode_project
             .as_ref()
-            .ok_or_else(|| anyhow!("no project metadata found"))
+            .ok_or_else(|| anyhow!("no xcode project found"))
+    }
+
+    pub fn xcode_product(&self) -> TaiResult<&PathBuf> {
+        self.xcode_product
+            .as_ref()
+            .ok_or_else(|| anyhow!("no xcode product found"))
+    }
+
+    pub fn xcode_test_product(&self) -> TaiResult<&PathBuf> {
+        self.xcode_test_product
+            .as_ref()
+            .ok_or_else(|| anyhow!("no xcode test product found"))
     }
 }
 
@@ -93,6 +107,8 @@ impl TryFrom<options::Options> for Context {
             build_bundles: None,
             project_metadata: None,
             xcode_project: None,
+            xcode_product: None,
+            xcode_test_product: None,
         })
     }
 }

@@ -27,8 +27,8 @@ pub enum Profile {
 impl Profile {
     pub fn as_str(&self) -> &str {
         match self {
-            Profile::Debug => "debug",
-            Profile::Release => "release",
+            Self::Debug => "debug",
+            Self::Release => "release",
         }
     }
 }
