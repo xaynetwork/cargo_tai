@@ -6,7 +6,7 @@ use crate::{
         options::Options,
         task::{get_project_metadata::GetProjectMetadata, Runner},
     },
-    ios::task::{BuildBuildUnit, Context, CreateBundles, ListSimulators, RunOnSimulators, Task},
+    ios::task::{BuildBuiltUnits, Context, CreateBundles, ListSimulators, RunOnSimulators, Task},
     TaiResult,
 };
 
@@ -22,7 +22,7 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
             Runner::execute(
                 &[
                     Task::GetProjectMetadata(GetProjectMetadata),
-                    Task::BuildBuildUnit(BuildBuildUnit),
+                    Task::BuildBuiltUnits(BuildBuiltUnits),
                     Task::ListSimulators(ListSimulators),
                     Task::CreateBundles(CreateBundles),
                     Task::RunOnSimulators(RunOnSimulators),

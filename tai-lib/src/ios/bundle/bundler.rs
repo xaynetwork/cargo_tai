@@ -10,8 +10,8 @@ use tracing::{debug, instrument};
 
 use crate::{
     common::{
-        bundle::{copy_resources, BuildBundle},
-        compiler::BuildUnit,
+        bundle::{copy_resources, BuiltBundle},
+        compiler::BuiltUnit,
     },
     TaiResult,
 };
@@ -21,11 +21,11 @@ const INFO_PLIST: &str = "Info.plist";
 
 #[instrument(name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, app_id, resources))]
 pub fn create_bundle<P: AsRef<Path>>(
-    unit: BuildUnit,
+    unit: BuiltUnit,
     bundles_root: P,
     resources: &Option<Vec<(String, PathBuf)>>,
     app_id: &str,
-) -> TaiResult<BuildBundle> {
+) -> TaiResult<BuiltBundle> {
     let version_root = bundles_root
         .as_ref()
         .join(unit.target.triple)
@@ -51,7 +51,7 @@ pub fn create_bundle<P: AsRef<Path>>(
         .with_context(|| format!("Failed to create {}", INFO_PLIST))?;
     copy_resources(&bundle_root, resources)?;
 
-    Ok(BuildBundle {
+    Ok(BuiltBundle {
         root: bundle_root,
         build_unit: unit,
     })
@@ -77,7 +77,7 @@ pub struct InfoPlist<'a> {
 
 fn create_plist<P: AsRef<Path>>(
     bundle_root: P,
-    build_unit: &BuildUnit,
+    build_unit: &BuiltUnit,
     app_id: &str,
 ) -> TaiResult<PathBuf> {
     let path = bundle_root.as_ref().join(INFO_PLIST);

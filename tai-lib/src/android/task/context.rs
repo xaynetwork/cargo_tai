@@ -3,8 +3,8 @@ use anyhow::anyhow;
 use crate::{
     android::tools::{adb::Device, AndroidSdk},
     common::{
-        bundle::BuildBundles,
-        compiler::BuildUnit,
+        bundle::BuiltBundles,
+        compiler::BuiltUnit,
         options::{BinaryOptions, BuildOptions, Options},
         project::ProjectMetadata,
     },
@@ -15,8 +15,8 @@ pub struct Context {
     pub options: Options,
     pub android_sdk: Option<AndroidSdk>,
     pub devices: Option<Vec<Device>>,
-    pub build_units: Option<Vec<BuildUnit>>,
-    pub build_bundles: Option<BuildBundles>,
+    pub built_units: Option<Vec<BuiltUnit>>,
+    pub built_bundles: Option<BuiltBundles>,
     pub project_metadata: Option<ProjectMetadata>,
 }
 
@@ -27,16 +27,16 @@ impl Context {
             .ok_or_else(|| anyhow!("no iOS devices found"))
     }
 
-    pub fn take_build_units(&mut self) -> TaiResult<Vec<BuildUnit>> {
-        self.build_units
+    pub fn take_built_units(&mut self) -> TaiResult<Vec<BuiltUnit>> {
+        self.built_units
             .take()
-            .ok_or_else(|| anyhow!("no build units found"))
+            .ok_or_else(|| anyhow!("no built units found"))
     }
 
-    pub fn build_bundles(&self) -> TaiResult<&BuildBundles> {
-        self.build_bundles
+    pub fn built_bundles(&self) -> TaiResult<&BuiltBundles> {
+        self.built_bundles
             .as_ref()
-            .ok_or_else(|| anyhow!("no build bundles found"))
+            .ok_or_else(|| anyhow!("no built bundles found"))
     }
 
     pub fn android_sdk(&self) -> TaiResult<&AndroidSdk> {
@@ -71,8 +71,8 @@ impl From<Options> for Context {
         Self {
             options,
             devices: None,
-            build_units: None,
-            build_bundles: None,
+            built_units: None,
+            built_bundles: None,
             project_metadata: None,
             android_sdk: None,
         }

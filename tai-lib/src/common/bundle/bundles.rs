@@ -7,17 +7,17 @@ use anyhow::{Context, Error};
 use tracing::debug;
 
 use crate::{
-    common::{compiler::BuildUnit, project::ProjectMetadata},
+    common::{compiler::BuiltUnit, project::ProjectMetadata},
     TaiResult,
 };
 
-use super::{BuildBundle, BuildBundles};
+use super::{BuiltBundle, BuiltBundles};
 
 pub fn create_bundles(
-    units: Vec<BuildUnit>,
+    units: Vec<BuiltUnit>,
     project_metadata: &ProjectMetadata,
-    f: impl Fn(BuildUnit, &PathBuf) -> TaiResult<BuildBundle>,
-) -> TaiResult<BuildBundles> {
+    f: impl Fn(BuiltUnit, &PathBuf) -> TaiResult<BuiltBundle>,
+) -> TaiResult<BuiltBundles> {
     let tai_target_dir = project_metadata.tai_target_dir();
     create_dir_all(&tai_target_dir)?;
 
@@ -26,7 +26,7 @@ pub fn create_bundles(
         .map(|unit| f(unit, &tai_target_dir))
         .collect::<Result<Vec<_>, Error>>()?;
 
-    Ok(BuildBundles { bundles })
+    Ok(BuiltBundles { bundles })
 }
 
 pub fn copy_resources<P: AsRef<Path>>(

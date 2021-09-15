@@ -13,12 +13,12 @@ pub struct CreateSignedBundles;
 
 impl Task<Context> for CreateSignedBundles {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
-        let build_units = context.take_build_units()?;
+        let built_units = context.take_built_units()?;
         let sig_settings = context.signing_settings()?;
         let resources = &context.binary()?.resources;
 
         let bundles = create_bundles(
-            build_units,
+            built_units,
             context.project_metadata()?,
             |unit, bundles_root| create_bundle(unit, bundles_root, resources, &sig_settings.app_id),
         )?;
@@ -32,7 +32,7 @@ impl Task<Context> for CreateSignedBundles {
             .iter()
             .try_for_each(|bundle| sign_bundle(bundle, sig_settings, &entitlements))?;
 
-        context.build_bundles = Some(bundles);
+        context.built_bundles = Some(bundles);
 
         Ok(context)
     }

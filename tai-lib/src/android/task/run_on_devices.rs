@@ -8,7 +8,7 @@ use tracing::{debug, instrument};
 
 use crate::{
     android::tools::{adb, AndroidSdk},
-    common::{bundle::BuildBundle, options::BinaryOptions, task::Task},
+    common::{bundle::BuiltBundle, options::BinaryOptions, task::Task},
     TaiResult,
 };
 
@@ -21,7 +21,7 @@ pub struct RunOnDevices;
 impl Task<Context> for RunOnDevices {
     fn run(&self, context: Context) -> TaiResult<Context> {
         let sdk = context.android_sdk()?;
-        let bundles = context.build_bundles()?;
+        let bundles = context.built_bundles()?;
 
         context.devices()?.iter().try_for_each(|device| {
             bundles.bundles.iter().try_for_each(|bundle| {
@@ -35,7 +35,7 @@ impl Task<Context> for RunOnDevices {
 fn install_and_run_bundle(
     sdk: &AndroidSdk,
     device: &str,
-    bundle: &BuildBundle,
+    bundle: &BuiltBundle,
     binary_opt: &BinaryOptions,
 ) -> TaiResult<()> {
     let (remote_root, remote_exe) = install_bundle(sdk, device, bundle)?;
@@ -54,7 +54,7 @@ fn install_and_run_bundle(
 fn install_bundle(
     sdk: &AndroidSdk,
     device: &str,
-    bundle: &BuildBundle,
+    bundle: &BuiltBundle,
 ) -> TaiResult<(PathBuf, PathBuf)> {
     let remote_workdir = PathBuf::from(ANDROID_REMOTE_WORKDIR);
     adb::mkdir(sdk, device, &remote_workdir)?;

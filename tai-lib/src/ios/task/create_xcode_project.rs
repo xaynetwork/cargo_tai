@@ -26,9 +26,9 @@ pub struct CreateXCodeProject;
 impl Task<Context> for CreateXCodeProject {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let lib_name = context
-            .take_build_units()?
+            .take_built_units()?
             .first()
-            .ok_or(anyhow::anyhow!("no units"))?
+            .ok_or_else(|| anyhow::anyhow!("no built units"))?
             .name
             .clone();
 

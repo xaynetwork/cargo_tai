@@ -10,9 +10,9 @@ use crate::{
 
 use super::Context;
 
-pub struct BuildBuildUnit;
+pub struct BuildBuiltUnits;
 
-impl Task<Context> for BuildBuildUnit {
+impl Task<Context> for BuildBuiltUnits {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let sdk = context.android_sdk()?;
         let options = &context.options;
@@ -25,12 +25,12 @@ impl Task<Context> for BuildBuildUnit {
             Command::Build => todo!(),
         };
 
-        let build_units = match options.command {
+        let built_units = match options.command {
             Command::Bench | Command::Benches => compile_benches(cmd, &options.compiler)?,
             Command::Test | Command::Tests => compile_tests(cmd, &options.compiler)?,
             Command::Build => todo!(),
         };
-        context.build_units = Some(build_units);
+        context.built_units = Some(built_units);
 
         Ok(context)
     }

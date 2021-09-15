@@ -10,7 +10,7 @@ use crate::{
 };
 
 use super::task::{
-    BuildBuildUnit,
+    BuildBuiltUnits,
     Context,
     CreateBundles,
     FindAndroidSdk,
@@ -30,7 +30,7 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
                 &[
                     Task::FindAndroidSdk(FindAndroidSdk),
                     Task::GetProjectMetadata(GetProjectMetadata),
-                    Task::BuildBuildUnit(BuildBuildUnit),
+                    Task::BuildBuiltUnits(BuildBuiltUnits),
                     Task::CreateBundles(CreateBundles),
                     Task::ListDevices(ListDevices),
                     Task::RunOnDevices(RunOnDevices),

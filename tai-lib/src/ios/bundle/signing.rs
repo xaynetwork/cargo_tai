@@ -12,7 +12,7 @@ use serde::Deserialize;
 use tracing::{debug, instrument};
 
 use crate::{
-    common::bundle::BuildBundle,
+    common::bundle::BuiltBundle,
     ios::tools::{codesign, security},
     TaiResult,
 };
@@ -44,7 +44,7 @@ struct Data(#[serde(with = "serde_bytes")] Vec<u8>);
 
 #[instrument(name = "sign", skip(bundle, settings))]
 pub fn sign_bundle(
-    bundle: &BuildBundle,
+    bundle: &BuiltBundle,
     settings: &SigningSettings,
     entitlements: &Path,
 ) -> TaiResult<()> {

@@ -16,7 +16,7 @@ pub struct RunOnPhysicalDevice;
 impl Task<Context> for RunOnPhysicalDevice {
     fn run(&self, context: Context) -> TaiResult<Context> {
         context
-            .build_bundles()?
+            .built_bundles()?
             .bundles
             .iter()
             .try_for_each(|bundle| install_and_launch(&bundle.root, context.binary()?))?;

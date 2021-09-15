@@ -24,7 +24,7 @@ pub struct RunOnSimulators;
 
 impl Task<Context> for RunOnSimulators {
     fn run(&self, context: Context) -> TaiResult<Context> {
-        let bundles = context.build_bundles()?;
+        let bundles = context.built_bundles()?;
 
         context.simulators()?.iter().try_for_each(|simulator| {
             bundles.bundles.iter().try_for_each(|bundle| {

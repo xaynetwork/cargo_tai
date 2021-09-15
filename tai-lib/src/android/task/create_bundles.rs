@@ -10,14 +10,14 @@ pub struct CreateBundles;
 
 impl Task<Context> for CreateBundles {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
-        let build_units = context.take_build_units()?;
+        let built_units = context.take_built_units()?;
         let resources = &context.binary()?.resources;
 
-        let bundles = create_bundles(build_units, context.project_metadata()?, |unit, root| {
+        let bundles = create_bundles(built_units, context.project_metadata()?, |unit, root| {
             create_bundle(unit, root, resources)
         })?;
 
-        context.build_bundles = Some(bundles);
+        context.built_bundles = Some(bundles);
 
         Ok(context)
     }

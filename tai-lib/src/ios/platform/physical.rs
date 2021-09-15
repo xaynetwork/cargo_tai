@@ -9,7 +9,7 @@ use crate::{
     ios::{
         platform::tasks_for_build_cmd,
         task::{
-            BuildBuildUnit,
+            BuildBuiltUnits,
             Context,
             CreateSignedBundles,
             ListPhysicalDevices,
@@ -32,7 +32,7 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
                 &[
                     Task::GetProjectMetadata(GetProjectMetadata),
                     Task::SetBenchArg(SetBenchArg),
-                    Task::BuildBuildUnit(BuildBuildUnit),
+                    Task::BuildBuiltUnits(BuildBuiltUnits),
                     Task::ListPhysicalDevices(ListPhysicalDevices),
                     Task::ReadSigningSettings(ReadSigningSettings),
                     Task::CreateSignedBundles(CreateSignedBundles),

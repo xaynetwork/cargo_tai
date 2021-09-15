@@ -4,8 +4,8 @@ use anyhow::anyhow;
 
 use crate::{
     common::{
-        bundle::BuildBundles,
-        compiler::BuildUnit,
+        bundle::BuiltBundles,
+        compiler::BuiltUnit,
         options::{BinaryOptions, BuildOptions, Options},
         project::ProjectMetadata,
     },
@@ -19,9 +19,9 @@ pub struct Context {
     pub options: Options,
     pub devices: Option<Vec<ios_deploy::Device>>,
     pub simulators: Option<Vec<simctl::Device>>,
-    pub build_units: Option<Vec<BuildUnit>>,
+    pub built_units: Option<Vec<BuiltUnit>>,
     pub signing_settings: Option<SigningSettings>,
-    pub build_bundles: Option<BuildBundles>,
+    pub built_bundles: Option<BuiltBundles>,
     pub project_metadata: Option<ProjectMetadata>,
     pub xcode_project: Option<XCodeProject>,
     pub xcode_product: Option<PathBuf>,
@@ -41,10 +41,10 @@ impl Context {
             .ok_or_else(|| anyhow!("no iOS simulators found"))
     }
 
-    pub fn take_build_units(&mut self) -> TaiResult<Vec<BuildUnit>> {
-        self.build_units
+    pub fn take_built_units(&mut self) -> TaiResult<Vec<BuiltUnit>> {
+        self.built_units
             .take()
-            .ok_or_else(|| anyhow!("no build units found"))
+            .ok_or_else(|| anyhow!("no built units found"))
     }
 
     pub fn signing_settings(&self) -> TaiResult<&SigningSettings> {
@@ -53,8 +53,8 @@ impl Context {
             .ok_or_else(|| anyhow!("no signing settings found"))
     }
 
-    pub fn build_bundles(&self) -> TaiResult<&BuildBundles> {
-        self.build_bundles
+    pub fn built_bundles(&self) -> TaiResult<&BuiltBundles> {
+        self.built_bundles
             .as_ref()
             .ok_or_else(|| anyhow!("no build bundles found"))
     }
@@ -113,9 +113,9 @@ impl From<Options> for Context {
             options,
             devices: None,
             simulators: None,
-            build_units: None,
+            built_units: None,
             signing_settings: None,
-            build_bundles: None,
+            built_bundles: None,
             project_metadata: None,
             xcode_project: None,
             xcode_product: None,
