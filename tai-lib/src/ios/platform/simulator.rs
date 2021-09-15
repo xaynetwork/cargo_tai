@@ -1,5 +1,3 @@
-use std::convert::TryFrom;
-
 use tracing::instrument;
 
 use crate::{
@@ -16,8 +14,11 @@ use super::tasks_for_build_cmd;
 
 #[instrument(name = "build_and_run", skip(requested))]
 pub fn run_command(requested: Options) -> TaiResult<()> {
-    match &requested.general.command {
-        Command::Bench | Command::Test | Command::Benches | Command::Tests => {
+    match &requested.command {
+        Command::Build => {
+            Runner::execute(&tasks_for_build_cmd(), Context::from(requested))?;
+        }
+        _ => {
             Runner::execute(
                 &[
                     Task::GetProjectMetadata(GetProjectMetadata),
@@ -26,11 +27,8 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
                     Task::CreateBundles(CreateBundles),
                     Task::RunOnSimulators(RunOnSimulators),
                 ],
-                Context::try_from(requested)?,
+                Context::from(requested),
             )?;
-        }
-        Command::Build => {
-            Runner::execute(&tasks_for_build_cmd(), Context::try_from(requested)?)?;
         }
     }
     Ok(())

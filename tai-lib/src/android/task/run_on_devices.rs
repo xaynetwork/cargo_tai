@@ -25,7 +25,7 @@ impl Task<Context> for RunOnDevices {
 
         context.devices()?.iter().try_for_each(|device| {
             bundles.bundles.iter().try_for_each(|bundle| {
-                install_and_run_bundle(sdk, &device.id, bundle, &context.requested.general.binary)
+                install_and_run_bundle(sdk, &device.id, bundle, context.binary()?)
             })
         })?;
         Ok(context)

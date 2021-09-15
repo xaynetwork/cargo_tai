@@ -19,9 +19,7 @@ impl Task<Context> for RunOnPhysicalDevice {
             .build_bundles()?
             .bundles
             .iter()
-            .try_for_each(|bundle| {
-                install_and_launch(&bundle.root, &context.requested.general.binary)
-            })?;
+            .try_for_each(|bundle| install_and_launch(&bundle.root, context.binary()?))?;
         Ok(context)
     }
 }

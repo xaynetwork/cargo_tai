@@ -15,7 +15,7 @@ impl Task<Context> for CreateSignedBundles {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let build_units = context.take_build_units()?;
         let sig_settings = context.signing_settings()?;
-        let resources = &context.requested.general.binary.resources;
+        let resources = &context.binary()?.resources;
 
         let bundles = create_bundles(
             build_units,

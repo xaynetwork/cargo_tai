@@ -1,8 +1,3 @@
-use std::{
-    convert::{TryFrom, TryInto},
-    path::PathBuf,
-};
-
 use anyhow::anyhow;
 
 use crate::{
@@ -10,14 +5,14 @@ use crate::{
     common::{
         bundle::BuildBundles,
         compiler::BuildUnit,
-        options::{self, GeneralOptions},
+        options::{BinaryOptions, BuildOptions, Options},
         project::ProjectMetadata,
     },
     TaiResult,
 };
 
 pub struct Context {
-    pub requested: Options,
+    pub options: Options,
     pub android_sdk: Option<AndroidSdk>,
     pub devices: Option<Vec<Device>>,
     pub build_units: Option<Vec<BuildUnit>>,
@@ -26,17 +21,6 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(requested: options::Options) -> TaiResult<Self> {
-        Ok(Self {
-            requested: requested.try_into()?,
-            android_sdk: None,
-            devices: None,
-            build_units: None,
-            build_bundles: None,
-            project_metadata: None,
-        })
-    }
-
     pub fn devices(&self) -> TaiResult<&Vec<Device>> {
         self.devices
             .as_ref()
@@ -61,6 +45,20 @@ impl Context {
             .ok_or_else(|| anyhow!("no android SDK found"))
     }
 
+    pub fn binary(&self) -> TaiResult<&BinaryOptions> {
+        self.options
+            .binary
+            .as_ref()
+            .ok_or_else(|| anyhow!("no binary found"))
+    }
+
+    pub fn build(&self) -> TaiResult<&BuildOptions> {
+        self.options
+            .build
+            .as_ref()
+            .ok_or_else(|| anyhow!("no build found"))
+    }
+
     pub fn project_metadata(&self) -> TaiResult<&ProjectMetadata> {
         self.project_metadata
             .as_ref()
@@ -68,27 +66,15 @@ impl Context {
     }
 }
 
-pub struct Options {
-    pub general: GeneralOptions,
-
-    pub android_api_lvl: u8,
-    pub android_ndk: PathBuf,
-}
-
-impl TryFrom<options::Options> for Options {
-    type Error = anyhow::Error;
-
-    fn try_from(opt: options::Options) -> Result<Self, Self::Error> {
-        Ok(Self {
-            general: opt.general,
-            android_api_lvl: opt
-                .platform
-                .android_api_lvl
-                .ok_or_else(|| anyhow!("the option android_api_lvl is missing"))?,
-            android_ndk: opt
-                .platform
-                .android_ndk
-                .ok_or_else(|| anyhow!("the option android_ndk is missing"))?,
-        })
+impl From<Options> for Context {
+    fn from(options: Options) -> Self {
+        Self {
+            options,
+            devices: None,
+            build_units: None,
+            build_bundles: None,
+            project_metadata: None,
+            android_sdk: None,
+        }
     }
 }

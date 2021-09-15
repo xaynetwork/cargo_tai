@@ -17,7 +17,7 @@ impl Task<Context> for BuildXCodeTest {
         let project_meta = context.project_metadata()?;
         let xcode_project = context.xcode_project()?;
         let data_path = project_meta.ios_dir().join(TEST_BUILD_DIR);
-        let sdk = Sdk::try_from(&context.requested.general.compiler.target)?;
+        let sdk = Sdk::try_from(&context.options.compiler.target)?;
 
         xcodebuild::build_for_testing(
             xcode_project.path(),

@@ -13,22 +13,9 @@ pub enum Command {
     Build,
 }
 
-pub fn run_command(mut requested: Options) -> TaiResult<()> {
+pub fn run_command(requested: Options) -> TaiResult<()> {
     debug!("run command with options:\n{:?}", requested);
-
-    if let Command::Bench | Command::Benches = requested.general.command {
-        let mut args_with_bench = vec!["--bench".to_string()];
-        if let Some(ref args) = requested.general.binary.args {
-            args_with_bench.extend_from_slice(args);
-        };
-
-        requested.general.binary.args = Some(args_with_bench);
-    }
-
-    match (
-        requested.general.compiler.target.arch,
-        requested.general.compiler.target.os,
-    ) {
+    match (requested.compiler.target.arch, requested.compiler.target.os) {
         #[cfg(feature = "ios")]
         (Arch::aarch64, Some(Os::ios)) => ios::platform::physical::run_command(requested),
         #[cfg(feature = "ios")]
@@ -36,9 +23,6 @@ pub fn run_command(mut requested: Options) -> TaiResult<()> {
         (Arch::aarch64 | Arch::arm | Arch::x86 | Arch::x86_64, Some(Os::android)) => {
             android::platform::run_command(requested)
         }
-        _ => bail!(
-            "unsupported target: {:?}",
-            requested.general.compiler.target
-        ),
+        _ => bail!("unsupported target: {:?}", requested.compiler.target),
     }
 }

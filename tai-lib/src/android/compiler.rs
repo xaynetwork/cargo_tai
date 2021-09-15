@@ -4,9 +4,9 @@ use anyhow::{bail, Context};
 use cfg_expr::targets::TargetInfo;
 use tracing::debug;
 
-use crate::TaiResult;
+use crate::{common::options::Options, TaiResult};
 
-use super::{task::Options, tools::AndroidSdk};
+use super::tools::AndroidSdk;
 
 #[cfg(target_os = "macos")]
 const HOST_ARCH: &str = "darwin-x86_64";
@@ -37,11 +37,11 @@ pub fn test_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command>
     Ok(cmd)
 }
 
-pub fn build_lib_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
-    let mut cmd = setup_android_deps(sdk, requested)?;
-    cmd.args(&["build"]);
-    Ok(cmd)
-}
+// pub fn build_lib_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
+//     let mut cmd = setup_android_deps(sdk, requested)?;
+//     cmd.args(&["build"]);
+//     Ok(cmd)
+// }
 
 fn clang_suffix(
     target: &TargetInfo<'static>,
@@ -99,39 +99,45 @@ fn toolchain_suffix(target: &TargetInfo<'static>, host_arch: &str, bin: &str) ->
 }
 
 fn setup_android_deps(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
-    let cc_key = format!("CC_{}", to_env_key(&requested.general.compiler.target));
-    let ar_key = format!("AR_{}", to_env_key(&requested.general.compiler.target));
-    let cxx_key = format!("CXX_{}", to_env_key(&requested.general.compiler.target));
+    let cc_key = format!("CC_{}", to_env_key(&requested.compiler.target));
+    let ar_key = format!("AR_{}", to_env_key(&requested.compiler.target));
+    let cxx_key = format!("CXX_{}", to_env_key(&requested.compiler.target));
 
     // https://github.com/rust-lang/rustup/blob/master/ci/docker/android/Dockerfile
     let cargo_ar_key = format!(
         "CARGO_TARGET_{}_{}",
-        to_cargo_env_key(&requested.general.compiler.target),
+        to_cargo_env_key(&requested.compiler.target),
         "AR"
     );
     let cargo_linker_key = format!(
         "CARGO_TARGET_{}_{}",
-        to_cargo_env_key(&requested.general.compiler.target),
+        to_cargo_env_key(&requested.compiler.target),
         "LINKER"
     );
 
     let target_ar = &sdk.ndk.join(toolchain_suffix(
-        &requested.general.compiler.target,
+        &requested.compiler.target,
         HOST_ARCH,
         "ar",
     ));
 
+    let api_lvl = requested
+        .android
+        .as_ref()
+        .ok_or_else(|| anyhow::anyhow!("no android options"))?
+        .api_lvl;
+
     let target_linker = &sdk.ndk.join(clang_suffix(
-        &requested.general.compiler.target,
+        &requested.compiler.target,
         HOST_ARCH,
-        requested.android_api_lvl,
+        api_lvl,
         "",
     ));
 
     let target_cxx = &sdk.ndk.join(clang_suffix(
-        &requested.general.compiler.target,
+        &requested.compiler.target,
         HOST_ARCH,
-        requested.android_api_lvl,
+        api_lvl,
         "++",
     ));
 

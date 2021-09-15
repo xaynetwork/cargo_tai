@@ -1,4 +1,7 @@
-use crate::{common::task::get_project_metadata::GetProjectMetadata, TaiResult};
+use crate::{
+    common::task::{get_project_metadata::GetProjectMetadata, set_bench_arg::SetBenchArg},
+    TaiResult,
+};
 
 use super::{
     BuildApp,
@@ -30,6 +33,7 @@ pub enum Task {
     BuildXCodeTest(BuildXCodeTest),
     BuildApp(BuildApp),
     CopyTestProducts(CopyTestProducts),
+    SetBenchArg(SetBenchArg),
 }
 
 impl crate::common::task::Task<Context> for Task {
@@ -48,6 +52,7 @@ impl crate::common::task::Task<Context> for Task {
             Task::BuildXCodeTest(task) => task.run(context),
             Task::BuildApp(task) => task.run(context),
             Task::CopyTestProducts(task) => task.run(context),
+            Task::SetBenchArg(task) => task.run(context),
         }
     }
 }

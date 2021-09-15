@@ -1,6 +1,7 @@
 use crate::TaiResult;
 
 pub mod get_project_metadata;
+pub mod set_bench_arg;
 
 pub trait Task<C> {
     fn run(&self, context: C) -> TaiResult<C>;

@@ -28,7 +28,7 @@ impl Task<Context> for RunOnSimulators {
 
         context.simulators()?.iter().try_for_each(|simulator| {
             bundles.bundles.iter().try_for_each(|bundle| {
-                install_and_launch(simulator, &bundle.root, &context.requested.general.binary)
+                install_and_launch(simulator, &bundle.root, context.binary()?)
             })
         })?;
         Ok(context)

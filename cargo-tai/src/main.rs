@@ -34,7 +34,7 @@ fn main() -> Result<(), Error> {
         // it might be to early
 
         use cfg_expr::targets::Os;
-        if let Some(Os::ios) = &requested_opt.general.compiler.target.os {
+        if let Some(Os::ios) = &requested_opt.compiler.target.os {
             panic!("cannot compile any iOS targets on a non Apple host system")
         }
     }

@@ -1,7 +1,4 @@
-use std::{
-    convert::{TryFrom, TryInto},
-    path::PathBuf,
-};
+use std::path::PathBuf;
 
 use anyhow::anyhow;
 
@@ -9,7 +6,7 @@ use crate::{
     common::{
         bundle::BuildBundles,
         compiler::BuildUnit,
-        options::{self, GeneralOptions},
+        options::{BinaryOptions, BuildOptions, Options},
         project::ProjectMetadata,
     },
     ios::{bundle::signing::SigningSettings, tools::ios_deploy},
@@ -19,7 +16,7 @@ use crate::{
 use super::create_xcode_project::XCodeProject;
 
 pub struct Context {
-    pub requested: Options,
+    pub options: Options,
     pub devices: Option<Vec<ios_deploy::Device>>,
     pub simulators: Option<Vec<simctl::Device>>,
     pub build_units: Option<Vec<BuildUnit>>,
@@ -63,10 +60,26 @@ impl Context {
     }
 
     pub fn mobile_provision(&self) -> TaiResult<&PathBuf> {
-        self.requested
-            .mobile_provision
+        Ok(&self
+            .options
+            .ios
             .as_ref()
-            .ok_or_else(|| anyhow!("no mobile provision found"))
+            .ok_or_else(|| anyhow!("no mobile provision found"))?
+            .mobile_provision)
+    }
+
+    pub fn binary(&self) -> TaiResult<&BinaryOptions> {
+        self.options
+            .binary
+            .as_ref()
+            .ok_or_else(|| anyhow!("no binary found"))
+    }
+
+    pub fn build(&self) -> TaiResult<&BuildOptions> {
+        self.options
+            .build
+            .as_ref()
+            .ok_or_else(|| anyhow!("no build found"))
     }
 
     pub fn project_metadata(&self) -> TaiResult<&ProjectMetadata> {
@@ -94,12 +107,10 @@ impl Context {
     }
 }
 
-impl TryFrom<options::Options> for Context {
-    type Error = anyhow::Error;
-
-    fn try_from(opts: options::Options) -> Result<Self, Self::Error> {
-        Ok(Self {
-            requested: opts.try_into()?,
+impl From<Options> for Context {
+    fn from(options: Options) -> Self {
+        Self {
+            options,
             devices: None,
             simulators: None,
             build_units: None,
@@ -109,23 +120,6 @@ impl TryFrom<options::Options> for Context {
             xcode_project: None,
             xcode_product: None,
             xcode_test_product: None,
-        })
-    }
-}
-
-pub struct Options {
-    pub general: GeneralOptions,
-
-    pub mobile_provision: Option<PathBuf>,
-}
-
-impl TryFrom<options::Options> for Options {
-    type Error = anyhow::Error;
-
-    fn try_from(opts: options::Options) -> Result<Self, Self::Error> {
-        Ok(Self {
-            general: opts.general,
-            mobile_provision: opts.platform.ios_mobile_provision,
-        })
+        }
     }
 }

@@ -15,19 +15,19 @@ pub struct BuildBuildUnit;
 impl Task<Context> for BuildBuildUnit {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let sdk = context.android_sdk()?;
-        let general_opt = &context.requested.general;
+        let options = &context.options;
 
-        let cmd = match general_opt.command {
-            Command::Bench => bench_command(sdk, &context.requested)?,
-            Command::Test => test_command(sdk, &context.requested)?,
-            Command::Benches => benches_command(sdk, &context.requested)?,
-            Command::Tests => tests_command(sdk, &context.requested)?,
+        let cmd = match options.command {
+            Command::Bench => bench_command(sdk, &context.options)?,
+            Command::Test => test_command(sdk, &context.options)?,
+            Command::Benches => benches_command(sdk, &context.options)?,
+            Command::Tests => tests_command(sdk, &context.options)?,
             Command::Build => todo!(),
         };
 
-        let build_units = match general_opt.command {
-            Command::Bench | Command::Benches => compile_benches(cmd, &general_opt.compiler)?,
-            Command::Test | Command::Tests => compile_tests(cmd, &general_opt.compiler)?,
+        let build_units = match options.command {
+            Command::Bench | Command::Benches => compile_benches(cmd, &options.compiler)?,
+            Command::Test | Command::Tests => compile_tests(cmd, &options.compiler)?,
             Command::Build => todo!(),
         };
         context.build_units = Some(build_units);

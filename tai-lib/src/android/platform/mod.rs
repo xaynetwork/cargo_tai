@@ -2,6 +2,7 @@ use tracing::instrument;
 
 use crate::{
     common::{
+        command::Command,
         options::Options,
         task::{get_project_metadata::GetProjectMetadata, Runner},
     },
@@ -20,16 +21,23 @@ use super::task::{
 
 #[instrument(name = "build_and_run", skip(requested))]
 pub fn run_command(requested: Options) -> TaiResult<()> {
-    Runner::execute(
-        &[
-            Task::FindAndroidSdk(FindAndroidSdk),
-            Task::GetProjectMetadata(GetProjectMetadata),
-            Task::BuildBuildUnit(BuildBuildUnit),
-            Task::CreateBundles(CreateBundles),
-            Task::ListDevices(ListDevices),
-            Task::RunOnDevices(RunOnDevices),
-        ],
-        Context::new(requested)?,
-    )?;
+    match &requested.command {
+        Command::Build => {
+            unimplemented!()
+        }
+        _ => {
+            Runner::execute(
+                &[
+                    Task::FindAndroidSdk(FindAndroidSdk),
+                    Task::GetProjectMetadata(GetProjectMetadata),
+                    Task::BuildBuildUnit(BuildBuildUnit),
+                    Task::CreateBundles(CreateBundles),
+                    Task::ListDevices(ListDevices),
+                    Task::RunOnDevices(RunOnDevices),
+                ],
+                Context::from(requested),
+            )?;
+        }
+    }
     Ok(())
 }

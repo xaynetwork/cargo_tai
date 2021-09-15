@@ -2,20 +2,16 @@ use std::path::PathBuf;
 
 use cfg_expr::targets::TargetInfo;
 
-use crate::common::command::Command;
+use super::command::Command;
 
 #[derive(Debug, Clone)]
 pub struct Options {
-    pub general: GeneralOptions,
-
-    pub platform: PlatformOptions,
-}
-
-#[derive(Debug, Clone)]
-pub struct GeneralOptions {
     pub command: Command,
     pub compiler: CompilerOptions,
-    pub binary: BinaryOptions,
+    pub binary: Option<BinaryOptions>,
+    pub build: Option<BuildOptions>,
+    pub android: Option<AndroidOptions>,
+    pub ios: Option<IosOptions>,
 }
 
 #[derive(Debug, Clone)]
@@ -35,8 +31,18 @@ pub struct BinaryOptions {
 }
 
 #[derive(Debug, Clone)]
-pub struct PlatformOptions {
-    pub android_api_lvl: Option<u8>,
-    pub android_ndk: Option<PathBuf>,
-    pub ios_mobile_provision: Option<PathBuf>,
+pub struct BuildOptions {
+    pub template_dir: PathBuf,
+    pub out_dir: PathBuf,
+}
+
+#[derive(Debug, Clone)]
+pub struct AndroidOptions {
+    pub api_lvl: u8,
+    pub ndk: PathBuf,
+}
+
+#[derive(Debug, Clone)]
+pub struct IosOptions {
+    pub mobile_provision: PathBuf,
 }

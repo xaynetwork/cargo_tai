@@ -17,7 +17,7 @@ impl Task<Context> for BuildApp {
         let project_meta = context.project_metadata()?;
         let xcode_project = context.xcode_project()?;
         let profile = &project_meta.cargo_opts.profile;
-        let sdk = Sdk::try_from(&context.requested.general.compiler.target)?;
+        let sdk = Sdk::try_from(&context.options.compiler.target)?;
         let data_path = project_meta.ios_dir().join(BUILD_DIR);
 
         xcodebuild::build(
