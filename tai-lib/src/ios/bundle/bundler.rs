@@ -10,7 +10,7 @@ use tracing::{debug, instrument};
 
 use crate::{
     common::{
-        bundle::{copy_resources, BuiltBundle},
+        bundle::{copy_resources_bundle, BuiltBundle},
         compiler::BuiltUnit,
     },
     TaiResult,
@@ -49,7 +49,7 @@ pub fn create_bundle<P: AsRef<Path>>(
 
     create_plist(&bundle_root, &unit, app_id)
         .with_context(|| format!("Failed to create {}", INFO_PLIST))?;
-    copy_resources(&bundle_root, resources)?;
+    copy_resources_bundle(&bundle_root, resources)?;
 
     Ok(BuiltBundle {
         root: bundle_root,

@@ -8,6 +8,7 @@ use super::command::Command;
 pub struct Options {
     pub command: Command,
     pub compiler: CompilerOptions,
+    pub resources: Option<Vec<(String, PathBuf)>>,
     pub binary: Option<BinaryOptions>,
     pub build: Option<BuildOptions>,
     pub android: Option<AndroidOptions>,
@@ -27,7 +28,6 @@ pub struct CompilerOptions {
 pub struct BinaryOptions {
     pub args: Option<Vec<String>>,
     pub envs: Option<Vec<(String, String)>>,
-    pub resources: Option<Vec<(String, PathBuf)>>,
 }
 
 #[derive(Debug, Clone)]

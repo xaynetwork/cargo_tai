@@ -15,6 +15,9 @@ targets:
     sources:
       - path: cargoTai
       - path: bindings
+      - path: resources
+        buildPhase: resources
+        type: folder
     settings:
       PRODUCT_NAME: {{data.app_name}}
       PRODUCT_BUNDLE_IDENTIFIER: {{data.app_bundle_id}}

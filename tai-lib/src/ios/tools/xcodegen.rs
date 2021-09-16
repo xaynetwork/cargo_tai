@@ -1,20 +1,39 @@
 use std::{
-    path::Path,
-    process::{Command, Output},
+    path::{Path, PathBuf},
+    process::Command,
 };
 
-use anyhow::anyhow;
-
-use crate::TaiResult;
+use crate::{common::tools::command_ext::ExitStatusExt, TaiResult};
 
 const XCODEGEN: &str = "xcodegen";
 
-pub fn generate<S: AsRef<Path>, P: AsRef<Path>>(spec: S, project: P) -> TaiResult<Output> {
-    Command::new(XCODEGEN)
-        .args(&["generate", "--spec"])
-        .arg(spec.as_ref())
-        .arg("--project")
-        .arg(project.as_ref())
-        .output()
-        .map_err(|err| anyhow!("{}", err))
+#[derive(Default)]
+pub struct XCodeGenGenerate {
+    spec: Option<PathBuf>,
+    project: Option<PathBuf>,
+}
+
+impl XCodeGenGenerate {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn spec<P: AsRef<Path>>(mut self, path: P) -> Self {
+        self.spec = Some(path.as_ref().to_owned());
+        self
+    }
+
+    pub fn project<P: AsRef<Path>>(mut self, path: P) -> Self {
+        self.project = Some(path.as_ref().to_owned());
+        self
+    }
+
+    pub fn execute(self) -> TaiResult<()> {
+        let mut command = Command::new(XCODEGEN);
+        command.arg("generate");
+        self.spec.map(|path| command.arg("--spec").arg(path));
+        self.project.map(|path| command.arg("--project").arg(path));
+
+        command.status()?.expect_success("failed to run xcodegen")
+    }
 }

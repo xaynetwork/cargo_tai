@@ -2,7 +2,7 @@ use std::convert::TryFrom;
 
 use crate::{
     common::{project::Profile, task::Task},
-    ios::tools::xcodebuild::{self, Sdk},
+    ios::tools::xcodebuild::{Sdk, XCodeBuild},
     TaiResult,
 };
 
@@ -19,12 +19,13 @@ impl Task<Context> for BuildXCodeTest {
         let data_path = project_meta.ios_dir().join(TEST_BUILD_DIR);
         let sdk = Sdk::try_from(&context.options.compiler.target)?;
 
-        xcodebuild::build_for_testing(
-            xcode_project.path(),
-            &xcode_project.app_name,
-            &sdk,
-            &data_path,
-        )?;
+        XCodeBuild::new()
+            .project(xcode_project.path())
+            .scheme(&xcode_project.app_name)
+            .sdk(sdk)
+            .derived_data_path(data_path)
+            .build_for_testing()
+            .execute()?;
 
         let product = project_meta
             .ios_dir()
@@ -35,8 +36,6 @@ impl Task<Context> for BuildXCodeTest {
             .join(format!("{}.app", &xcode_project.app_name))
             .join("PlugIns")
             .join(format!("{}.xctest", &xcode_project.xctest_name()));
-
-        println!("{} -> {}", product.display(), product.exists());
 
         context.xcode_test_product = Some(product);
         Ok(context)

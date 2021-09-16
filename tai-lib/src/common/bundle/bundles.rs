@@ -29,7 +29,7 @@ pub fn create_bundles(
     Ok(BuiltBundles { bundles })
 }
 
-pub fn copy_resources<P: AsRef<Path>>(
+pub fn copy_resources_bundle<P: AsRef<Path>>(
     bundle_root: P,
     resources: &Option<Vec<(String, PathBuf)>>,
 ) -> TaiResult<()> {
@@ -44,18 +44,26 @@ pub fn copy_resources<P: AsRef<Path>>(
         })?;
         debug!("create dir: {}", test_data_root.display());
 
-        let copied: TaiResult<Vec<()>> = resources
-            .iter()
-            .map(|(id, local_path)| {
-                let remote_path = test_data_root.join(id);
-                copy(local_path, &remote_path)
-                    .with_context(|| format!("Failed to copy resource {}", local_path.display()))?;
-                debug!("copy {} to {}", local_path.display(), remote_path.display());
-                Ok(())
-            })
-            .collect();
-        copied?;
+        copy_resources(test_data_root, resources)?;
     }
 
+    Ok(())
+}
+
+pub fn copy_resources<P: AsRef<Path>>(
+    dest_dir: P,
+    resources: &[(String, PathBuf)],
+) -> TaiResult<()> {
+    let copied: TaiResult<Vec<()>> = resources
+        .iter()
+        .map(|(id, local_path)| {
+            let remote_path = dest_dir.as_ref().join(id);
+            copy(local_path, &remote_path)
+                .with_context(|| format!("Failed to copy resource {}", local_path.display()))?;
+            debug!("copy {} to {}", local_path.display(), remote_path.display());
+            Ok(())
+        })
+        .collect();
+    copied?;
     Ok(())
 }

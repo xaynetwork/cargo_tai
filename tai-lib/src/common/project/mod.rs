@@ -19,6 +19,7 @@ pub struct CargoOptions {
     pub profile: Profile,
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum Profile {
     Debug,
     Release,

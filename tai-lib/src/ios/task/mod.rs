@@ -3,8 +3,8 @@ use crate::{
     TaiResult,
 };
 
-mod build_app;
 mod build_built_units;
+mod build_xcode_app;
 mod build_xcode_test;
 mod context;
 mod copy_test_products;
@@ -18,8 +18,8 @@ mod run_on_physical_device;
 mod run_on_simulators;
 
 pub use self::{
-    build_app::BuildApp,
     build_built_units::BuildBuiltUnits,
+    build_xcode_app::BuildXCodeApp,
     build_xcode_test::BuildXCodeTest,
     context::Context,
     copy_test_products::CopyTestProducts,
@@ -45,7 +45,7 @@ pub enum Task {
     GetProjectMetadata(GetProjectMetadata),
     CreateXCodeProject(CreateXCodeProject),
     BuildXCodeTest(BuildXCodeTest),
-    BuildApp(BuildApp),
+    BuildXCodeApp(BuildXCodeApp),
     CopyTestProducts(CopyTestProducts),
     SetBenchArg(SetBenchArg),
 }
@@ -64,7 +64,7 @@ impl crate::common::task::Task<Context> for Task {
             Task::GetProjectMetadata(task) => task.run(context),
             Task::CreateXCodeProject(task) => task.run(context),
             Task::BuildXCodeTest(task) => task.run(context),
-            Task::BuildApp(task) => task.run(context),
+            Task::BuildXCodeApp(task) => task.run(context),
             Task::CopyTestProducts(task) => task.run(context),
             Task::SetBenchArg(task) => task.run(context),
         }

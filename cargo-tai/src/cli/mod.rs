@@ -10,6 +10,7 @@ use self::{
     build::BuildOptions,
     compiler::CompilerOptions,
     ios::IosOptions,
+    resource::ResourceOptions,
 };
 
 pub mod android;
@@ -17,6 +18,7 @@ pub mod binary;
 pub mod build;
 pub mod compiler;
 pub mod ios;
+pub mod resource;
 
 #[derive(StructOpt, Debug)]
 pub enum Options {
@@ -38,6 +40,9 @@ pub struct LocalRun {
     compiler: CompilerOptions,
 
     #[structopt(flatten)]
+    resources: ResourceOptions,
+
+    #[structopt(flatten)]
     binary: BinaryOptions,
 
     #[structopt(flatten)]
@@ -51,6 +56,9 @@ pub struct LocalRun {
 pub struct NativeTestBuild {
     #[structopt(flatten)]
     compiler: CompilerOptions,
+
+    #[structopt(flatten)]
+    resources: ResourceOptions,
 
     #[structopt(flatten)]
     build: BuildOptions,
@@ -78,6 +86,7 @@ fn from_local_run(command: Command, options: LocalRun) -> options::Options {
     options::Options {
         command,
         compiler: options.compiler.into(),
+        resources: options.resources.resources,
         binary: options.binary.into(),
         build: None,
         android: options.android.into(),
@@ -89,9 +98,24 @@ fn from_native_test_build(command: Command, options: NativeTestBuild) -> options
     options::Options {
         command,
         compiler: options.compiler.into(),
+        resources: options.resources.resources,
         binary: None,
         build: Some(options.build.into()),
         android: options.android.into(),
         ios: options.ios.into(),
     }
+}
+
+/// Parse a single key-value pair
+fn parse_key_val<T, U>(s: &str) -> Result<(T, U), Box<dyn std::error::Error>>
+where
+    T: std::str::FromStr,
+    T::Err: std::error::Error + 'static,
+    U: std::str::FromStr,
+    U::Err: std::error::Error + 'static,
+{
+    let pos = s
+        .find('=')
+        .ok_or_else(|| format!("invalid KEY=value: no `=` found in `{}`", s))?;
+    Ok((s[..pos].parse()?, s[pos + 1..].parse()?))
 }

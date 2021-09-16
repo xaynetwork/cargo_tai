@@ -1,8 +1,8 @@
 use crate::common::task::get_project_metadata::GetProjectMetadata;
 
 use super::task::{
-    BuildApp,
     BuildBuiltUnits,
+    BuildXCodeApp,
     BuildXCodeTest,
     CopyTestProducts,
     CreateXCodeProject,
@@ -20,7 +20,7 @@ fn tasks_for_build_cmd() -> [Task; 6] {
         Task::BuildBuiltUnits(BuildBuiltUnits),
         // Task::ReadSigningSettings(ReadSigningSettings), we need the team id later + bundle id
         Task::CreateXCodeProject(CreateXCodeProject),
-        Task::BuildApp(BuildApp),
+        Task::BuildXCodeApp(BuildXCodeApp),
         Task::BuildXCodeTest(BuildXCodeTest),
         Task::CopyTestProducts(CopyTestProducts),
     ]

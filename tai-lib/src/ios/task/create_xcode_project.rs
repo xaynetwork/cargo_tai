@@ -8,10 +8,10 @@ use serde::Serialize;
 use serde_json::value::Map;
 
 use crate::{
-    common::task::Task,
+    common::{bundle::copy_resources, task::Task},
     ios::{
         platform::APP_ID,
-        tools::{rsync::rsync, xcodegen},
+        tools::{rsync::rsync, xcodegen::XCodeGenGenerate},
     },
     TaiResult,
 };
@@ -20,6 +20,7 @@ use super::Context;
 
 // needs to be otherwise the tests will not work https://github.com/yonaskolb/XcodeGen/issues/408#issuecomment-458639126
 const APP_NAME: &str = "cargoTai";
+const RESOURCES_DIR: &str = "resources";
 
 pub struct CreateXCodeProject;
 
@@ -34,11 +35,17 @@ impl Task<Context> for CreateXCodeProject {
 
         let project_meta = context.project_metadata()?;
         let template_dir = &context.build()?.template_dir;
-
         let ios_dir = project_meta.ios_dir();
 
         create_dir_all(&ios_dir)?;
         rsync(&template_dir, &ios_dir)?;
+
+        let resources_path = ios_dir.join(RESOURCES_DIR);
+        create_dir_all(&resources_path)?;
+
+        if let Some(resources) = &context.options.resources {
+            copy_resources(resources_path, resources)?;
+        }
 
         let tpl_path = ios_dir.join("project.yml.hbs");
         let project_path = ios_dir.join("project.yml");
@@ -51,12 +58,15 @@ impl Task<Context> for CreateXCodeProject {
                 .target_directory
                 .clone()
                 .into_std_path_buf(),
-                template_dir: template_dir.clone(),
+            template_dir: template_dir.clone().canonicalize()?,
             lib_name,
         };
 
         generate_project_file(&tpl_path, &project_path, &data)?;
-        xcodegen::generate(&project_path, &ios_dir)?;
+        XCodeGenGenerate::new()
+            .spec(&project_path)
+            .project(&ios_dir)
+            .execute()?;
 
         let xcode_project = XCodeProject {
             root: ios_dir,

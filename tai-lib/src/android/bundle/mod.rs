@@ -7,7 +7,7 @@ use tracing::{debug, instrument};
 
 use crate::{
     common::{
-        bundle::{copy_resources, BuiltBundle},
+        bundle::{copy_resources_bundle, BuiltBundle},
         compiler::BuiltUnit,
     },
     TaiResult,
@@ -33,7 +33,7 @@ pub fn create_bundle<P: AsRef<Path>>(
     let to = bundle_root.join(&unit.name);
     copy(&unit.artifact, &to)?;
     debug!("copy {} to {}", &unit.artifact.display(), to.display());
-    copy_resources(&bundle_root, resources)?;
+    copy_resources_bundle(&bundle_root, resources)?;
 
     Ok(BuiltBundle {
         root: bundle_root,
