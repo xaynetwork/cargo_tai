@@ -33,7 +33,7 @@ impl Task<Context> for CreateXCodeProject {
             .clone();
 
         let project_meta = context.project_metadata()?;
-        let template_dir = PathBuf::from("/Users/robert/projects/cargo-tai/project-templates/ios");
+        let template_dir = &context.build()?.template_dir;
 
         let ios_dir = project_meta.ios_dir();
 
@@ -51,7 +51,7 @@ impl Task<Context> for CreateXCodeProject {
                 .target_directory
                 .clone()
                 .into_std_path_buf(),
-            template_dir,
+                template_dir: template_dir.clone(),
             lib_name,
         };
 

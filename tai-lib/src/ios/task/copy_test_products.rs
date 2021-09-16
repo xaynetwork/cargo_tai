@@ -10,11 +10,8 @@ pub struct CopyTestProducts;
 
 impl Task<Context> for CopyTestProducts {
     fn run(&self, context: Context) -> TaiResult<Context> {
-        let project_meta = context.project_metadata()?;
         let xcode_project = context.xcode_project()?;
-
-        // make it a configurable
-        let output_dir = project_meta.ios_dir().join("out");
+        let output_dir = &context.build()?.out_dir;
 
         let payload = output_dir.join("Payload");
         create_dir_all(&payload)?;
