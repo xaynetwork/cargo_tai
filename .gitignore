@@ -1,5 +1,6 @@
 /target
 /.vscode/
+out/
 
 # MacOS files
 .DS_Store

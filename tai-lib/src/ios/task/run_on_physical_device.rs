@@ -15,6 +15,14 @@ pub struct RunOnPhysicalDevice;
 
 impl Task<Context> for RunOnPhysicalDevice {
     fn run(&self, context: Context) -> TaiResult<Context> {
+        // if !mobile_provision
+        //     .provisioned_devices
+        //     .iter()
+        //     .any(|d| d == device_id)
+        // {
+        //     bail!("device: {} not in provisioning profile", device_id);
+        // }
+
         context
             .built_bundles()?
             .bundles

@@ -11,7 +11,7 @@ use crate::{
     common::{bundle::copy_resources, task::Task},
     ios::{
         platform::APP_ID,
-        tools::{rsync::rsync, xcodegen::XCodeGenGenerate},
+        tools::{rsync::Rsync, xcodegen::XCodeGenGenerate},
     },
     TaiResult,
 };
@@ -20,7 +20,6 @@ use super::Context;
 
 // needs to be otherwise the tests will not work https://github.com/yonaskolb/XcodeGen/issues/408#issuecomment-458639126
 const APP_NAME: &str = "cargoTai";
-const RESOURCES_DIR: &str = "resources";
 
 pub struct CreateXCodeProject;
 
@@ -38,9 +37,14 @@ impl Task<Context> for CreateXCodeProject {
         let ios_dir = project_meta.ios_dir();
 
         create_dir_all(&ios_dir)?;
-        rsync(&template_dir, &ios_dir)?;
+        Rsync::new(&template_dir, &ios_dir)
+            .archive()
+            .verbose()
+            .delete()
+            .only_content()
+            .execute()?;
 
-        let resources_path = ios_dir.join(RESOURCES_DIR);
+        let resources_path = ios_dir.join(tai_util::DATA_DIR_NAME);
         create_dir_all(&resources_path)?;
 
         if let Some(resources) = &context.options.resources {
@@ -50,9 +54,18 @@ impl Task<Context> for CreateXCodeProject {
         let tpl_path = ios_dir.join("project.yml.hbs");
         let project_path = ios_dir.join("project.yml");
 
+        let (app_bundle_id, team_id) = if let Ok(sig_settings) = context.signing_settings() {
+            (
+                sig_settings.app_id.to_owned(),
+                Some(sig_settings.team_id.to_owned()),
+            )
+        } else {
+            (APP_ID.to_owned(), None)
+        };
+
         let data = Data {
             app_name: APP_NAME.into(),
-            app_bundle_id: APP_ID.into(),
+            app_bundle_id,
             target_dir: project_meta
                 .meta
                 .target_directory
@@ -60,6 +73,7 @@ impl Task<Context> for CreateXCodeProject {
                 .into_std_path_buf(),
             template_dir: template_dir.clone().canonicalize()?,
             lib_name,
+            team_id,
         };
 
         generate_project_file(&tpl_path, &project_path, &data)?;
@@ -106,6 +120,7 @@ struct Data {
     pub target_dir: PathBuf,
     pub template_dir: PathBuf,
     pub lib_name: String,
+    pub team_id: Option<String>,
 }
 
 pub struct XCodeProject {

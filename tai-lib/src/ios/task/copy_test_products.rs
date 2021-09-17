@@ -13,9 +13,11 @@ pub struct CopyTestProducts;
 impl Task<Context> for CopyTestProducts {
     fn run(&self, context: Context) -> TaiResult<Context> {
         let xcode_project = context.xcode_project()?;
-        let output_dir = &context.build()?.out_dir.canonicalize()?;
+        let out_dir = &context.build()?.out_dir;
+        create_dir_all(&out_dir)?;
 
-        let payload = output_dir.join(PAYLOAD_DIR);
+        let out_dir = out_dir.canonicalize()?;
+        let payload = out_dir.join(PAYLOAD_DIR);
         create_dir_all(&payload)?;
 
         let opt = CopyOptions {
@@ -24,18 +26,18 @@ impl Task<Context> for CopyTestProducts {
         };
         copy(context.xcode_product()?, &payload, &opt)?;
 
-        let zip_file = output_dir.join(format!("{}.ipa", &xcode_project.app_name));
+        let zip_file = out_dir.join(format!("{}.ipa", &xcode_project.app_name));
         Zip::new()
-            .current_dir(output_dir)
+            .current_dir(&out_dir)
             .zip_file(zip_file)
             .file(PAYLOAD_DIR)
             .recurse_paths()
             .move_into_zip_file()
             .execute()?;
 
-        copy(context.xcode_test_product()?, &output_dir, &opt)?;
+        copy(context.xcode_test_product()?, &out_dir, &opt)?;
 
-        info!("test products: {}", output_dir.display());
+        info!("test products: {}", out_dir.display());
 
         Ok(context)
     }

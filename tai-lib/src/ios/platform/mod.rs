@@ -6,6 +6,7 @@ use super::task::{
     BuildXCodeTest,
     CopyTestProducts,
     CreateXCodeProject,
+    ReadSigningSettings,
     Task,
 };
 
@@ -14,11 +15,11 @@ pub mod simulator;
 
 pub const APP_ID: &str = "cargo-tai";
 
-fn tasks_for_build_cmd() -> [Task; 6] {
+fn tasks_for_build_cmd() -> [Task; 7] {
     [
         Task::GetProjectMetadata(GetProjectMetadata),
         Task::BuildBuiltUnits(BuildBuiltUnits),
-        // Task::ReadSigningSettings(ReadSigningSettings), we need the team id later + bundle id
+        Task::ReadSigningSettings(ReadSigningSettings), //we need the team id later + bundle id
         Task::CreateXCodeProject(CreateXCodeProject),
         Task::BuildXCodeApp(BuildXCodeApp),
         Task::BuildXCodeTest(BuildXCodeTest),
