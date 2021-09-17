@@ -4,7 +4,7 @@ use anyhow::{bail, Context};
 use cfg_expr::targets::TargetInfo;
 use tracing::debug;
 
-use crate::{common::options::Options, TaiResult};
+use crate::{common::opts::Options, TaiResult};
 
 use super::tools::AndroidSdk;
 

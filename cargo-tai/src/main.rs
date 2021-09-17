@@ -1,12 +1,12 @@
 use anyhow::Error;
 
 use structopt::StructOpt;
-use tai_lib::common::{command::run_command, options};
+use tai_lib::common::command::run_command;
 
-mod cli;
+mod opts;
 
-use cli::Options;
-use tracing_subscriber::{EnvFilter, FmtSubscriber};
+use opts::Options;
+use tracing_subscriber::{fmt::format::FmtSpan, EnvFilter, FmtSubscriber};
 
 fn main() -> Result<(), Error> {
     FmtSubscriber::builder()
@@ -15,10 +15,11 @@ fn main() -> Result<(), Error> {
         .with_target(false)
         .with_level(false)
         .without_time()
+        .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .init();
 
     let opt = Options::from_args();
-    let requested_opt: options::Options = opt.into();
+    let requested_opt: tai_lib::common::opts::Options = opt.into();
 
     #[cfg(not(target_os = "macos"))]
     {

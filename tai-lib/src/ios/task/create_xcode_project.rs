@@ -6,6 +6,7 @@ use std::{
 use handlebars::{to_json, Handlebars};
 use serde::Serialize;
 use serde_json::value::Map;
+use tracing::instrument;
 
 use crate::{
     common::{bundle::copy_resources, task::Task},
@@ -24,6 +25,7 @@ const APP_NAME: &str = "cargoTai";
 pub struct CreateXCodeProject;
 
 impl Task<Context> for CreateXCodeProject {
+    #[instrument(name = "create_xcode_project", skip(self, context))]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let lib_name = context
             .take_built_units()?
@@ -37,12 +39,12 @@ impl Task<Context> for CreateXCodeProject {
         let ios_dir = project_meta.ios_dir();
 
         create_dir_all(&ios_dir)?;
-        Rsync::new(&template_dir, &ios_dir)
-            .archive()
-            .verbose()
-            .delete()
-            .only_content()
-            .execute()?;
+        let mut cmd = Rsync::new(&template_dir, &ios_dir);
+        cmd.archive().delete().only_content();
+        if context.options.cli.verbose {
+            cmd.verbose();
+        }
+        cmd.execute()?;
 
         let resources_path = ios_dir.join(tai_util::DATA_DIR_NAME);
         create_dir_all(&resources_path)?;
@@ -77,10 +79,13 @@ impl Task<Context> for CreateXCodeProject {
         };
 
         generate_project_file(&tpl_path, &project_path, &data)?;
-        XCodeGenGenerate::new()
-            .spec(&project_path)
-            .project(&ios_dir)
-            .execute()?;
+        let mut cmd = XCodeGenGenerate::new();
+        cmd.spec(&project_path).project(&ios_dir);
+        if context.options.cli.verbose {
+            cmd.verbose();
+        }
+
+        cmd.execute()?;
 
         let xcode_project = XCodeProject {
             root: ios_dir,

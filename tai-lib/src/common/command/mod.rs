@@ -2,7 +2,7 @@ use anyhow::bail;
 use cfg_expr::targets::{Arch, Os};
 use tracing::debug;
 
-use crate::{android, common::options::Options, ios, TaiResult};
+use crate::{android, common::opts::Options, ios, TaiResult};
 
 #[derive(Debug, Clone)]
 pub enum Command {

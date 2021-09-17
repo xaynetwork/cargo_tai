@@ -1,6 +1,6 @@
 use fs_extra::dir::{copy, CopyOptions};
 use std::fs::create_dir_all;
-use tracing::info;
+use tracing::{info, instrument};
 
 use crate::{common::task::Task, ios::tools::zip::Zip, TaiResult};
 
@@ -11,6 +11,7 @@ const PAYLOAD_DIR: &str = "Payload";
 pub struct CopyTestProducts;
 
 impl Task<Context> for CopyTestProducts {
+    #[instrument(name = "copy_test_products", skip(self, context))]
     fn run(&self, context: Context) -> TaiResult<Context> {
         let xcode_project = context.xcode_project()?;
         let out_dir = &context.build()?.out_dir;
@@ -27,13 +28,17 @@ impl Task<Context> for CopyTestProducts {
         copy(context.xcode_product()?, &payload, &opt)?;
 
         let zip_file = out_dir.join(format!("{}.ipa", &xcode_project.app_name));
-        Zip::new()
-            .current_dir(&out_dir)
+        let mut cmd = Zip::new();
+        cmd.current_dir(&out_dir)
             .zip_file(zip_file)
             .file(PAYLOAD_DIR)
             .recurse_paths()
-            .move_into_zip_file()
-            .execute()?;
+            .move_into_zip_file();
+        if context.options.cli.verbose {
+            cmd.verbose();
+        }
+
+        cmd.execute()?;
 
         copy(context.xcode_test_product()?, &out_dir, &opt)?;
 

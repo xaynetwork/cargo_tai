@@ -1,5 +1,5 @@
 use structopt::StructOpt;
-use tai_lib::common::options;
+use tai_lib::common::opts;
 
 use super::parse_key_val;
 
@@ -22,11 +22,11 @@ pub struct BinaryOptions {
     pub envs: Option<Vec<(String, String)>>,
 }
 
-impl From<BinaryOptions> for Option<options::BinaryOptions> {
+impl From<BinaryOptions> for Option<opts::BinaryOptions> {
     fn from(BinaryOptions { args, envs }: BinaryOptions) -> Self {
         match (&args, &envs) {
             (None, None) => None,
-            _ => Some(options::BinaryOptions { args, envs }),
+            _ => Some(opts::BinaryOptions { args, envs }),
         }
     }
 }

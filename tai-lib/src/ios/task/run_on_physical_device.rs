@@ -4,7 +4,7 @@ use anyhow::bail;
 use tracing::{info, instrument};
 
 use crate::{
-    common::{options::BinaryOptions, task::Task},
+    common::{opts::BinaryOptions, task::Task},
     ios::{platform::APP_ID, tools::ios_deploy},
     TaiResult,
 };
@@ -14,6 +14,7 @@ use super::Context;
 pub struct RunOnPhysicalDevice;
 
 impl Task<Context> for RunOnPhysicalDevice {
+    #[instrument(name = "run_on_physical_device", skip(self, context))]
     fn run(&self, context: Context) -> TaiResult<Context> {
         // if !mobile_provision
         //     .provisioned_devices

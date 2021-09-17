@@ -1,24 +1,26 @@
 use structopt::StructOpt;
 use tai_lib::common::{
     command::Command,
-    options::{self},
-};
-
-use self::{
-    android::AndroidOptions,
-    binary::BinaryOptions,
-    build::BuildOptions,
-    compiler::CompilerOptions,
-    ios::IosOptions,
-    resource::ResourceOptions,
+    opts::{self},
 };
 
 pub mod android;
 pub mod binary;
 pub mod build;
+pub mod cli;
 pub mod compiler;
 pub mod ios;
 pub mod resource;
+
+use self::{
+    android::AndroidOptions,
+    binary::BinaryOptions,
+    build::BuildOptions,
+    cli::CliOptions,
+    compiler::CompilerOptions,
+    ios::IosOptions,
+    resource::ResourceOptions,
+};
 
 #[derive(StructOpt, Debug)]
 pub enum Options {
@@ -36,6 +38,9 @@ pub enum Options {
 
 #[derive(StructOpt, Debug)]
 pub struct LocalRun {
+    #[structopt(flatten)]
+    cli: CliOptions,
+
     #[structopt(flatten)]
     compiler: CompilerOptions,
 
@@ -55,6 +60,9 @@ pub struct LocalRun {
 #[derive(StructOpt, Debug)]
 pub struct NativeTestBuild {
     #[structopt(flatten)]
+    cli: CliOptions,
+
+    #[structopt(flatten)]
     compiler: CompilerOptions,
 
     #[structopt(flatten)]
@@ -70,7 +78,7 @@ pub struct NativeTestBuild {
     ios: IosOptions,
 }
 
-impl From<Options> for options::Options {
+impl From<Options> for opts::Options {
     fn from(opt: Options) -> Self {
         match opt {
             Options::Bench(opts) => from_local_run(Command::Bench, opts),
@@ -82,8 +90,8 @@ impl From<Options> for options::Options {
     }
 }
 
-fn from_local_run(command: Command, options: LocalRun) -> options::Options {
-    options::Options {
+fn from_local_run(command: Command, options: LocalRun) -> opts::Options {
+    opts::Options {
         command,
         compiler: options.compiler.into(),
         resources: options.resources.resources,
@@ -91,11 +99,12 @@ fn from_local_run(command: Command, options: LocalRun) -> options::Options {
         build: None,
         android: options.android.into(),
         ios: options.ios.into(),
+        cli: options.cli.into(),
     }
 }
 
-fn from_native_test_build(command: Command, options: NativeTestBuild) -> options::Options {
-    options::Options {
+fn from_native_test_build(command: Command, options: NativeTestBuild) -> opts::Options {
+    opts::Options {
         command,
         compiler: options.compiler.into(),
         resources: options.resources.resources,
@@ -103,6 +112,7 @@ fn from_native_test_build(command: Command, options: NativeTestBuild) -> options
         build: Some(options.build.into()),
         android: options.android.into(),
         ios: options.ios.into(),
+        cli: options.cli.into(),
     }
 }
 

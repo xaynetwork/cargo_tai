@@ -1,9 +1,7 @@
-use tracing::instrument;
-
 use crate::{
     common::{
         command::Command,
-        options::Options,
+        opts::Options,
         task::{get_project_metadata::GetProjectMetadata, Runner},
     },
     TaiResult,
@@ -19,7 +17,6 @@ use super::task::{
     Task,
 };
 
-#[instrument(name = "build_and_run", skip(requested))]
 pub fn run_command(requested: Options) -> TaiResult<()> {
     match &requested.command {
         Command::Build => {

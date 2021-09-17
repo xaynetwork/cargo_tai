@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Error};
 use cfg_expr::targets::{get_builtin_target_by_triple, TargetInfo};
 use structopt::{clap::ArgSettings, StructOpt};
-use tai_lib::common::options;
+use tai_lib::common::opts;
 
 #[derive(StructOpt, Debug)]
 pub struct CompilerOptions {
@@ -33,9 +33,9 @@ fn parse_target(src: &str) -> Result<TargetInfo<'static>, Error> {
     Ok(target.to_owned())
 }
 
-impl From<CompilerOptions> for options::CompilerOptions {
+impl From<CompilerOptions> for opts::CompilerOptions {
     fn from(options: CompilerOptions) -> Self {
-        options::CompilerOptions {
+        opts::CompilerOptions {
             target: options.target,
             cargo_args: options.cargo_args,
         }

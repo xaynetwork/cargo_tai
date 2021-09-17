@@ -1,9 +1,7 @@
-use tracing::instrument;
-
 use crate::{
     common::{
         command::Command,
-        options::Options,
+        opts::Options,
         task::{get_project_metadata::GetProjectMetadata, set_bench_arg::SetBenchArg, Runner},
     },
     ios::{
@@ -21,7 +19,6 @@ use crate::{
     TaiResult,
 };
 
-#[instrument(name = "build_and_run", skip(requested))]
 pub fn run_command(requested: Options) -> TaiResult<()> {
     match &requested.command {
         Command::Build => {

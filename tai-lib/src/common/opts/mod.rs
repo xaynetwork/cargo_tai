@@ -13,6 +13,7 @@ pub struct Options {
     pub build: Option<BuildOptions>,
     pub android: Option<AndroidOptions>,
     pub ios: Option<IosOptions>,
+    pub cli: CliOptions,
 }
 
 #[derive(Debug, Clone)]
@@ -45,4 +46,9 @@ pub struct AndroidOptions {
 #[derive(Debug, Clone)]
 pub struct IosOptions {
     pub mobile_provision: PathBuf,
+}
+
+#[derive(Debug, Clone)]
+pub struct CliOptions {
+    pub verbose: bool,
 }

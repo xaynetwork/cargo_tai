@@ -1,7 +1,7 @@
 use std::{
     convert::TryFrom,
     path::{Path, PathBuf},
-    process::Command,
+    process::{Command, Stdio},
 };
 
 use anyhow::bail;
@@ -49,7 +49,8 @@ pub struct XCodeBuild {
     sdk: Option<Sdk>,
     derived_data_path: Option<PathBuf>,
     build_for_testing: bool,
-    allow_provisioning_update: bool,
+    allow_provisioning_updates: bool,
+    verbose: bool,
 }
 
 impl XCodeBuild {
@@ -57,43 +58,53 @@ impl XCodeBuild {
         Self::default()
     }
 
-    pub fn project<P: AsRef<Path>>(mut self, path: P) -> Self {
+    pub fn project<P: AsRef<Path>>(&mut self, path: P) -> &mut Self {
         self.project = Some(path.as_ref().to_owned());
         self
     }
 
-    pub fn scheme(mut self, scheme: &str) -> Self {
+    pub fn scheme(&mut self, scheme: &str) -> &mut Self {
         self.scheme = Some(scheme.to_owned());
         self
     }
 
-    pub fn profile(mut self, profile: Profile) -> Self {
+    pub fn profile(&mut self, profile: Profile) -> &mut Self {
         self.profile = Some(profile);
         self
     }
 
-    pub fn sdk(mut self, sdk: Sdk) -> Self {
+    pub fn sdk(&mut self, sdk: Sdk) -> &mut Self {
         self.sdk = Some(sdk);
         self
     }
 
-    pub fn derived_data_path<P: AsRef<Path>>(mut self, path: P) -> Self {
+    pub fn derived_data_path<P: AsRef<Path>>(&mut self, path: P) -> &mut Self {
         self.derived_data_path = Some(path.as_ref().to_owned());
         self
     }
 
-    pub fn build_for_testing(mut self) -> Self {
+    pub fn build_for_testing(&mut self) -> &mut Self {
         self.build_for_testing = true;
         self
     }
 
-    pub fn allow_provisioning_update(mut self) -> Self {
-        self.allow_provisioning_update = true;
+    pub fn allow_provisioning_updates(&mut self) -> &mut Self {
+        self.allow_provisioning_updates = true;
+        self
+    }
+
+    pub fn verbose(&mut self) -> &mut Self {
+        self.verbose = true;
         self
     }
 
     pub fn execute(self) -> TaiResult<()> {
         let mut command = Command::new(XCODEBUILD);
+        if !self.verbose {
+            command.stdout(Stdio::null());
+            command.stderr(Stdio::null());
+        }
+
         self.project.map(|path| command.arg("-project").arg(path));
         self.scheme.map(|scheme| command.arg("-scheme").arg(scheme));
         self.profile
@@ -101,9 +112,9 @@ impl XCodeBuild {
         self.sdk.map(|sdk| command.arg("-sdk").arg(sdk.as_str()));
         self.derived_data_path
             .map(|path| command.arg("-derivedDataPath").arg(path));
-        self.allow_provisioning_update
+        self.allow_provisioning_updates
             .then(|| ())
-            .map(|_| command.arg("-allowProvisioningUpdate"));
+            .map(|_| command.arg("-allowProvisioningUpdates"));
         self.build_for_testing
             .then(|| ())
             .map(|_| command.arg("build-for-testing"));

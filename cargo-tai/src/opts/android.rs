@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use structopt::StructOpt;
-use tai_lib::common::options;
+use tai_lib::common::opts;
 
 #[derive(StructOpt, Debug)]
 pub struct AndroidOptions {
@@ -40,11 +40,11 @@ pub struct AndroidOptions {
     pub ndk: Option<PathBuf>,
 }
 
-impl From<AndroidOptions> for Option<options::AndroidOptions> {
+impl From<AndroidOptions> for Option<opts::AndroidOptions> {
     fn from(AndroidOptions { api_lvl, ndk }: AndroidOptions) -> Self {
         match (api_lvl, ndk) {
             (None, None) => None,
-            (Some(api_lvl), Some(ndk)) => Some(options::AndroidOptions { api_lvl, ndk }),
+            (Some(api_lvl), Some(ndk)) => Some(opts::AndroidOptions { api_lvl, ndk }),
             // forced by clap that all or none are set
             _ => unreachable!(),
         }

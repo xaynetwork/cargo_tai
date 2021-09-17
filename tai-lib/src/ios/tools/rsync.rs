@@ -1,6 +1,6 @@
 use std::{
     path::{Path, PathBuf},
-    process::Command,
+    process::{Command, Stdio},
 };
 
 use crate::{common::tools::command_ext::ExitStatusExt, TaiResult};
@@ -32,31 +32,36 @@ impl Rsync {
         }
     }
 
-    pub fn archive(mut self) -> Self {
+    pub fn archive(&mut self) -> &mut Self {
         self.archive = true;
         self
     }
 
-    pub fn delete(mut self) -> Self {
+    pub fn delete(&mut self) -> &mut Self {
         self.delete = true;
         self
     }
 
-    pub fn verbose(mut self) -> Self {
+    pub fn verbose(&mut self) -> &mut Self {
         self.verbose = true;
         self
     }
 
-    pub fn only_content(mut self) -> Self {
+    pub fn only_content(&mut self) -> &mut Self {
         self.only_content = true;
         self
     }
 
     pub fn execute(self) -> TaiResult<()> {
         let mut command = Command::new(RSYNC);
+        if !self.verbose {
+            command.stdout(Stdio::null());
+            command.stderr(Stdio::null());
+        } else {
+            command.arg("-v");
+        }
 
         self.archive.then(|| ()).map(|_| command.arg("-a"));
-        self.verbose.then(|| ()).map(|_| command.arg("-v"));
         self.delete.then(|| ()).map(|_| command.arg("--delete"));
 
         if self.only_content {

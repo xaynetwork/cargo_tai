@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 use structopt::StructOpt;
-use tai_lib::common::options::{self};
+use tai_lib::common::opts::{self};
 
 #[derive(StructOpt, Debug)]
 pub struct IosOptions {
@@ -11,8 +11,8 @@ pub struct IosOptions {
     pub mobile_provision: Option<PathBuf>,
 }
 
-impl From<IosOptions> for Option<options::IosOptions> {
+impl From<IosOptions> for Option<opts::IosOptions> {
     fn from(IosOptions { mobile_provision }: IosOptions) -> Self {
-        mobile_provision.map(|mobile_provision| options::IosOptions { mobile_provision })
+        mobile_provision.map(|mobile_provision| opts::IosOptions { mobile_provision })
     }
 }

@@ -8,7 +8,7 @@ use tracing::{debug, instrument};
 
 use crate::{
     android::tools::{adb, AndroidSdk},
-    common::{bundle::BuiltBundle, options::BinaryOptions, task::Task},
+    common::{bundle::BuiltBundle, opts::BinaryOptions, task::Task},
     TaiResult,
 };
 

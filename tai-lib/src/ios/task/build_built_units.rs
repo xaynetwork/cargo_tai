@@ -1,3 +1,5 @@
+use tracing::instrument;
+
 use crate::{
     common::{
         command::Command,
@@ -19,6 +21,7 @@ use super::Context;
 pub struct BuildBuiltUnits;
 
 impl Task<Context> for BuildBuiltUnits {
+    #[instrument(name = "build_built_units", skip(self, context))]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let options = &context.options;
 

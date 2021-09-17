@@ -1,3 +1,5 @@
+use tracing::instrument;
+
 use crate::{
     common::{bundle::create_bundles, task::Task},
     ios::bundle::{
@@ -12,6 +14,7 @@ use super::Context;
 pub struct CreateSignedBundles;
 
 impl Task<Context> for CreateSignedBundles {
+    #[instrument(name = "create_signed_bundles", skip(self, context))]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let built_units = context.take_built_units()?;
         let sig_settings = context.signing_settings()?;

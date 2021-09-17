@@ -6,7 +6,7 @@ use std::{
 use anyhow::{anyhow, bail};
 use cargo_metadata::{camino::Utf8PathBuf, diagnostic::DiagnosticLevel, Artifact, Message};
 
-use crate::{common::options::CompilerOptions, TaiResult};
+use crate::{common::opts::CompilerOptions, TaiResult};
 
 use super::BuiltUnit;
 

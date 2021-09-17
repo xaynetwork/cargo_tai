@@ -6,7 +6,7 @@ use crate::{
     common::{
         bundle::BuiltBundles,
         compiler::BuiltUnit,
-        options::{BinaryOptions, BuildOptions, Options},
+        opts::{BinaryOptions, BuildOptions, Options},
         project::ProjectMetadata,
     },
     ios::{bundle::signing::SigningSettings, tools::ios_deploy},

@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use structopt::StructOpt;
-use tai_lib::common::options;
+use tai_lib::common::opts;
 
 #[derive(StructOpt, Debug)]
 pub struct BuildOptions {
@@ -14,9 +14,9 @@ pub struct BuildOptions {
     pub out_dir: PathBuf,
 }
 
-impl From<BuildOptions> for options::BuildOptions {
+impl From<BuildOptions> for opts::BuildOptions {
     fn from(options: BuildOptions) -> Self {
-        options::BuildOptions {
+        opts::BuildOptions {
             template_dir: options.template_dir,
             out_dir: options.out_dir,
         }

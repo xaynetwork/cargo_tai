@@ -29,6 +29,9 @@ Furthermore, ideas were taken from the following projects:
 
 - Xcode
 - [ios-deploy](https://github.com/ios-control/ios-deploy)
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen)
+- rsync
+- zip
 - A valid iOS Development certificate
 - toolchains:
   - `x86_64-apple-ios`
