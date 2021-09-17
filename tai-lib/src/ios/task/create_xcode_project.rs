@@ -1,5 +1,5 @@
 use std::{
-    fs::{create_dir_all, File},
+    fs::File,
     path::{Path, PathBuf},
 };
 
@@ -27,18 +27,11 @@ pub struct CreateXCodeProject;
 impl Task<Context> for CreateXCodeProject {
     #[instrument(name = "create_xcode_project", skip(self, context))]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
-        let lib_name = context
-            .take_built_units()?
-            .first()
-            .ok_or_else(|| anyhow::anyhow!("no built units"))?
-            .name
-            .clone();
-
         let project_meta = context.project_metadata()?;
         let template_dir = &context.build()?.template_dir;
         let ios_working_dir = project_meta.ios_working_dir.to_owned();
 
-        create_dir_all(&ios_working_dir)?;
+        // copy template into working directory
         let mut cmd = Rsync::new(&template_dir, &ios_working_dir);
         cmd.archive().delete().only_content();
         if context.opts.cli.verbose {
@@ -46,16 +39,13 @@ impl Task<Context> for CreateXCodeProject {
         }
         cmd.execute()?;
 
-        let resources_path = ios_working_dir.join(tai_util::DATA_DIR_NAME);
-        create_dir_all(&resources_path)?;
+        // copy resources into working directory
+        copy_resources(
+            &ios_working_dir,
+            context.opts.resources.as_ref().unwrap_or(&Vec::new()),
+        )?;
 
-        if let Some(resources) = &context.opts.resources {
-            copy_resources(resources_path, resources)?;
-        }
-
-        let tpl_path = ios_working_dir.join("project.yml.hbs");
-        let project_path = ios_working_dir.join("project.yml");
-
+        // gather all data for the project spec template
         let (app_bundle_id, team_id) = if let Ok(sig_settings) = context.signing_settings() {
             (
                 sig_settings.app_id.to_owned(),
@@ -64,6 +54,13 @@ impl Task<Context> for CreateXCodeProject {
         } else {
             (APP_ID.to_owned(), None)
         };
+
+        let lib_name = context
+            .built_units()?
+            .first()
+            .ok_or_else(|| anyhow::anyhow!("no built units"))?
+            .name
+            .clone();
 
         let data = Data {
             app_name: APP_NAME.into(),
@@ -78,44 +75,43 @@ impl Task<Context> for CreateXCodeProject {
             team_id,
         };
 
-        generate_project_file(&tpl_path, &project_path, &data)?;
+        // generate xcode project spec
+        let spec = generate_project_spec(&ios_working_dir, &data)?;
+
+        // generate xcode project
         let mut cmd = XCodeGenGenerate::new();
-        cmd.spec(&project_path).project(&ios_working_dir);
+        cmd.spec(&spec).project(&ios_working_dir);
         if context.opts.cli.verbose {
             cmd.verbose();
         }
-
         cmd.execute()?;
 
-        let xcode_project = XCodeProject {
+        context.xcode_project = Some(XCodeProject {
             root: ios_working_dir,
             app_name: APP_NAME.into(),
-        };
-
-        context.xcode_project = Some(xcode_project);
+        });
 
         Ok(context)
     }
 }
 
-fn generate_project_file<P1: AsRef<Path>, P2: AsRef<Path>>(
-    tpl_path: P1,
-    project_path: P2,
-    data: &Data,
-) -> TaiResult<()> {
+fn generate_project_spec<P: AsRef<Path>>(working_dir: P, data: &Data) -> TaiResult<PathBuf> {
     let mut handlebars = Handlebars::new();
 
     let mut data_map = Map::new();
     data_map.insert("data".to_string(), to_json(data));
+
+    let tpl_path = working_dir.as_ref().join("project.yml.hbs");
+    let project_path = working_dir.as_ref().join("project.yml");
 
     let tpl_name = "project";
     handlebars
         .register_template_file(tpl_name, tpl_path)
         .unwrap();
 
-    let mut output_file = File::create(project_path)?;
+    let mut output_file = File::create(&project_path)?;
     handlebars.render_to_write(tpl_name, &data_map, &mut output_file)?;
-    Ok(())
+    Ok(project_path)
 }
 
 #[derive(Serialize)]

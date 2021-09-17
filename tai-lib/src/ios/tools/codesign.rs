@@ -19,7 +19,7 @@ impl<'f> CodeSign<'f> {
     pub fn new(identity: &str, files: &'f [&'f PathBuf]) -> Self {
         Self {
             identity: identity.to_owned(),
-            files: files,
+            files,
             ..Default::default()
         }
     }

@@ -20,6 +20,7 @@ pub struct IosDeployLaunch<'a, 'e> {
     debug: bool,
     no_wifi: bool,
     verbose: bool,
+    app_deltas: Option<PathBuf>,
 }
 
 impl<'a, 'e> IosDeployLaunch<'a, 'e> {
@@ -33,6 +34,7 @@ impl<'a, 'e> IosDeployLaunch<'a, 'e> {
             debug: false,
             no_wifi: false,
             verbose: false,
+            app_deltas: None,
         }
     }
 
@@ -65,6 +67,11 @@ impl<'a, 'e> IosDeployLaunch<'a, 'e> {
         self
     }
 
+    pub fn app_deltas<P: AsRef<Path>>(&mut self, path: P) -> &mut Self {
+        self.app_deltas = Some(path.as_ref().to_owned());
+        self
+    }
+
     pub fn execute(&mut self) -> TaiResult<()> {
         let mut cmd = Command::new(IOS_DEPLOY);
         if !self.verbose {
@@ -92,6 +99,10 @@ impl<'a, 'e> IosDeployLaunch<'a, 'e> {
                 .join(" ");
             cmd.args(&["--envs", &envs_as_string]);
         };
+
+        self.app_deltas
+            .as_ref()
+            .map(|path| cmd.arg("--app_deltas").arg(path));
 
         cmd.arg("--bundle").arg(&self.bundle);
 

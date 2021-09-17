@@ -19,16 +19,16 @@ impl Task<Context> for CreateSignedBundles {
         let built_units = context.take_built_units()?;
         let sig_settings = context.signing_settings()?;
         let resources = &context.opts.resources;
+        let project_meta = context.project_metadata()?;
 
         let bundles = create_bundles(
             built_units,
-            context.project_metadata()?,
+            &project_meta.tai_target,
             |unit, bundles_root| create_bundle(unit, bundles_root, resources, &sig_settings.app_id),
         )?;
-        let entitlements = create_entitlements_file(
-            &context.project_metadata()?.ios_cache,
-            &sig_settings.entitlements,
-        )?;
+
+        let entitlements =
+            create_entitlements_file(&project_meta.ios_cache, &sig_settings.entitlements)?;
 
         bundles
             .bundles

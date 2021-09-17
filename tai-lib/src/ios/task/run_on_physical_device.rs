@@ -1,11 +1,15 @@
-use std::path::Path;
+use std::{fs::create_dir_all, path::Path};
 
 use anyhow::bail;
 use tracing::{info, instrument};
 
 use crate::{
     common::{opts::BinaryOptions, task::Task},
-    ios::{platform::APP_ID, tools::ios_deploy::IosDeployLaunch},
+    ios::{
+        bundle::bundler::APP_DISPLAY_NAME,
+        platform::APP_ID,
+        tools::{ios_deploy::IosDeployLaunch, Rsync},
+    },
     TaiResult,
 };
 
@@ -22,6 +26,10 @@ impl Task<Context> for RunOnPhysicalDevice {
             .provisioned_devices;
         let bundles = context.built_bundles()?;
         let binary_opts = context.binary()?;
+        let ios_cache = &context.project_metadata()?.ios_cache;
+
+        let app_deltas = ios_cache.join("app_deltas");
+        create_dir_all(&app_deltas)?;
 
         context
             .devices()?
@@ -29,9 +37,17 @@ impl Task<Context> for RunOnPhysicalDevice {
             .filter(|device| provisioned_devices.contains(&device.id))
             .try_for_each(|provisioned_device| {
                 bundles.bundles.iter().try_for_each(|bundle| {
+                    let mut cmd = Rsync::new(&bundle.root, &ios_cache);
+                    cmd.archive().delete();
+                    if context.opts.cli.verbose {
+                        cmd.verbose();
+                    }
+                    cmd.execute()?;
+
                     install_and_launch(
                         &provisioned_device.id,
-                        &bundle.root,
+                        ios_cache.join(format!("{}.app", APP_DISPLAY_NAME)),
+                        &app_deltas,
                         binary_opts,
                         context.opts.cli.verbose,
                     )
@@ -41,18 +57,23 @@ impl Task<Context> for RunOnPhysicalDevice {
     }
 }
 
-#[instrument(name = "install_launch", skip(bundle_root))]
-fn install_and_launch<P>(
+#[instrument(name = "install_launch", skip(bundle_root, app_deltas))]
+fn install_and_launch<P1, P2>(
     device: &str,
-    bundle_root: P,
+    bundle_root: P1,
+    app_deltas: P2,
     binary_opt: &BinaryOptions,
     verbose: bool,
 ) -> TaiResult<()>
 where
-    P: AsRef<Path>,
+    P1: AsRef<Path>,
+    P2: AsRef<Path>,
 {
     let mut cmd = IosDeployLaunch::new(device, &bundle_root);
-    cmd.non_interactive().no_wifi().debug();
+    cmd.non_interactive()
+        .no_wifi()
+        .debug()
+        .app_deltas(app_deltas);
 
     if let Some(ref args) = binary_opt.args {
         cmd.args(args);

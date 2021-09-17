@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{fs::create_dir_all, path::PathBuf};
 
 use crate::common::tools::cargo_metadata;
 use cargo_metadata::Metadata;
@@ -74,12 +74,15 @@ impl ProjectMetadata {
         let tai_target = meta
             .target_directory
             .join(CARGO_TAI_TARGET_DIR)
-            .into_std_path_buf()
-            .to_owned();
+            .into_std_path_buf();
 
         let ios_working_dir = tai_target.join(IOS_NATIVE_TEST_WORKING_DIR);
         let android_working_dir = tai_target.join(ANDROID_NATIVE_TEST_WORKING_DIR);
         let ios_cache = tai_target.join(IOS_CACHE_DIR);
+
+        create_dir_all(&ios_working_dir)?;
+        create_dir_all(&android_working_dir)?;
+        create_dir_all(&ios_cache)?;
 
         Ok(Self {
             meta,

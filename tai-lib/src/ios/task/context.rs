@@ -47,6 +47,12 @@ impl Context {
             .ok_or_else(|| anyhow!("no built units found"))
     }
 
+    pub fn built_units(&self) -> TaiResult<&Vec<BuiltUnit>> {
+        self.built_units
+            .as_ref()
+            .ok_or_else(|| anyhow!("no built units found"))
+    }
+
     pub fn signing_settings(&self) -> TaiResult<&SigningSettings> {
         self.signing_settings
             .as_ref()
