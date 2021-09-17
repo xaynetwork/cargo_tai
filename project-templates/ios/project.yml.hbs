@@ -27,8 +27,8 @@ targets:
       LIBRARY_SEARCH_PATHS[sdk=iphoneos*]: $(inherited) "{{data.target_dir}}/aarch64-apple-ios/$(CONFIGURATION)"
       LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]: $(inherited) "{{data.target_dir}}/x86_64-apple-ios/$(CONFIGURATION)"
       SWIFT_OBJC_BRIDGING_HEADER: {{data.template_dir}}/bindings/cargoTai-Bridging-Header.h
-      {{#if data.team}}
-      DEVELOPMENT_TEAM: {{data.team}}
+      {{#if data.team_id}}
+      DEVELOPMENT_TEAM: {{data.team_id}}
       {{else}}
       CODE_SIGNING_ALLOWED: NO
       {{/if}}
@@ -46,8 +46,8 @@ targets:
     settings:
       EXCLUDED_ARCHS[sdk=iphoneos*]: armv7
       EXCLUDED_ARCHS[sdk=iphonesimulator*]: arm64
-      {{#if data.team}}
-      DEVELOPMENT_TEAM: {{data.team}}
+      {{#if data.team_id}}
+      DEVELOPMENT_TEAM: {{data.team_id}}
       {{else}}
       CODE_SIGNING_ALLOWED: NO
       {{/if}}
