@@ -6,12 +6,17 @@ use cargo_metadata::Metadata;
 use crate::TaiResult;
 
 pub const CARGO_TAI_TARGET_DIR: &str = "cargo-tai";
-pub const IOS_DIR: &str = "native-ios";
-pub const ANDROID_DIR: &str = "native-android";
+pub const IOS_NATIVE_TEST_WORKING_DIR: &str = "native-ios";
+pub const IOS_CACHE_DIR: &str = "cache-ios";
+pub const ANDROID_NATIVE_TEST_WORKING_DIR: &str = "native-android";
 
 pub struct ProjectMetadata {
     pub meta: Metadata,
     pub cargo_opts: CargoOptions,
+    pub tai_target: PathBuf,
+    pub ios_cache: PathBuf,
+    pub ios_working_dir: PathBuf,
+    pub android_working_dir: PathBuf,
 }
 
 pub struct CargoOptions {
@@ -66,29 +71,23 @@ impl ProjectMetadata {
         let cargo_opts = CargoOptions::from_cargo_args(cargo_args)?;
         let meta = cargo_metadata(&cargo_opts.manifest_path)?;
 
-        Ok(Self { meta, cargo_opts })
-    }
-
-    pub fn tai_target_dir(&self) -> PathBuf {
-        let project_target_dir = &self.meta.target_directory;
-        project_target_dir
+        let tai_target = meta
+            .target_directory
             .join(CARGO_TAI_TARGET_DIR)
             .into_std_path_buf()
-    }
+            .to_owned();
 
-    pub fn ios_dir(&self) -> PathBuf {
-        let project_target_dir = &self.meta.target_directory;
-        project_target_dir
-            .join(CARGO_TAI_TARGET_DIR)
-            .join(IOS_DIR)
-            .into_std_path_buf()
-    }
+        let ios_working_dir = tai_target.join(IOS_NATIVE_TEST_WORKING_DIR);
+        let android_working_dir = tai_target.join(ANDROID_NATIVE_TEST_WORKING_DIR);
+        let ios_cache = tai_target.join(IOS_CACHE_DIR);
 
-    pub fn android_dir(&self) -> PathBuf {
-        let project_target_dir = &self.meta.target_directory;
-        project_target_dir
-            .join(CARGO_TAI_TARGET_DIR)
-            .join(ANDROID_DIR)
-            .into_std_path_buf()
+        Ok(Self {
+            meta,
+            cargo_opts,
+            tai_target,
+            ios_cache,
+            ios_working_dir,
+            android_working_dir,
+        })
     }
 }

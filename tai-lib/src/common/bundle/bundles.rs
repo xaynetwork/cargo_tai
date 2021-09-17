@@ -18,12 +18,12 @@ pub fn create_bundles(
     project_metadata: &ProjectMetadata,
     f: impl Fn(BuiltUnit, &PathBuf) -> TaiResult<BuiltBundle>,
 ) -> TaiResult<BuiltBundles> {
-    let tai_target_dir = project_metadata.tai_target_dir();
-    create_dir_all(&tai_target_dir)?;
+    let tai_target = &project_metadata.tai_target;
+    create_dir_all(&tai_target)?;
 
     let bundles = units
         .into_iter()
-        .map(|unit| f(unit, &tai_target_dir))
+        .map(|unit| f(unit, &tai_target))
         .collect::<Result<Vec<_>, Error>>()?;
 
     Ok(BuiltBundles { bundles })

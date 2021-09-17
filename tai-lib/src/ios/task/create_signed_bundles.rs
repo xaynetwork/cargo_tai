@@ -18,7 +18,7 @@ impl Task<Context> for CreateSignedBundles {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let built_units = context.take_built_units()?;
         let sig_settings = context.signing_settings()?;
-        let resources = &context.options.resources;
+        let resources = &context.opts.resources;
 
         let bundles = create_bundles(
             built_units,
@@ -26,7 +26,7 @@ impl Task<Context> for CreateSignedBundles {
             |unit, bundles_root| create_bundle(unit, bundles_root, resources, &sig_settings.app_id),
         )?;
         let entitlements = create_entitlements_file(
-            &context.project_metadata()?.ios_dir(),
+            &context.project_metadata()?.ios_cache,
             &sig_settings.entitlements,
         )?;
 

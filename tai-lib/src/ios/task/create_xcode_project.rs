@@ -12,7 +12,7 @@ use crate::{
     common::{bundle::copy_resources, task::Task},
     ios::{
         platform::APP_ID,
-        tools::{rsync::Rsync, xcodegen::XCodeGenGenerate},
+        tools::{Rsync, XCodeGenGenerate},
     },
     TaiResult,
 };
@@ -36,25 +36,25 @@ impl Task<Context> for CreateXCodeProject {
 
         let project_meta = context.project_metadata()?;
         let template_dir = &context.build()?.template_dir;
-        let ios_dir = project_meta.ios_dir();
+        let ios_working_dir = project_meta.ios_working_dir.to_owned();
 
-        create_dir_all(&ios_dir)?;
-        let mut cmd = Rsync::new(&template_dir, &ios_dir);
+        create_dir_all(&ios_working_dir)?;
+        let mut cmd = Rsync::new(&template_dir, &ios_working_dir);
         cmd.archive().delete().only_content();
-        if context.options.cli.verbose {
+        if context.opts.cli.verbose {
             cmd.verbose();
         }
         cmd.execute()?;
 
-        let resources_path = ios_dir.join(tai_util::DATA_DIR_NAME);
+        let resources_path = ios_working_dir.join(tai_util::DATA_DIR_NAME);
         create_dir_all(&resources_path)?;
 
-        if let Some(resources) = &context.options.resources {
+        if let Some(resources) = &context.opts.resources {
             copy_resources(resources_path, resources)?;
         }
 
-        let tpl_path = ios_dir.join("project.yml.hbs");
-        let project_path = ios_dir.join("project.yml");
+        let tpl_path = ios_working_dir.join("project.yml.hbs");
+        let project_path = ios_working_dir.join("project.yml");
 
         let (app_bundle_id, team_id) = if let Ok(sig_settings) = context.signing_settings() {
             (
@@ -80,15 +80,15 @@ impl Task<Context> for CreateXCodeProject {
 
         generate_project_file(&tpl_path, &project_path, &data)?;
         let mut cmd = XCodeGenGenerate::new();
-        cmd.spec(&project_path).project(&ios_dir);
-        if context.options.cli.verbose {
+        cmd.spec(&project_path).project(&ios_working_dir);
+        if context.opts.cli.verbose {
             cmd.verbose();
         }
 
         cmd.execute()?;
 
         let xcode_project = XCodeProject {
-            root: ios_dir,
+            root: ios_working_dir,
             app_name: APP_NAME.into(),
         };
 

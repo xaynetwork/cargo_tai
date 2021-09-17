@@ -24,9 +24,6 @@ pub struct BinaryOptions {
 
 impl From<BinaryOptions> for Option<opts::BinaryOptions> {
     fn from(BinaryOptions { args, envs }: BinaryOptions) -> Self {
-        match (&args, &envs) {
-            (None, None) => None,
-            _ => Some(opts::BinaryOptions { args, envs }),
-        }
+        Some(opts::BinaryOptions { args, envs })
     }
 }

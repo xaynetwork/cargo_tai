@@ -23,19 +23,19 @@ pub struct BuildBuiltUnits;
 impl Task<Context> for BuildBuiltUnits {
     #[instrument(name = "build_built_units", skip(self, context))]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
-        let options = &context.options;
+        let opts = &context.opts;
 
-        let cmd = match options.command {
+        let cmd = match opts.command {
             Command::Bench => bench_command()?,
             Command::Test => test_command()?,
             Command::Benches => benches_command()?,
             Command::Tests => tests_command()?,
             Command::Build => build_lib_command()?,
         };
-        let built_units = match options.command {
-            Command::Bench | Command::Benches => compile_benches(cmd, &options.compiler)?,
-            Command::Test | Command::Tests => compile_tests(cmd, &options.compiler)?,
-            Command::Build => compile_static_lib(cmd, &options.compiler)?,
+        let built_units = match opts.command {
+            Command::Bench | Command::Benches => compile_benches(cmd, &opts.compiler)?,
+            Command::Test | Command::Tests => compile_tests(cmd, &opts.compiler)?,
+            Command::Build => compile_static_lib(cmd, &opts.compiler)?,
         };
 
         context.built_units = Some(built_units);

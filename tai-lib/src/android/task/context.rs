@@ -12,7 +12,7 @@ use crate::{
 };
 
 pub struct Context {
-    pub options: Options,
+    pub opts: Options,
     pub android_sdk: Option<AndroidSdk>,
     pub devices: Option<Vec<Device>>,
     pub built_units: Option<Vec<BuiltUnit>>,
@@ -46,14 +46,14 @@ impl Context {
     }
 
     pub fn binary(&self) -> TaiResult<&BinaryOptions> {
-        self.options
+        self.opts
             .binary
             .as_ref()
             .ok_or_else(|| anyhow!("no binary found"))
     }
 
     pub fn build(&self) -> TaiResult<&BuildOptions> {
-        self.options
+        self.opts
             .build
             .as_ref()
             .ok_or_else(|| anyhow!("no build found"))
@@ -67,9 +67,9 @@ impl Context {
 }
 
 impl From<Options> for Context {
-    fn from(options: Options) -> Self {
+    fn from(opts: Options) -> Self {
         Self {
-            options,
+            opts,
             devices: None,
             built_units: None,
             built_bundles: None,

@@ -98,27 +98,32 @@ impl XCodeBuild {
         self
     }
 
-    pub fn execute(self) -> TaiResult<()> {
-        let mut command = Command::new(XCODEBUILD);
+    pub fn execute(&mut self) -> TaiResult<()> {
+        let mut cmd = Command::new(XCODEBUILD);
         if !self.verbose {
-            command.stdout(Stdio::null());
-            command.stderr(Stdio::null());
+            cmd.stdout(Stdio::null());
+            cmd.stderr(Stdio::null());
         }
 
-        self.project.map(|path| command.arg("-project").arg(path));
-        self.scheme.map(|scheme| command.arg("-scheme").arg(scheme));
+        self.project
+            .as_ref()
+            .map(|path| cmd.arg("-project").arg(path));
+        self.scheme
+            .as_ref()
+            .map(|scheme| cmd.arg("-scheme").arg(scheme));
         self.profile
-            .map(|profile| command.arg("-configuration").arg(profile.as_str()));
-        self.sdk.map(|sdk| command.arg("-sdk").arg(sdk.as_str()));
+            .map(|profile| cmd.arg("-configuration").arg(profile.as_str()));
+        self.sdk.map(|sdk| cmd.arg("-sdk").arg(sdk.as_str()));
         self.derived_data_path
-            .map(|path| command.arg("-derivedDataPath").arg(path));
+            .as_ref()
+            .map(|path| cmd.arg("-derivedDataPath").arg(path));
         self.allow_provisioning_updates
             .then(|| ())
-            .map(|_| command.arg("-allowProvisioningUpdates"));
+            .map(|_| cmd.arg("-allowProvisioningUpdates"));
         self.build_for_testing
             .then(|| ())
-            .map(|_| command.arg("build-for-testing"));
+            .map(|_| cmd.arg("build-for-testing"));
 
-        command.status()?.expect_success("failed to run xcode")
+        cmd.status()?.expect_success("failed to run xcode")
     }
 }

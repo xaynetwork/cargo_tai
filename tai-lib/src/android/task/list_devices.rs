@@ -16,7 +16,7 @@ impl Task<Context> for ListDevices {
 
         let devices = adb::devices(sdk)?
             .into_iter()
-            .filter(|device| device.arch == context.options.compiler.target.arch)
+            .filter(|device| device.arch == context.opts.compiler.target.arch)
             .collect::<Vec<Device>>();
 
         if devices.is_empty() {

@@ -2,7 +2,7 @@ use fs_extra::dir::{copy, CopyOptions};
 use std::fs::create_dir_all;
 use tracing::{info, instrument};
 
-use crate::{common::task::Task, ios::tools::zip::Zip, TaiResult};
+use crate::{common::task::Task, ios::tools::Zip, TaiResult};
 
 use super::Context;
 
@@ -34,7 +34,7 @@ impl Task<Context> for CopyTestProducts {
             .file(PAYLOAD_DIR)
             .recurse_paths()
             .move_into_zip_file();
-        if context.options.cli.verbose {
+        if context.opts.cli.verbose {
             cmd.verbose();
         }
 

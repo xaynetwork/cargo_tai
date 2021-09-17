@@ -13,7 +13,7 @@ use tracing::{debug, instrument};
 
 use crate::{
     common::bundle::BuiltBundle,
-    ios::tools::{codesign, security},
+    ios::tools::{codesign::CodeSign, security},
     TaiResult,
 };
 
@@ -63,7 +63,9 @@ pub fn sign_bundle(
         settings.mobile_provision_path.display()
     );
 
-    codesign::sign(&settings.identity_name, &entitlements, &bundle.root)
+    CodeSign::new(&settings.identity_name, &[&bundle.root])
+        .entitlements(entitlements)
+        .execute()
 }
 
 #[instrument(name = "entitlements", skip(dest, entitlements))]

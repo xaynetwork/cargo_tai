@@ -17,12 +17,12 @@ impl Task<Context> for ReadSigningSettings {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let maybe_mobile_provision = context.mobile_provision();
 
-        if let Sdk::IPhoneOS = Sdk::try_from(&context.options.compiler.target)? {
+        if let Sdk::IPhoneOS = Sdk::try_from(&context.opts.compiler.target)? {
             // for IPhoneOS we require a mobile_provision
             let sig_settings = find_signing_settings(maybe_mobile_provision?)?;
             context.signing_settings = Some(sig_settings);
         } else {
-            // for IPhoneSimulator it is optional
+            // for IPhoneSimulator it can be optional
             if let Ok(mobile_provision) = maybe_mobile_provision {
                 let sig_settings = find_signing_settings(mobile_provision)?;
                 context.signing_settings = Some(sig_settings);

@@ -4,7 +4,7 @@ use tracing::instrument;
 
 use crate::{
     common::{project::Profile, task::Task},
-    ios::tools::xcodebuild::{Sdk, XCodeBuild},
+    ios::tools::{xcodebuild::Sdk, XCodeBuild},
     TaiResult,
 };
 
@@ -19,8 +19,8 @@ impl Task<Context> for BuildXCodeTest {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let project_meta = context.project_metadata()?;
         let xcode_project = context.xcode_project()?;
-        let data_path = project_meta.ios_dir().join(TEST_BUILD_DIR);
-        let sdk = Sdk::try_from(&context.options.compiler.target)?;
+        let data_path = project_meta.ios_working_dir.join(TEST_BUILD_DIR);
+        let sdk = Sdk::try_from(&context.opts.compiler.target)?;
 
         let mut cmd = XCodeBuild::new();
         cmd.project(xcode_project.path())
@@ -28,14 +28,14 @@ impl Task<Context> for BuildXCodeTest {
             .sdk(sdk)
             .derived_data_path(data_path)
             .build_for_testing();
-        if context.options.cli.verbose {
+        if context.opts.cli.verbose {
             cmd.verbose();
         }
 
         cmd.execute()?;
 
         let product = project_meta
-            .ios_dir()
+            .ios_working_dir
             .join(TEST_BUILD_DIR)
             .join("Build")
             .join("Products")

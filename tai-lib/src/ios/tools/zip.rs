@@ -52,21 +52,19 @@ impl Zip {
         self
     }
 
-    pub fn execute(self) -> TaiResult<()> {
-        let mut command = Command::new(ZIP);
+    pub fn execute(&mut self) -> TaiResult<()> {
+        let mut cmd = Command::new(ZIP);
         if !self.verbose {
-            command.stdout(Stdio::null());
-            command.stderr(Stdio::null());
+            cmd.stdout(Stdio::null());
+            cmd.stderr(Stdio::null());
         }
 
-        self.current_dir.map(|path| command.current_dir(path));
-        self.recurse_paths.then(|| ()).map(|_| command.arg("-r"));
-        self.move_into_zip_file
-            .then(|| ())
-            .map(|_| command.arg("-m"));
-        self.zip_file.map(|path| command.arg(path));
-        self.file.map(|path| command.arg(path));
+        self.current_dir.as_ref().map(|path| cmd.current_dir(path));
+        self.recurse_paths.then(|| ()).map(|_| cmd.arg("-r"));
+        self.move_into_zip_file.then(|| ()).map(|_| cmd.arg("-m"));
+        self.zip_file.as_ref().map(|path| cmd.arg(path));
+        self.file.as_ref().map(|path| cmd.arg(path));
 
-        command.status()?.expect_success("failed to run zip")
+        cmd.status()?.expect_success("failed to run zip")
     }
 }

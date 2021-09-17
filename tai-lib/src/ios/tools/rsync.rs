@@ -52,25 +52,25 @@ impl Rsync {
         self
     }
 
-    pub fn execute(self) -> TaiResult<()> {
-        let mut command = Command::new(RSYNC);
+    pub fn execute(&mut self) -> TaiResult<()> {
+        let mut cmd = Command::new(RSYNC);
         if !self.verbose {
-            command.stdout(Stdio::null());
-            command.stderr(Stdio::null());
+            cmd.stdout(Stdio::null());
+            cmd.stderr(Stdio::null());
         } else {
-            command.arg("-v");
+            cmd.arg("-v");
         }
 
-        self.archive.then(|| ()).map(|_| command.arg("-a"));
-        self.delete.then(|| ()).map(|_| command.arg("--delete"));
+        self.archive.then(|| ()).map(|_| cmd.arg("-a"));
+        self.delete.then(|| ()).map(|_| cmd.arg("--delete"));
 
         if self.only_content {
-            command.arg(format!("{}/", self.source.display()));
+            cmd.arg(format!("{}/", self.source.display()));
         } else {
-            command.arg(self.source);
+            cmd.arg(&self.source);
         };
 
-        command.arg(self.destination);
-        command.status()?.expect_success("failed to run rsync")
+        cmd.arg(&self.destination);
+        cmd.status()?.expect_success("failed to run rsync")
     }
 }

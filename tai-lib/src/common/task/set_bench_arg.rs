@@ -9,14 +9,14 @@ pub struct SetBenchArg;
 
 impl Task<IosContext> for SetBenchArg {
     fn run(&self, mut context: IosContext) -> TaiResult<IosContext> {
-        set_bench_arg(&mut context.options);
+        set_bench_arg(&mut context.opts);
         Ok(context)
     }
 }
 
 impl Task<AndroidContext> for SetBenchArg {
     fn run(&self, mut context: AndroidContext) -> TaiResult<AndroidContext> {
-        set_bench_arg(&mut context.options);
+        set_bench_arg(&mut context.opts);
         Ok(context)
     }
 }

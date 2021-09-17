@@ -10,7 +10,7 @@ impl Task<Context> for FindAndroidSdk {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let sdk = AndroidSdk::derive_sdk(
             &context
-                .options
+                .opts
                 .android
                 .as_ref()
                 .ok_or_else(|| anyhow!("no ndk"))?

@@ -15,19 +15,19 @@ pub struct BuildBuiltUnits;
 impl Task<Context> for BuildBuiltUnits {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let sdk = context.android_sdk()?;
-        let options = &context.options;
+        let opts = &context.opts;
 
-        let cmd = match options.command {
-            Command::Bench => bench_command(sdk, &context.options)?,
-            Command::Test => test_command(sdk, &context.options)?,
-            Command::Benches => benches_command(sdk, &context.options)?,
-            Command::Tests => tests_command(sdk, &context.options)?,
+        let cmd = match opts.command {
+            Command::Bench => bench_command(sdk, &context.opts)?,
+            Command::Test => test_command(sdk, &context.opts)?,
+            Command::Benches => benches_command(sdk, &context.opts)?,
+            Command::Tests => tests_command(sdk, &context.opts)?,
             Command::Build => todo!(),
         };
 
-        let built_units = match options.command {
-            Command::Bench | Command::Benches => compile_benches(cmd, &options.compiler)?,
-            Command::Test | Command::Tests => compile_tests(cmd, &options.compiler)?,
+        let built_units = match opts.command {
+            Command::Bench | Command::Benches => compile_benches(cmd, &opts.compiler)?,
+            Command::Test | Command::Tests => compile_tests(cmd, &opts.compiler)?,
             Command::Build => todo!(),
         };
         context.built_units = Some(built_units);

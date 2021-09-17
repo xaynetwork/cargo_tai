@@ -16,7 +16,7 @@ use crate::{
 use super::create_xcode_project::XCodeProject;
 
 pub struct Context {
-    pub options: Options,
+    pub opts: Options,
     pub devices: Option<Vec<ios_deploy::Device>>,
     pub simulators: Option<Vec<simctl::Device>>,
     pub built_units: Option<Vec<BuiltUnit>>,
@@ -61,7 +61,7 @@ impl Context {
 
     pub fn mobile_provision(&self) -> TaiResult<&PathBuf> {
         Ok(&self
-            .options
+            .opts
             .ios
             .as_ref()
             .ok_or_else(|| anyhow!("no mobile provision found"))?
@@ -69,14 +69,14 @@ impl Context {
     }
 
     pub fn binary(&self) -> TaiResult<&BinaryOptions> {
-        self.options
+        self.opts
             .binary
             .as_ref()
             .ok_or_else(|| anyhow!("no binary found"))
     }
 
     pub fn build(&self) -> TaiResult<&BuildOptions> {
-        self.options
+        self.opts
             .build
             .as_ref()
             .ok_or_else(|| anyhow!("no build found"))
@@ -108,9 +108,9 @@ impl Context {
 }
 
 impl From<Options> for Context {
-    fn from(options: Options) -> Self {
+    fn from(opts: Options) -> Self {
         Self {
-            options,
+            opts,
             devices: None,
             simulators: None,
             built_units: None,
