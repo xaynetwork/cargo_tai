@@ -4,5 +4,6 @@ members = [
     "ns-path-utilities-sys",
     "tai-lib",
     "tai-util",
-    "test-project",
+    "examples/test-project",
+    "examples/test-native-tests",
 ]

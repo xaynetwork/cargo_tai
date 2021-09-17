@@ -14,16 +14,18 @@ edition = "2018"
 publish = false
 
 [dependencies]
-# sodiumoxide = "0.2.6"
+tai-util = { path = "../../tai-util", optional = true }
 
 [lib]
 bench = false
-crate-type = ["staticlib"]
 
 [dev-dependencies]
 criterion = "0.3"
-tai-util = { path = "../tai-util" }
+tai-util = { path = "../../tai-util" }
 
 [[bench]]
 name = "criterion"
 harness = false
+
+[features]
+tai-tests = ["tai-util"]
