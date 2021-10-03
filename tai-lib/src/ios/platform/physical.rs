@@ -22,7 +22,7 @@ use crate::{
 pub fn run_command(requested: Options) -> TaiResult<()> {
     match &requested.command {
         Command::Build => {
-            Runner::execute(&tasks_for_build_cmd(), Context::from(requested))?;
+            Runner::execute(tasks_for_build_cmd(), Context::from(requested))?;
         }
         _ => {
             Runner::execute(

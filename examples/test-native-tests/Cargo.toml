@@ -17,4 +17,4 @@ publish = false
 test-project = { path = "../test-project", features = ["tai-tests"] }
 
 [lib]
-crate-type = ["staticlib"]
+crate-type = ["staticlib", "cdylib"]

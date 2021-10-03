@@ -3,7 +3,7 @@ use tracing::instrument;
 use crate::{
     common::{
         command::Command,
-        compiler::{compile_benches, compile_static_lib, compile_tests},
+        compiler::{compile_benches, compile_staticlib, compile_tests},
         task::Task,
     },
     ios::compiler::{
@@ -35,7 +35,7 @@ impl Task<Context> for BuildBuiltUnits {
         let built_units = match opts.command {
             Command::Bench | Command::Benches => compile_benches(cmd, &opts.compiler)?,
             Command::Test | Command::Tests => compile_tests(cmd, &opts.compiler)?,
-            Command::Build => compile_static_lib(cmd, &opts.compiler)?,
+            Command::Build => compile_staticlib(cmd, &opts.compiler)?,
         };
 
         context.built_units = Some(built_units);

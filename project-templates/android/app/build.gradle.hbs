@@ -7,11 +7,11 @@ android {
     compileSdk 30
 
     defaultConfig {
-        applicationId "com.example.rust"
-        minSdk 21
-        targetSdk 30
-        versionCode 1
-        versionName "1.0"
+        applicationId "{{ data.application_id }}"
+        minSdk {{ data.min_sdk }}
+        targetSdk {{ data.target_sdk }}
+        versionCode {{ data.version_code }}
+        versionName "{{ data.version_name }}"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

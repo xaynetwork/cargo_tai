@@ -4,11 +4,11 @@ use anyhow::bail;
 use tracing::{info, instrument};
 
 use crate::{
-    common::{opts::BinaryOptions, task::Task},
+    common::{opts::BinaryOptions, task::Task, tools::Rsync},
     ios::{
         bundle::bundler::APP_DISPLAY_NAME,
         platform::APP_ID,
-        tools::{ios_deploy::IosDeployLaunch, Rsync},
+        tools::ios_deploy::IosDeployLaunch,
     },
     TaiResult,
 };

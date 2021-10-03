@@ -9,11 +9,8 @@ use serde_json::value::Map;
 use tracing::instrument;
 
 use crate::{
-    common::{bundle::copy_resources, task::Task},
-    ios::{
-        platform::APP_ID,
-        tools::{Rsync, XCodeGenGenerate},
-    },
+    common::{bundle::copy_resources, task::Task, tools::Rsync},
+    ios::{platform::APP_ID, tools::XCodeGenGenerate},
     TaiResult,
 };
 
@@ -48,11 +45,11 @@ impl Task<Context> for CreateXCodeProject {
         // gather all data for the project spec template
         let (app_bundle_id, team_id) = if let Ok(sig_settings) = context.signing_settings() {
             (
-                sig_settings.app_id.to_owned(),
-                Some(sig_settings.team_id.to_owned()),
+                sig_settings.app_id.as_str(),
+                Some(sig_settings.team_id.as_str()),
             )
         } else {
-            (APP_ID.to_owned(), None)
+            (APP_ID, None)
         };
 
         let lib_name = context
@@ -60,10 +57,10 @@ impl Task<Context> for CreateXCodeProject {
             .first()
             .ok_or_else(|| anyhow::anyhow!("no built units"))?
             .name
-            .clone();
+            .as_str();
 
-        let data = Data {
-            app_name: APP_NAME.into(),
+        let data = TemplateData {
+            app_name: APP_NAME,
             app_bundle_id,
             target_dir: project_meta
                 .meta
@@ -95,7 +92,10 @@ impl Task<Context> for CreateXCodeProject {
     }
 }
 
-fn generate_project_spec<P: AsRef<Path>>(working_dir: P, data: &Data) -> TaiResult<PathBuf> {
+fn generate_project_spec<P: AsRef<Path>>(
+    working_dir: P,
+    data: &TemplateData,
+) -> TaiResult<PathBuf> {
     let mut handlebars = Handlebars::new();
 
     let mut data_map = Map::new();
@@ -115,13 +115,13 @@ fn generate_project_spec<P: AsRef<Path>>(working_dir: P, data: &Data) -> TaiResu
 }
 
 #[derive(Serialize)]
-struct Data {
-    pub app_name: String,
-    pub app_bundle_id: String,
+struct TemplateData<'a> {
+    pub app_name: &'a str,
+    pub app_bundle_id: &'a str,
     pub target_dir: PathBuf,
     pub template_dir: PathBuf,
-    pub lib_name: String,
-    pub team_id: Option<String>,
+    pub lib_name: &'a str,
+    pub team_id: Option<&'a str>,
 }
 
 pub struct XCodeProject {

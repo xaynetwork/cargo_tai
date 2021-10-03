@@ -37,11 +37,11 @@ pub fn test_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command>
     Ok(cmd)
 }
 
-// pub fn build_lib_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
-//     let mut cmd = setup_android_deps(sdk, requested)?;
-//     cmd.args(&["build"]);
-//     Ok(cmd)
-// }
+pub fn build_lib_command(sdk: &AndroidSdk, requested: &Options) -> TaiResult<Command> {
+    let mut cmd = setup_android_deps(sdk, requested)?;
+    cmd.args(&["build"]);
+    Ok(cmd)
+}
 
 fn clang_suffix(
     target: &TargetInfo<'static>,

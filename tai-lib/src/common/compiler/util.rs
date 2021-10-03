@@ -29,10 +29,21 @@ pub fn is_bench(artifact: Artifact) -> Option<Utf8PathBuf> {
     }
 }
 
-pub fn is_static_lib(mut artifact: Artifact) -> Option<Utf8PathBuf> {
+pub fn is_staticlib(mut artifact: Artifact) -> Option<Utf8PathBuf> {
     if let (Some(path), true) = (
         artifact.filenames.pop(),
         artifact.target.kind.contains(&String::from("staticlib")),
+    ) {
+        Some(path)
+    } else {
+        None
+    }
+}
+
+pub fn is_cdylib(mut artifact: Artifact) -> Option<Utf8PathBuf> {
+    if let (Some(path), true) = (
+        artifact.filenames.pop(),
+        artifact.target.kind.contains(&String::from("cdylib")),
     ) {
         Some(path)
     } else {

@@ -64,6 +64,12 @@ impl Context {
             .as_ref()
             .ok_or_else(|| anyhow!("no project metadata found"))
     }
+
+    pub fn built_units(&self) -> TaiResult<&Vec<BuiltUnit>> {
+        self.built_units
+            .as_ref()
+            .ok_or_else(|| anyhow!("no built units found"))
+    }
 }
 
 impl From<Options> for Context {

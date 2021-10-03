@@ -14,7 +14,7 @@ pub struct BuiltUnit {
 
 use crate::{common::opts::CompilerOptions, TaiResult};
 
-use self::util::is_static_lib;
+use self::util::{is_cdylib, is_staticlib};
 
 pub fn compile_tests(cmd: Command, requested: &CompilerOptions) -> TaiResult<Vec<BuiltUnit>> {
     compile(cmd, requested, is_test)
@@ -24,6 +24,10 @@ pub fn compile_benches(cmd: Command, requested: &CompilerOptions) -> TaiResult<V
     compile(cmd, requested, is_bench)
 }
 
-pub fn compile_static_lib(cmd: Command, requested: &CompilerOptions) -> TaiResult<Vec<BuiltUnit>> {
-    compile(cmd, requested, is_static_lib)
+pub fn compile_staticlib(cmd: Command, requested: &CompilerOptions) -> TaiResult<Vec<BuiltUnit>> {
+    compile(cmd, requested, is_staticlib)
+}
+
+pub fn compile_cdylib(cmd: Command, requested: &CompilerOptions) -> TaiResult<Vec<BuiltUnit>> {
+    compile(cmd, requested, is_cdylib)
 }
