@@ -17,6 +17,7 @@ anyhow = "1.0.44"
 base64 = "0.13.0"
 cargo_metadata = "0.14.0"
 cfg-expr = "0.8.1"
+handlebars = "4.1.3"
 once_cell = "1.8.0"
 regex = "1.5.4"
 serde = "1.0.130"
@@ -24,6 +25,7 @@ serde_bytes = "0.11.5"
 serde_json = "1.0.68"
 tai-util = { path = "../tai-util" }
 tracing = "0.1.28"
+walkdir = "2.3.2"
 
 # ios feature
 chrono = { version = "0.4.19", optional = true }
@@ -31,7 +33,8 @@ openssl = { version = "0.10.36", optional = true }
 plist = { version = "1.2.1", optional = true }
 simctl = { version = "0.1.1", optional = true }
 tempfile = { version = "3.2.0", optional = true }
+fs_extra = { version = "1.2.0", optional = true }
 
 [features]
 default = []
-ios = ["tempfile", "openssl", "plist", "simctl", "chrono"]
+ios = ["tempfile", "openssl", "plist", "simctl", "chrono", "fs_extra"]

@@ -7,7 +7,7 @@ use anyhow::anyhow;
 use cfg_expr::targets::Arch;
 use once_cell::sync::OnceCell;
 
-use crate::{command_ext::ExitStatusExt, TaiResult};
+use crate::{common::tools::command_ext::ExitStatusExt, TaiResult};
 
 use super::AndroidSdk;
 
@@ -92,6 +92,8 @@ pub fn run(sdk: &AndroidSdk, device: &str, start_script: &str) -> TaiResult<Outp
         .map_err(|err| anyhow!("{}", err))
 }
 
+// #TODO replace with https://github.com/rust-windowing/android-ndk-rs/blob/master/ndk-build/src/target.rs
+
 #[derive(Debug, Clone)]
 pub enum CpuArch {
     Aarch64,
@@ -113,6 +115,18 @@ impl From<&str> for CpuArch {
     }
 }
 
+impl From<CpuArch> for &str {
+    fn from(arch: CpuArch) -> Self {
+        match arch {
+            CpuArch::Aarch64 => "arm64-v8a",
+            CpuArch::ARMv7 => "armeabi-v7a",
+            CpuArch::X86 => "x86",
+            CpuArch::X86_64 => "x86_64",
+            CpuArch::Unsupported(_) => panic!(""),
+        }
+    }
+}
+
 impl From<CpuArch> for Arch<'_> {
     fn from(arch: CpuArch) -> Self {
         match arch {
@@ -121,6 +135,18 @@ impl From<CpuArch> for Arch<'_> {
             CpuArch::X86 => Arch::x86,
             CpuArch::X86_64 => Arch::x86_64,
             CpuArch::Unsupported(_) => panic!(""),
+        }
+    }
+}
+
+impl From<Arch<'_>> for CpuArch {
+    fn from(arch: Arch) -> Self {
+        match arch {
+            Arch::aarch64 => CpuArch::Aarch64,
+            Arch::arm => CpuArch::ARMv7,
+            Arch::x86 => CpuArch::X86,
+            Arch::x86_64 => CpuArch::X86_64,
+            _ => panic!(""),
         }
     }
 }

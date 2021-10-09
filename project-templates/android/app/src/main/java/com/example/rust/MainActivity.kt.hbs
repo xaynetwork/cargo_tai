@@ -1,0 +1,13 @@
+package {{ data.application_id }};
+
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        System.loadLibrary("{{ data.lib_name }}");
+
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+    }
+}

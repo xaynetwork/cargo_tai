@@ -1,26 +1,28 @@
-use crate::{
-    compiler::{compile_benches, compile_tests},
-    ios::compiler::{bench_command, benches_command, test_command, tests_command},
-    task::{GeneralOptions, Task},
+use crate::common::task::get_project_metadata::GetProjectMetadata;
+
+use super::task::{
+    BuildBuiltUnits,
+    BuildXCodeApp,
+    BuildXCodeTest,
+    CopyTestProducts,
+    CreateXCodeProject,
+    ReadSigningSettings,
+    Task,
 };
 
 pub mod physical;
 pub mod simulator;
 
-const APP_ID: &str = "cargo-tai";
+pub const APP_ID: &str = "cargo-tai";
 
-fn compile_build_units(
-    general_opt: &GeneralOptions,
-) -> Result<Vec<crate::compiler::BuildUnit>, anyhow::Error> {
-    let cmd = match general_opt.task {
-        Task::Bench => bench_command()?,
-        Task::Test => test_command()?,
-        Task::Benches => benches_command()?,
-        Task::Tests => tests_command()?,
-    };
-    let build_units = match general_opt.task {
-        Task::Bench | Task::Benches => compile_benches(cmd, &general_opt.compiler)?,
-        Task::Test | Task::Tests => compile_tests(cmd, &general_opt.compiler)?,
-    };
-    Ok(build_units)
+fn tasks_for_build_cmd() -> &'static [Task] {
+    &[
+        Task::GetProjectMetadata(GetProjectMetadata),
+        Task::BuildBuiltUnits(BuildBuiltUnits),
+        Task::ReadSigningSettings(ReadSigningSettings), //we need the team id later + bundle id
+        Task::CreateXCodeProject(CreateXCodeProject),
+        Task::BuildXCodeApp(BuildXCodeApp),
+        Task::BuildXCodeTest(BuildXCodeTest),
+        Task::CopyTestProducts(CopyTestProducts),
+    ]
 }

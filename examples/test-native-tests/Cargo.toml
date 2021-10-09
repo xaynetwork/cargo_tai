@@ -1,0 +1,20 @@
+[package]
+name = "test-native-tests"
+version = "0.0.1"
+authors = ["Xayn Engineering <engineering@xaynet.dev>"]
+license = "Apache-2.0"
+description = "Mobile-testing made easier"
+repository = "https://github.com/xaynetwork/cargo_tai"
+keywords = [
+    "test", "mobile", "ios", "android", "cargo"
+]
+categories = ["development-tools::cargo-plugins", "development-tools::testing", "development-tools::profiling"]
+readme = "../README.md"
+edition = "2018"
+publish = false
+
+[dependencies]
+test-project = { path = "../test-project", features = ["tai-tests"] }
+
+[lib]
+crate-type = ["staticlib", "cdylib"]
