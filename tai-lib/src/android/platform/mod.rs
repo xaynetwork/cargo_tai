@@ -7,16 +7,7 @@ use crate::{
     TaiResult,
 };
 
-use super::task::{
-    BuildBuiltUnits,
-    Context,
-    CreateAndroidProject,
-    CreateBundles,
-    FindAndroidSdk,
-    ListDevices,
-    RunOnDevices,
-    Task,
-};
+use super::task::{BuildAndroidTest, BuildBuiltUnits, Context, CreateAndroidProject, CreateBundles, FindAndroidSdk, ListDevices, RunOnDevices, Task};
 
 pub fn run_command(requested: Options) -> TaiResult<()> {
     match &requested.command {
@@ -27,6 +18,7 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
                     Task::GetProjectMetadata(GetProjectMetadata),
                     Task::BuildBuiltUnits(BuildBuiltUnits),
                     Task::CreateAndroidProject(CreateAndroidProject),
+                    Task::BuildAndroidTest(BuildAndroidTest)
                 ],
                 Context::from(requested),
             )?;

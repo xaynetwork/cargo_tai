@@ -10,13 +10,9 @@ pub mod list_devices;
 pub mod run_on_devices;
 
 pub use self::{
-    build_built_units::BuildBuiltUnits,
-    context::Context,
-    create_android_project::CreateAndroidProject,
-    create_bundles::CreateBundles,
-    find_android_sdk::FindAndroidSdk,
-    list_devices::ListDevices,
-    run_on_devices::RunOnDevices,
+    build_android_test::BuildAndroidTest, build_built_units::BuildBuiltUnits, context::Context,
+    create_android_project::CreateAndroidProject, create_bundles::CreateBundles,
+    find_android_sdk::FindAndroidSdk, list_devices::ListDevices, run_on_devices::RunOnDevices,
 };
 
 pub enum Task {
@@ -28,7 +24,7 @@ pub enum Task {
     GetProjectMetadata(GetProjectMetadata),
     // BuildUniversalBuilt(),
     CreateAndroidProject(CreateAndroidProject),
-    // BuildAndroidTest(),
+    BuildAndroidTest(BuildAndroidTest),
 }
 
 impl crate::common::task::Task<Context> for Task {
@@ -41,6 +37,7 @@ impl crate::common::task::Task<Context> for Task {
             Task::RunOnDevices(task) => task.run(context),
             Task::GetProjectMetadata(task) => task.run(context),
             Task::CreateAndroidProject(task) => task.run(context),
+            Task::BuildAndroidTest(task) => task.run(context),
         }
     }
 }
