@@ -17,5 +17,5 @@ anyhow = "1.0.44"
 cfg-expr = "0.8.1"
 structopt = "0.3.23"
 tai-lib = { path = "../tai-lib", features = ["ios"] }
-tracing = "0.1.28"
+tracing = "0.1.30"
 tracing-subscriber = "0.2.24"
