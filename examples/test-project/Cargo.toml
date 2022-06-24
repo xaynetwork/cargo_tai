@@ -10,19 +10,22 @@ keywords = [
 ]
 categories = ["development-tools::cargo-plugins", "development-tools::testing", "development-tools::profiling"]
 readme = "../README.md"
-edition = "2018"
+edition = "2021"
 publish = false
 
 [dependencies]
-# sodiumoxide = "0.2.6"
+tai-util = { path = "../../tai-util", optional = true }
 
 [lib]
 bench = false
 
 [dev-dependencies]
 criterion = "0.3"
-tai-util = { path = "../tai-util" }
+tai-util = { path = "../../tai-util" }
 
 [[bench]]
 name = "criterion"
 harness = false
+
+[features]
+tai-tests = ["tai-util"]

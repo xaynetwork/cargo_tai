@@ -1,32 +1,44 @@
 use std::{
-    fs::{copy, create_dir_all},
+    fs::{copy, create_dir_all, remove_dir_all},
     path::{Path, PathBuf},
 };
 
 use tracing::{debug, instrument};
 
 use crate::{
-    bundle::{copy_resources, BuildBundle},
-    compiler::BuildUnit,
+    common::{
+        bundle::{copy_resources, BuiltBundle},
+        compiler::BuiltUnit,
+    },
     TaiResult,
 };
 
 #[instrument(name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, resources))]
 pub fn create_bundle<P: AsRef<Path>>(
-    unit: BuildUnit,
+    unit: BuiltUnit,
     bundles_root: P,
     resources: &Option<Vec<(String, PathBuf)>>,
-) -> TaiResult<BuildBundle> {
-    let bundle_root = bundles_root.as_ref().join(&unit.name);
+) -> TaiResult<BuiltBundle> {
+    let bundle_root = bundles_root
+        .as_ref()
+        .join(unit.target.triple)
+        .join(&unit.name);
+
+    if bundle_root.exists() {
+        remove_dir_all(&bundle_root)?;
+    }
 
     create_dir_all(&bundle_root)?;
     debug!("create dir: {}", bundle_root.display());
     let to = bundle_root.join(&unit.name);
-    copy(&unit.executable, &to)?;
-    debug!("copy {} to {}", &unit.executable.display(), to.display());
-    copy_resources(&bundle_root, resources)?;
+    copy(&unit.artifact, &to)?;
+    debug!("copy {} to {}", &unit.artifact.display(), to.display());
 
-    Ok(BuildBundle {
+    if let Some(resources) = resources {
+        copy_resources(&bundle_root, resources)?;
+    }
+
+    Ok(BuiltBundle {
         root: bundle_root,
         build_unit: unit,
     })

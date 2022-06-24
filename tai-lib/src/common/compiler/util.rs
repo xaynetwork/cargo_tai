@@ -6,9 +6,9 @@ use std::{
 use anyhow::{anyhow, bail};
 use cargo_metadata::{camino::Utf8PathBuf, diagnostic::DiagnosticLevel, Artifact, Message};
 
-use crate::{task::CompilerOptions, TaiResult};
+use crate::{common::opts::CompilerOptions, TaiResult};
 
-use super::BuildUnit;
+use super::BuiltUnit;
 
 pub fn is_test(artifact: Artifact) -> Option<Utf8PathBuf> {
     if let (Some(path), true) = (artifact.executable, artifact.profile.test) {
@@ -33,7 +33,7 @@ pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
     mut cmd: Command,
     requested: &CompilerOptions,
     f: F,
-) -> TaiResult<Vec<BuildUnit>> {
+) -> TaiResult<Vec<BuiltUnit>> {
     let cmd = extend_with_cargo_args(&mut cmd, requested)?;
     cmd.stdout(Stdio::piped());
     let mut child = cmd.spawn()?;
@@ -43,17 +43,17 @@ pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
         .ok_or_else(|| anyhow!("failed to read cargo output"))?;
 
     let reader = BufReader::new(cargo_output);
-    let build_units: Result<Vec<BuildUnit>, _> = Message::parse_stream(reader)
+    let built_units: Result<Vec<BuiltUnit>, _> = Message::parse_stream(reader)
         .into_iter()
         .try_fold(vec![], |mut acc, msg| match msg? {
             Message::CompilerArtifact(art) => {
                 if let Some(path) = f(art) {
-                    let unit = BuildUnit {
+                    let unit = BuiltUnit {
                         name: path
                             .file_name()
                             .ok_or_else(|| anyhow!("build artifact should have a name"))?
                             .to_string(),
-                        executable: path.into(),
+                        artifact: path.into(),
                         target: requested.target.clone(),
                     };
                     acc.push(unit);
@@ -70,7 +70,7 @@ pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
         });
 
     child.wait()?;
-    build_units
+    built_units
 }
 
 pub fn extend_with_cargo_args<'a>(
