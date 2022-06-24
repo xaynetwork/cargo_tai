@@ -6,17 +6,13 @@ use cargo_metadata::Metadata;
 use crate::TaiResult;
 
 pub const CARGO_TAI_TARGET_DIR: &str = "cargo-tai";
-pub const IOS_NATIVE_TEST_WORKING_DIR: &str = "native-ios";
 pub const IOS_CACHE_DIR: &str = "cache-ios";
-pub const ANDROID_NATIVE_TEST_WORKING_DIR: &str = "native-android";
 
 pub struct ProjectMetadata {
     pub meta: Metadata,
     pub cargo_opts: CargoOptions,
     pub tai_target: PathBuf,
     pub ios_cache: PathBuf,
-    pub ios_working_dir: PathBuf,
-    pub android_working_dir: PathBuf,
 }
 
 pub struct CargoOptions {
@@ -76,12 +72,7 @@ impl ProjectMetadata {
             .join(CARGO_TAI_TARGET_DIR)
             .into_std_path_buf();
 
-        let ios_working_dir = tai_target.join(IOS_NATIVE_TEST_WORKING_DIR);
-        let android_working_dir = tai_target.join(ANDROID_NATIVE_TEST_WORKING_DIR);
         let ios_cache = tai_target.join(IOS_CACHE_DIR);
-
-        create_dir_all(&ios_working_dir)?;
-        create_dir_all(&android_working_dir)?;
         create_dir_all(&ios_cache)?;
 
         Ok(Self {
@@ -89,8 +80,7 @@ impl ProjectMetadata {
             cargo_opts,
             tai_target,
             ios_cache,
-            ios_working_dir,
-            android_working_dir,
         })
     }
 }
+ 
