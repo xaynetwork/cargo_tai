@@ -1,7 +1,7 @@
 use crate::{
     common::{
         opts::Options,
-        task::{get_project_metadata::GetProjectMetadata, Runner},
+        task::{get_project_metadata::GetProjectMetadata, Runner, set_bench_arg::SetBenchArg},
     },
     TaiResult,
 };
@@ -21,6 +21,7 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
         &[
             Task::FindAndroidSdk(FindAndroidSdk),
             Task::GetProjectMetadata(GetProjectMetadata),
+            Task::SetBenchArg(SetBenchArg),
             Task::BuildBuiltUnits(BuildBuiltUnits),
             Task::CreateBundles(CreateBundles),
             Task::ListDevices(ListDevices),

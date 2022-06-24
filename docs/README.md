@@ -1,17 +1,17 @@
 # Documentation
 
-* [Documentation](#documentation)
-   * [Installation](#installation)
-   * [Usage](#usage)
-      * [iOS](#ios)
-         * [Setup (real device only)](#setup-real-device-only)
-         * [Running tests on iOS](#running-tests-on-ios)
-         * [Running benchmarks on iOS](#running-benchmarks-on-ios)
-      * [Android](#android)
-         * [Setup (real device only)](#setup-real-device-only-1)
-         * [Runnings tests on Android](#runnings-tests-on-android)
-         * [Running benchmarks on Android](#running-benchmarks-on-android)
-   * [cargo-tai logs](#cargo-tai-logs)
+- [Documentation](#documentation)
+  - [Installation](#installation)
+  - [Usage](#usage)
+    - [iOS](#ios)
+      - [Setup (real device only)](#setup-real-device-only)
+      - [Running tests on iOS](#running-tests-on-ios)
+      - [Running benchmarks on iOS](#running-benchmarks-on-ios)
+    - [Android](#android)
+      - [Setup (real device only)](#setup-real-device-only-1)
+      - [Runnings tests on Android](#runnings-tests-on-android)
+      - [Running benchmarks on Android](#running-benchmarks-on-android)
+  - [cargo-tai logs](#cargo-tai-logs)
 
 ## Installation
 
@@ -115,10 +115,10 @@ cargo-tai tests --target x86_64-apple-ios -r test_txt=./data/test.txt --args -Z,
 
 # run a specific integration test binary
 # https://doc.rust-lang.org/cargo/reference/cargo-targets.html#integration-tests
-cargo-tai test --target x86_64-apple-ios --args test_x86_64_ios, -- integration
+cargo-tai test --target x86_64-apple-ios --args test_x86_64_ios -- integration
 
 # run a specific test in release mode
-cargo-tai tests --target x86_64-apple-ios --args test_x86_64_ios, -- --release
+cargo-tai tests --target x86_64-apple-ios --args test_x86_64_ios -- --release
 ```
 
 #### Running benchmarks on iOS

@@ -91,3 +91,101 @@ where
         .ok_or_else(|| format!("invalid KEY=value: no `=` found in `{}`", s))?;
     Ok((s[..pos].parse()?, s[pos + 1..].parse()?))
 }
+
+#[cfg(test)]
+mod tests {
+    use cfg_expr::targets::get_builtin_target_by_triple;
+
+    // Note this useful idiom: importing names from outer (for mod tests) scope.
+    use super::*;
+
+    #[test]
+    fn test_tests_with_resource() {
+        let o = Options::parse_from(
+            "cargo-tai tests --target x86_64-apple-ios -r test_txt=./data/test.txt"
+                .split_whitespace(),
+        );
+        let o = match o {
+            Options::Tests(o) => o,
+            _ => panic!(""),
+        };
+
+        assert_eq!(
+            &o.compiler.target,
+            get_builtin_target_by_triple("x86_64-apple-ios").unwrap()
+        );
+        assert_eq!(
+            &o.resources.resources.unwrap(),
+            &vec![("test_txt".to_string(), "./data/test.txt".into())]
+        );
+    }
+
+    #[test]
+    fn test_tests_with_additional_binary_arguments() {
+        let o = Options::parse_from(
+            "cargo-tai tests --target x86_64-apple-ios --args -Z,unstable-options,--report-time"
+                .split_whitespace(),
+        );
+        let o = match o {
+            Options::Tests(o) => o,
+            _ => panic!(""),
+        };
+
+        assert_eq!(
+            &o.compiler.target,
+            get_builtin_target_by_triple("x86_64-apple-ios").unwrap()
+        );
+        assert_eq!(
+            &o.binary.args.unwrap(),
+            &vec![
+                "-Z".to_string(),
+                "unstable-options".to_string(),
+                "--report-time".to_string()
+            ]
+        );
+    }
+
+    #[test]
+    fn test_tests_with_cargo_arguments() {
+        let o = Options::parse_from(
+            "cargo-tai tests --target x86_64-apple-ios --args test_x86_64_ios -- --release"
+                .split_whitespace(),
+        );
+        let o = match o {
+            Options::Tests(o) => o,
+            _ => panic!(""),
+        };
+
+        assert_eq!(
+            &o.compiler.target,
+            get_builtin_target_by_triple("x86_64-apple-ios").unwrap()
+        );
+        assert_eq!(
+            &o.binary.args.unwrap(),
+            &vec!["test_x86_64_ios".to_string()]
+        );
+        assert_eq!(&o.compiler.cargo_args, &vec!["--release".to_string(),]);
+    }
+
+    #[test]
+    fn test_test_with_cargo_arguments() {
+        let o = Options::parse_from(
+            "cargo-tai test --target x86_64-apple-ios --args test_x86_64_ios -- integration"
+                .split_whitespace(),
+        );
+        let o = match o {
+            Options::Test(o) => o,
+            _ => panic!(""),
+        };
+
+        assert_eq!(
+            &o.compiler.target,
+            get_builtin_target_by_triple("x86_64-apple-ios").unwrap()
+        );
+        assert_eq!(
+            &o.binary.args.unwrap(),
+            &vec!["test_x86_64_ios".to_string()]
+        );
+        assert_eq!(&o.compiler.cargo_args, &vec!["integration".to_string(),]);
+    }
+}

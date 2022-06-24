@@ -1,4 +1,7 @@
-use crate::{common::task::get_project_metadata::GetProjectMetadata, TaiResult};
+use crate::{
+    common::task::{get_project_metadata::GetProjectMetadata, set_bench_arg::SetBenchArg},
+    TaiResult,
+};
 
 pub mod build_built_units;
 pub mod context;
@@ -23,6 +26,7 @@ pub enum Task {
     CreateBundles(CreateBundles),
     RunOnDevices(RunOnDevices),
     GetProjectMetadata(GetProjectMetadata),
+    SetBenchArg(SetBenchArg),
 }
 
 impl crate::common::task::Task<Context> for Task {
@@ -34,6 +38,7 @@ impl crate::common::task::Task<Context> for Task {
             Task::CreateBundles(task) => task.run(context),
             Task::RunOnDevices(task) => task.run(context),
             Task::GetProjectMetadata(task) => task.run(context),
+            Task::SetBenchArg(task) => task.run(context),
         }
     }
 }
