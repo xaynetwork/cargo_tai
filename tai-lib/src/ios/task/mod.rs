@@ -1,10 +1,13 @@
 use crate::{
-    common::task::{get_project_metadata::GetProjectMetadata, set_bench_arg::SetBenchArg},
+    common::task::{
+        context::Context,
+        get_project_metadata::GetProjectMetadata,
+        set_bench_arg::SetBenchArg,
+    },
     TaiResult,
 };
 
 mod build_built_units;
-mod context;
 mod create_bundles;
 mod create_signed_bundles;
 mod list_physical_devices;
@@ -15,7 +18,6 @@ mod run_on_simulators;
 
 pub use self::{
     build_built_units::BuildBuiltUnits,
-    context::Context,
     create_bundles::CreateBundles,
     create_signed_bundles::CreateSignedBundles,
     list_physical_devices::ListPhysicalDevices,

@@ -8,11 +8,15 @@ use tracing::{debug, instrument};
 
 use crate::{
     android::tools::{adb, AndroidSdk},
-    common::{bundle::BuiltBundle, opts::BinaryOptions, task::Task},
+    common::{
+        bundle::{BuiltBundle, BuiltBundles},
+        opts::{BinaryOptions, Options},
+        task::Task,
+    },
     TaiResult,
 };
 
-use super::Context;
+use super::{list_devices::Devices, Context};
 
 const ANDROID_REMOTE_WORKDIR: &str = "/data/local/tmp/cargo-tai";
 
@@ -20,13 +24,19 @@ pub struct RunOnDevices;
 
 impl Task<Context> for RunOnDevices {
     fn run(&self, context: Context) -> TaiResult<Context> {
-        let sdk = context.android_sdk()?;
-        let bundles = context.built_bundles()?;
+        let sdk: &AndroidSdk = context.get();
+        let bundles = context.get::<BuiltBundles>();
+        let default = BinaryOptions::default();
+        let binary_opt = match context.get::<Options>().binary.as_ref() {
+            Some(opts) => opts,
+            None => &default,
+        };
 
-        context.devices()?.iter().try_for_each(|device| {
-            bundles.bundles.iter().try_for_each(|bundle| {
-                install_and_run_bundle(sdk, &device.id, bundle, context.binary()?)
-            })
+        context.get::<Devices>().0.iter().try_for_each(|device| {
+            bundles
+                .bundles
+                .iter()
+                .try_for_each(|bundle| install_and_run_bundle(sdk, &device.id, bundle, binary_opt))
         })?;
         Ok(context)
     }

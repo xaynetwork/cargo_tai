@@ -12,7 +12,11 @@ use tempfile::TempDir;
 use tracing::{debug, info, instrument};
 
 use crate::{
-    common::{opts::BinaryOptions, task::Task},
+    common::{
+        bundle::BuiltBundles,
+        opts::{BinaryOptions, Options},
+        task::Task,
+    },
     ios::{
         platform::APP_ID,
         tools::{lldb, xcrun},
@@ -20,20 +24,31 @@ use crate::{
     TaiResult,
 };
 
-use super::Context;
+use super::{list_simulators::Simulators, Context};
 
 pub struct RunOnSimulators;
 
 impl Task<Context> for RunOnSimulators {
     #[instrument(name = "run_on_simulator", skip(self, context))]
     fn run(&self, context: Context) -> TaiResult<Context> {
-        let bundles = context.built_bundles()?;
+        let bundles: &BuiltBundles = context.get();
+        let opts: &Options = context.get();
+        let default = BinaryOptions::default();
+        let binary_opt = match opts.binary.as_ref() {
+            Some(opts) => opts,
+            None => &default,
+        };
 
-        context.simulators()?.iter().try_for_each(|simulator| {
-            bundles.bundles.iter().try_for_each(|bundle| {
-                install_and_launch(simulator, &bundle.root, context.binary()?)
-            })
-        })?;
+        context
+            .get::<Simulators>()
+            .0
+            .iter()
+            .try_for_each(|simulator| {
+                bundles
+                    .bundles
+                    .iter()
+                    .try_for_each(|bundle| install_and_launch(simulator, &bundle.root, binary_opt))
+            })?;
         Ok(context)
     }
 }

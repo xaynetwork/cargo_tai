@@ -1,22 +1,15 @@
 use crate::{
-    android::task::Context as AndroidContext,
     common::{command::Command, opts::Options, task::Task},
-    ios::task::Context as IosContext,
     TaiResult,
 };
 
+use super::context::Context;
+
 pub struct SetBenchArg;
 
-impl Task<IosContext> for SetBenchArg {
-    fn run(&self, mut context: IosContext) -> TaiResult<IosContext> {
-        set_bench_arg(&mut context.opts);
-        Ok(context)
-    }
-}
-
-impl Task<AndroidContext> for SetBenchArg {
-    fn run(&self, mut context: AndroidContext) -> TaiResult<AndroidContext> {
-        set_bench_arg(&mut context.opts);
+impl Task<Context> for SetBenchArg {
+    fn run(&self, mut context: Context) -> TaiResult<Context> {
+        set_bench_arg(context.get_mut());
         Ok(context)
     }
 }

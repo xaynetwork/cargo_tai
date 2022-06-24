@@ -4,16 +4,25 @@ use anyhow::bail;
 use tracing::{info, instrument};
 
 use crate::{
-    common::{opts::BinaryOptions, task::Task, tools::Rsync},
+    common::{
+        opts::{BinaryOptions, Options},
+        project::ProjectMetadata,
+        task::Task,
+        tools::Rsync,
+    },
     ios::{
-        bundle::bundler::APP_DISPLAY_NAME,
+        bundle::{bundler::APP_DISPLAY_NAME, signing::SigningSettings},
         platform::APP_ID,
         tools::ios_deploy::IosDeployLaunch,
     },
     TaiResult,
 };
 
-use super::Context;
+use super::{
+    create_signed_bundles::SignedBuiltBundles,
+    list_physical_devices::PhysicalDevices,
+    Context,
+};
 
 pub struct RunOnPhysicalDevice;
 
@@ -21,25 +30,31 @@ impl Task<Context> for RunOnPhysicalDevice {
     #[instrument(name = "run_on_physical_device", skip(self, context))]
     fn run(&self, context: Context) -> TaiResult<Context> {
         let provisioned_devices = &context
-            .signing_settings()?
+            .get::<SigningSettings>()
             .mobile_provision
             .provisioned_devices;
-        let bundles = context.built_bundles()?;
-        let binary_opts = context.binary()?;
-        let ios_cache = &context.project_metadata()?.ios_cache;
+        let bundles = &context.get::<SignedBuiltBundles>().0;
+        let ios_cache = &context.get::<ProjectMetadata>().ios_cache;
+        let opts: &Options = context.get();
+        let default = BinaryOptions::default();
+        let binary_opts = match opts.binary.as_ref() {
+            Some(opts) => opts,
+            None => &default,
+        };
 
         let app_deltas = ios_cache.join("app_deltas");
         create_dir_all(&app_deltas)?;
 
         context
-            .devices()?
+            .get::<PhysicalDevices>()
+            .0
             .iter()
             .filter(|device| provisioned_devices.contains(&device.id))
             .try_for_each(|provisioned_device| {
                 bundles.bundles.iter().try_for_each(|bundle| {
                     let mut cmd = Rsync::new(&bundle.root, &ios_cache);
                     cmd.archive().delete();
-                    if context.opts.cli.verbose {
+                    if opts.cli.verbose {
                         cmd.verbose();
                     }
                     cmd.execute()?;
@@ -49,7 +64,7 @@ impl Task<Context> for RunOnPhysicalDevice {
                         ios_cache.join(format!("{}.app", APP_DISPLAY_NAME)),
                         &app_deltas,
                         binary_opts,
-                        context.opts.cli.verbose,
+                        opts.cli.verbose,
                     )
                 })
             })?;

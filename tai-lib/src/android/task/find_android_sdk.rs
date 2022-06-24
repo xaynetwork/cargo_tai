@@ -1,6 +1,10 @@
 use anyhow::anyhow;
 
-use crate::{android::tools::AndroidSdk, common::task::Task, TaiResult};
+use crate::{
+    android::tools::AndroidSdk,
+    common::{opts::Options, task::Task},
+    TaiResult,
+};
 
 use super::Context;
 
@@ -10,14 +14,14 @@ impl Task<Context> for FindAndroidSdk {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let sdk = AndroidSdk::derive_sdk(
             &context
-                .opts
+                .get::<Options>()
                 .android
                 .as_ref()
                 .ok_or_else(|| anyhow!("no ndk"))?
                 .ndk,
         )?;
 
-        context.android_sdk = Some(sdk);
+        context.insert(sdk);
 
         Ok(context)
     }

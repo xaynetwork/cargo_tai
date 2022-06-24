@@ -1,9 +1,14 @@
 use crate::{
     common::{
         opts::Options,
-        task::{get_project_metadata::GetProjectMetadata, set_bench_arg::SetBenchArg, Runner},
+        task::{
+            context::Context,
+            get_project_metadata::GetProjectMetadata,
+            set_bench_arg::SetBenchArg,
+            Runner,
+        },
     },
-    ios::task::{BuildBuiltUnits, Context, CreateBundles, ListSimulators, RunOnSimulators, Task},
+    ios::task::{BuildBuiltUnits, CreateBundles, ListSimulators, RunOnSimulators, Task},
     TaiResult,
 };
 

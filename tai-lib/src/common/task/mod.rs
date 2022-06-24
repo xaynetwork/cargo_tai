@@ -1,5 +1,6 @@
 use crate::TaiResult;
 
+pub mod context;
 pub mod get_project_metadata;
 pub mod set_bench_arg;
 

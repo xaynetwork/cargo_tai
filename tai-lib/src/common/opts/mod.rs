@@ -24,7 +24,7 @@ pub struct CompilerOptions {
     pub cargo_args: Vec<String>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct BinaryOptions {
     pub args: Option<Vec<String>>,
     pub envs: Option<Vec<(String, String)>>,

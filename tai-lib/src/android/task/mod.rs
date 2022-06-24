@@ -1,10 +1,9 @@
 use crate::{
-    common::task::{get_project_metadata::GetProjectMetadata, set_bench_arg::SetBenchArg},
+    common::task::{get_project_metadata::GetProjectMetadata, set_bench_arg::SetBenchArg, context::Context},
     TaiResult,
 };
 
 pub mod build_built_units;
-pub mod context;
 pub mod create_bundles;
 pub mod find_android_sdk;
 pub mod list_devices;
@@ -12,7 +11,6 @@ pub mod run_on_devices;
 
 pub use self::{
     build_built_units::BuildBuiltUnits,
-    context::Context,
     create_bundles::CreateBundles,
     find_android_sdk::FindAndroidSdk,
     list_devices::ListDevices,

@@ -1,25 +1,32 @@
 use tracing::instrument;
 
 use crate::{
-    common::{bundle::create_bundles, task::Task},
+    common::{
+        bundle::{create_bundles, BuiltBundles},
+        opts::Options,
+        project::ProjectMetadata,
+        task::Task,
+    },
     ios::bundle::{
         bundler::create_bundle,
-        signing::{create_entitlements_file, sign_bundle},
+        signing::{create_entitlements_file, sign_bundle, SigningSettings},
     },
     TaiResult,
 };
 
-use super::Context;
+use super::{build_built_units::BuiltUnits, Context};
+
+pub struct SignedBuiltBundles(pub BuiltBundles);
 
 pub struct CreateSignedBundles;
 
 impl Task<Context> for CreateSignedBundles {
     #[instrument(name = "create_signed_bundles", skip(self, context))]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
-        let built_units = context.take_built_units()?;
-        let sig_settings = context.signing_settings()?;
-        let resources = &context.opts.resources;
-        let project_meta = context.project_metadata()?;
+        let built_units = context.remove::<BuiltUnits>().0;
+        let sig_settings: &SigningSettings = context.get();
+        let resources = &context.get::<Options>().resources;
+        let project_meta: &ProjectMetadata = context.get();
 
         let bundles = create_bundles(
             built_units,
@@ -35,8 +42,7 @@ impl Task<Context> for CreateSignedBundles {
             .iter()
             .try_for_each(|bundle| sign_bundle(bundle, sig_settings, &entitlements))?;
 
-        context.built_bundles = Some(bundles);
-
+        context.insert(SignedBuiltBundles(bundles));
         Ok(context)
     }
 }

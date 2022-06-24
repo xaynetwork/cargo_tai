@@ -4,6 +4,7 @@ use tracing::instrument;
 use crate::{common::task::Task, ios::tools::xcrun, TaiResult};
 
 use super::Context;
+pub struct Simulators(pub Vec<simctl::Device>);
 
 pub struct ListSimulators;
 
@@ -15,7 +16,7 @@ impl Task<Context> for ListSimulators {
             bail!("no iOS simulator available")
         }
 
-        context.simulators = Some(simulators);
+        context.insert(Simulators(simulators));
         Ok(context)
     }
 }

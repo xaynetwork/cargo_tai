@@ -1,14 +1,18 @@
 use crate::{
     common::{
         opts::Options,
-        task::{get_project_metadata::GetProjectMetadata, Runner, set_bench_arg::SetBenchArg},
+        task::{
+            context::Context,
+            get_project_metadata::GetProjectMetadata,
+            set_bench_arg::SetBenchArg,
+            Runner,
+        },
     },
     TaiResult,
 };
 
 use super::task::{
     BuildBuiltUnits,
-    Context,
     CreateBundles,
     FindAndroidSdk,
     ListDevices,
