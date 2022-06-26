@@ -23,10 +23,10 @@ impl Task<Context> for BuildBuiltUnits {
         let opts: &Options = context.get();
 
         let cmd = match opts.command {
-            Command::Bench => bench_command()?,
-            Command::Test => test_command()?,
-            Command::Benches => benches_command()?,
-            Command::Tests => tests_command()?,
+            Command::Bench => bench_command(&opts.compiler)?,
+            Command::Test => test_command(&opts.compiler)?,
+            Command::Benches => benches_command(&opts.compiler)?,
+            Command::Tests => tests_command(&opts.compiler)?,
         };
         let built_units = match opts.command {
             Command::Bench | Command::Benches => compile_benches(cmd, &opts.compiler)?,

@@ -78,13 +78,6 @@ pub fn extend_with_cargo_args<'a>(
     requested: &CompilerOptions,
 ) -> TaiResult<&'a mut Command> {
     cmd.args(&requested.cargo_args);
-
-    cmd.args(&[
-        "--target",
-        requested.target.triple,
-        "--message-format",
-        "json",
-    ]);
-
+    cmd.args(&["--message-format", "json"]);
     Ok(cmd)
 }

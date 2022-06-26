@@ -40,6 +40,7 @@ Furthermore, ideas were taken from the following projects:
 
 - Android SDK
 - Android NDK
+- [cargo-ndk](https://github.com/bbqsrc/cargo-ndk)
 - rustup toolchains:
   - `x86_64-linux-android`
   - `aarch64-linux-android`

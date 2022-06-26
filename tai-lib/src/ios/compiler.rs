@@ -1,27 +1,27 @@
 use std::process::Command;
 
-use crate::TaiResult;
+use crate::{common::opts::CompilerOptions, TaiResult};
 
-pub fn benches_command() -> TaiResult<Command> {
+pub fn benches_command(requested: &CompilerOptions) -> TaiResult<Command> {
     let mut cmd = Command::new("cargo");
-    cmd.args(&["build", "--release", "--benches"]);
+    cmd.args(&["build", "--benches", "--target", requested.target.triple]);
     Ok(cmd)
 }
 
-pub fn tests_command() -> TaiResult<Command> {
+pub fn tests_command(requested: &CompilerOptions) -> TaiResult<Command> {
     let mut cmd = Command::new("cargo");
-    cmd.args(&["build", "--tests"]);
+    cmd.args(&["build", "--tests", "--target", requested.target.triple]);
     Ok(cmd)
 }
 
-pub fn bench_command() -> TaiResult<Command> {
+pub fn bench_command(requested: &CompilerOptions) -> TaiResult<Command> {
     let mut cmd = Command::new("cargo");
-    cmd.args(&["build", "--release", "--bench"]);
+    cmd.args(&["build", "--bench", "--target", requested.target.triple]);
     Ok(cmd)
 }
 
-pub fn test_command() -> TaiResult<Command> {
+pub fn test_command(requested: &CompilerOptions) -> TaiResult<Command> {
     let mut cmd = Command::new("cargo");
-    cmd.args(&["build", "--test"]);
+    cmd.args(&["build", "--test", "--target", requested.target.triple]);
     Ok(cmd)
 }
