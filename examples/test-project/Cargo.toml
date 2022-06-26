@@ -19,6 +19,7 @@ bench = false
 
 [dev-dependencies]
 criterion = "0.3"
+include_dir = "0.7.2"
 tai-util = { path = "../../tai-util" }
 
 [[bench]]
