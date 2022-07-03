@@ -1,7 +1,7 @@
 use crate::{
     android::{
         compiler::{bench_command, benches_command, test_command, tests_command},
-        tools::AndroidSdk,
+        tools::AndroidEnv,
     },
     common::{
         command::Command,
@@ -20,14 +20,14 @@ pub struct BuildBuiltUnits;
 
 impl Task<Context> for BuildBuiltUnits {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
-        let sdk: &AndroidSdk = context.get();
+        let env: &AndroidEnv = context.get();
         let opts: &Options = context.get();
 
         let cmd = match opts.command {
-            Command::Bench => bench_command(sdk, opts)?,
-            Command::Test => test_command(sdk, opts)?,
-            Command::Benches => benches_command(sdk, opts)?,
-            Command::Tests => tests_command(sdk, opts)?,
+            Command::Bench => bench_command(env, opts)?,
+            Command::Test => test_command(env, opts)?,
+            Command::Benches => benches_command(env, opts)?,
+            Command::Tests => tests_command(env, opts)?,
         };
 
         let built_units = match opts.command {

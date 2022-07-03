@@ -3,7 +3,7 @@ use anyhow::bail;
 use crate::{
     android::tools::{
         adb::{self, Device},
-        AndroidSdk,
+        AndroidEnv,
     },
     common::{opts::Options, task::Task},
     TaiResult,
@@ -17,9 +17,9 @@ pub struct ListDevices;
 
 impl Task<Context> for ListDevices {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
-        let sdk: &AndroidSdk = context.get();
+        let env: &AndroidEnv = context.get();
 
-        let devices = adb::devices(sdk)?
+        let devices = adb::devices(env)?
             .into_iter()
             .filter(|device| device.arch == context.get::<Options>().compiler.target.arch)
             .collect::<Vec<Device>>();

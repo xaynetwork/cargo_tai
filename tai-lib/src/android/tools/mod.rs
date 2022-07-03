@@ -1,31 +1,27 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use anyhow::anyhow;
 
-use crate::TaiResult;
+use crate::{common::opts::AndroidOptions, TaiResult};
 
 pub mod adb;
 
-pub struct AndroidSdk {
+pub struct AndroidEnv {
     pub adb: PathBuf,
     pub ndk: PathBuf,
     pub sdk: PathBuf,
 }
 
-impl AndroidSdk {
-    pub fn derive_sdk<P: AsRef<Path>>(ndk: P) -> TaiResult<AndroidSdk> {
-        let sdk = ndk
-            .as_ref()
-            .parent()
-            .and_then(|p| p.parent())
-            .ok_or_else(|| anyhow!("failed to find `sdk` folder in ../../ANDROID_NDK_HOME"))?;
+impl AndroidEnv {
+    pub fn derive_env(opts: &AndroidOptions) -> TaiResult<AndroidEnv> {
+        let ndk = opts.ndk.to_path_buf();
+        let sdk = opts
+            .sdk
+            .clone()
+            .or_else(|| ndk.parent().and_then(|p| p.parent()).map(Into::into))
+            .ok_or_else(|| anyhow!("failed to find `sdk` folder in ../../{}", ndk.display()))?;
 
         let adb = sdk.join("platform-tools").join("adb");
-
-        Ok(Self {
-            adb,
-            ndk: ndk.as_ref().to_path_buf(),
-            sdk: sdk.to_path_buf(),
-        })
+        Ok(Self { adb, ndk, sdk })
     }
 }

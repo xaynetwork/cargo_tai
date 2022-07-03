@@ -11,19 +11,12 @@ use crate::{
     TaiResult,
 };
 
-use super::task::{
-    BuildBuiltUnits,
-    CreateBundles,
-    FindAndroidSdk,
-    ListDevices,
-    RunOnDevices,
-    Task,
-};
+use super::task::{BuildBuiltUnits, CreateBundles, GetAndroidEnv, ListDevices, RunOnDevices, Task};
 
 pub fn run_command(requested: Options) -> TaiResult<()> {
     Runner::execute(
         &[
-            Task::FindAndroidSdk(FindAndroidSdk),
+            Task::GetAndroidEnv(GetAndroidEnv),
             Task::GetProjectMetadata(GetProjectMetadata),
             Task::SetBenchArg(SetBenchArg),
             Task::BuildBuiltUnits(BuildBuiltUnits),

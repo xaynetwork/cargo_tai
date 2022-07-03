@@ -94,6 +94,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    use std::path::PathBuf;
+
     use cfg_expr::targets::get_builtin_target_by_triple;
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
@@ -185,6 +187,35 @@ mod tests {
         assert_eq!(
             &o.binary.args.unwrap(),
             &vec!["test_x86_64_ios".to_string()]
+        );
+        assert_eq!(&o.compiler.cargo_args, &vec!["integration".to_string(),]);
+    }
+
+    #[test]
+    fn test_test_with_cargo_ndk_arguments_and_cargo_arguments() {
+        let o = Options::parse_from(
+            "cargo-tai test --target x86_64-linux-android --android-api-lvl 21 --android-ndk path --cargo-ndk-args --no-strip,--bindgen --args test_x86_64_android -- integration"
+                .split_whitespace(),
+        );
+        let o = match o {
+            Options::Test(o) => o,
+            _ => panic!(""),
+        };
+
+        assert_eq!(
+            &o.compiler.target,
+            get_builtin_target_by_triple("x86_64-linux-android").unwrap()
+        );
+        assert_eq!(o.android.api_lvl.unwrap(), 21);
+        assert_eq!(o.android.ndk.unwrap(), PathBuf::from("path"));
+        assert!(o.android.sdk.is_none());
+        assert_eq!(
+            &o.android.cargo_ndk_args.unwrap(),
+            &vec!["--no-strip".to_string(), "--bindgen".to_string()]
+        );
+        assert_eq!(
+            &o.binary.args.unwrap(),
+            &vec!["test_x86_64_android".to_string()]
         );
         assert_eq!(&o.compiler.cargo_args, &vec!["integration".to_string(),]);
     }

@@ -33,7 +33,9 @@ pub struct BinaryOptions {
 #[derive(Debug, Clone)]
 pub struct AndroidOptions {
     pub api_lvl: u8,
+    pub sdk: Option<PathBuf>,
     pub ndk: PathBuf,
+    pub cargo_ndk_args: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone)]

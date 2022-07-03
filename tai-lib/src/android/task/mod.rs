@@ -9,20 +9,20 @@ use crate::{
 
 pub mod build_built_units;
 pub mod create_bundles;
-pub mod find_android_sdk;
+pub mod get_android_env;
 pub mod list_devices;
 pub mod run_on_devices;
 
 pub use self::{
     build_built_units::BuildBuiltUnits,
     create_bundles::CreateBundles,
-    find_android_sdk::FindAndroidSdk,
+    get_android_env::GetAndroidEnv,
     list_devices::ListDevices,
     run_on_devices::RunOnDevices,
 };
 
 pub enum Task {
-    FindAndroidSdk(FindAndroidSdk),
+    GetAndroidEnv(GetAndroidEnv),
     ListDevices(ListDevices),
     BuildBuiltUnits(BuildBuiltUnits),
     CreateBundles(CreateBundles),
@@ -34,7 +34,7 @@ pub enum Task {
 impl crate::common::task::Task<Context> for Task {
     fn run(&self, context: Context) -> TaiResult<Context> {
         match self {
-            Task::FindAndroidSdk(task) => task.run(context),
+            Task::GetAndroidEnv(task) => task.run(context),
             Task::ListDevices(task) => task.run(context),
             Task::BuildBuiltUnits(task) => task.run(context),
             Task::CreateBundles(task) => task.run(context),

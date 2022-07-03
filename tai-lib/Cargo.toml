@@ -26,7 +26,7 @@ tai-util = { path = "../tai-util" }
 tracing = "0.1.35"
 walkdir = "2.3.2"
 
-# ios features
+# ios feature
 chrono = { version = "0.4.19", optional = true }
 openssl = { version = "0.10.40", optional = true }
 plist = { version = "1.3.1", optional = true }
