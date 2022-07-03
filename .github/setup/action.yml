@@ -21,8 +21,8 @@ runs:
       if: inputs.rust-nightly != ''
       shell: bash
       run: |
-        rustup install nightly-2022-05-19
-        rustup component add rustfmt --toolchain nightly-2022-05-19
+        rustup install ${{ env.RUST_NIGHTLY }}
+        rustup component add rustfmt --toolchain ${{ env.RUST_NIGHTLY }}
 
     - name: Install additional rust target
       if: inputs.rust-target != ''

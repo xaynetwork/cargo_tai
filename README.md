@@ -66,7 +66,7 @@ Furthermore, ideas were taken from the following projects:
 - ios-deploy 1.11.4
 - API level 21
 - NDK 22.1.7171670
-- cargo 1.61.0
+- cargo 1.62.0
 - cargo toolchains:
   - `x86_64-linux-android`
   - `aarch64-linux-android`
