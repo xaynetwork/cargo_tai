@@ -123,9 +123,9 @@ cargo-tai tests --target x86_64-apple-ios --args test_x86_64_ios -- --release
 
 You can also use [`include_dir`](https://github.com/Michael-F-Bryan/include_dir) to embed resources
 into your binary (see test `test_data_host_and_device_include_dir` in `examples/test-project/src/lib/rs`).
-This way, you don't need to specify the resources using the `-r` flag. With large resources, this may
-cause the app to take longer to transfer to the phone. By separating the code from the resources,
-the upload tools can skip resources already present in the app from the previous run
+This way, you don't need to specify the resources using the `-r` flag. With large resources however,
+this may cause the app to take longer to transfer to the phone. By separating the code from the resources,
+the upload tools can skip resources already present in the app from the previous run.
 
 #### Running benchmarks on iOS
 

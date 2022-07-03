@@ -1,5 +1,9 @@
 use crate::{
-    common::task::{get_project_metadata::GetProjectMetadata, set_bench_arg::SetBenchArg, context::Context},
+    common::task::{
+        context::Context,
+        get_project_metadata::GetProjectMetadata,
+        set_bench_arg::SetBenchArg,
+    },
     TaiResult,
 };
 
