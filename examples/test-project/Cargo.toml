@@ -18,7 +18,7 @@ tai-util = { path = "../../tai-util" }
 bench = false
 
 [dev-dependencies]
-criterion = "0.3"
+criterion = "0.3.5"
 include_dir = "0.7.2"
 tai-util = { path = "../../tai-util" }
 
