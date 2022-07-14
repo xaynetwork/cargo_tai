@@ -31,7 +31,16 @@ impl Task<Context> for CreateSignedBundles {
         let bundles = create_bundles(
             built_units,
             &project_meta.tai_target,
-            |unit, bundles_root| create_bundle(unit, bundles_root, resources, &sig_settings.app_id),
+            |unit, bundles_root| {
+                create_bundle(
+                    unit,
+                    bundles_root,
+                    resources,
+                    &sig_settings.app_id,
+                    &project_meta.resources_dir,
+                    &project_meta.package_graph,
+                )
+            },
         )?;
 
         let entitlements =

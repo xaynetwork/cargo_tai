@@ -7,6 +7,7 @@ use crate::{
         command::Command,
         compiler::{compile_benches, compile_tests, BuiltUnit},
         opts::Options,
+        project::ProjectMetadata,
         task::Task,
     },
     TaiResult,
@@ -30,9 +31,11 @@ impl Task<Context> for BuildBuiltUnits {
             Command::Tests => tests_command(env, opts)?,
         };
 
+        let meta: &ProjectMetadata = context.get();
+
         let built_units = match opts.command {
-            Command::Bench | Command::Benches => compile_benches(cmd, &opts.compiler)?,
-            Command::Test | Command::Tests => compile_tests(cmd, &opts.compiler)?,
+            Command::Bench | Command::Benches => compile_benches(cmd, &opts.compiler, meta)?,
+            Command::Test | Command::Tests => compile_tests(cmd, &opts.compiler, meta)?,
         };
         context.insert(BuiltUnits(built_units));
 

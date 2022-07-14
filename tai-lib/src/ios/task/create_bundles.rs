@@ -18,7 +18,14 @@ impl Task<Context> for CreateBundles {
         let project_meta: &ProjectMetadata = context.get();
 
         let bundles = create_bundles(built_units, &project_meta.tai_target, |unit, root| {
-            create_bundle(unit, root, resources, APP_ID)
+            create_bundle(
+                unit,
+                root,
+                resources,
+                APP_ID,
+                &project_meta.resources_dir,
+                &project_meta.package_graph,
+            )
         })?;
 
         context.insert(bundles);

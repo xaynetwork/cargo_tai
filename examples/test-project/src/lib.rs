@@ -1,15 +1,24 @@
+pub fn test_resources() {
+    use std::fs::File;
+    use tai_resource::include_file;
+
+    let path = include_file!("data/test.txt");
+    let path2 = include_file!("data/data2/test.txt");
+
+    File::open(path).unwrap();
+    File::open(path2).unwrap();
+}
+
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use std::env;
 
+    use crate::test_resources;
+
     #[test]
     fn test_data_host_and_device() {
-        use std::fs::File;
-        use tai_util::try_resources_file_path;
-        let path = try_resources_file_path("test_txt").unwrap_or_else(|| "./data/test.txt".into());
-
-        File::open(path).unwrap();
+        test_resources()
     }
 
     #[test]

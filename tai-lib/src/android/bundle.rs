@@ -3,21 +3,24 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use guppy::graph::PackageGraph;
 use tracing::{debug, instrument};
 
 use crate::{
     common::{
-        bundle::{copy_resources, BuiltBundle},
+        bundle::{copy_resources, copy_resources2, find_resources, BuiltBundle},
         compiler::BuiltUnit,
     },
     TaiResult,
 };
 
-#[instrument(name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, resources))]
+#[instrument(name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, resources, resources_dir))]
 pub fn create_bundle<P: AsRef<Path>>(
     unit: BuiltUnit,
     bundles_root: P,
     resources: &Option<Vec<(String, PathBuf)>>,
+    resources_dir: &PathBuf,
+    package_graph: &PackageGraph,
 ) -> TaiResult<BuiltBundle> {
     let bundle_root = bundles_root
         .as_ref()
@@ -37,6 +40,9 @@ pub fn create_bundle<P: AsRef<Path>>(
     if let Some(resources) = resources {
         copy_resources(&bundle_root, resources)?;
     }
+
+    let dirs = find_resources(&unit.package_id, resources_dir, package_graph)?;
+    copy_resources2(&bundle_root, &dirs)?;
 
     Ok(BuiltBundle {
         root: bundle_root,

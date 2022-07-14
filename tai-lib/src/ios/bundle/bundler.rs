@@ -5,12 +5,13 @@ use std::{
 
 use anyhow::{bail, Context};
 use cfg_expr::targets::{Arch, TargetInfo};
+use guppy::graph::PackageGraph;
 use serde::Serialize;
 use tracing::{debug, instrument};
 
 use crate::{
     common::{
-        bundle::{copy_resources, BuiltBundle},
+        bundle::{copy_resources, copy_resources2, find_resources, BuiltBundle},
         compiler::BuiltUnit,
     },
     TaiResult,
@@ -25,6 +26,8 @@ pub fn create_bundle<P: AsRef<Path>>(
     bundles_root: P,
     resources: &Option<Vec<(String, PathBuf)>>,
     app_id: &str,
+    resources_dir: &PathBuf,
+    package_graph: &PackageGraph,
 ) -> TaiResult<BuiltBundle> {
     let version_root = bundles_root
         .as_ref()
@@ -53,6 +56,9 @@ pub fn create_bundle<P: AsRef<Path>>(
     if let Some(resources) = resources {
         copy_resources(&bundle_root, resources)?;
     }
+
+    let dirs = find_resources(&unit.package_id, resources_dir, package_graph)?;
+    copy_resources2(&bundle_root, &dirs)?;
 
     Ok(BuiltBundle {
         root: bundle_root,

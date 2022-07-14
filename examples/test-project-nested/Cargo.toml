@@ -1,5 +1,5 @@
 [package]
-name = "test-project"
+name = "test-project-nested"
 version = "0.0.1"
 authors = ["Xayn Engineering <engineering@xaynet.dev>"]
 license = "Apache-2.0"
@@ -13,15 +13,4 @@ publish = false
 
 [dependencies]
 tai-resource = { path = "../../tai-resource" }
-
-[lib]
-bench = false
-
-[dev-dependencies]
-criterion = "0.3.5"
-include_dir = "0.7.2"
-tai-util = { path = "../../tai-util" }
-
-[[bench]]
-name = "criterion"
-harness = false
+test-project = { path = "../test-project" }
