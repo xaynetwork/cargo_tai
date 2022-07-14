@@ -4,7 +4,7 @@ use crate::common::compiler::BuiltUnit;
 
 mod bundles;
 
-pub use bundles::{copy_resources, copy_resources2, create_bundles, find_resources};
+pub use bundles::{copy_resources, create_bundles, find_resources};
 
 #[derive(Debug)]
 pub struct BuiltBundles {

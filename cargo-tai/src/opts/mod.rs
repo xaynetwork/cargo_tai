@@ -9,7 +9,6 @@ pub mod binary;
 pub mod cli;
 pub mod compiler;
 pub mod ios;
-pub mod resource;
 
 use self::{
     android::AndroidOptions,
@@ -17,7 +16,6 @@ use self::{
     cli::CliOptions,
     compiler::CompilerOptions,
     ios::IosOptions,
-    resource::ResourceOptions,
 };
 
 #[derive(Parser, Debug)]
@@ -39,9 +37,6 @@ pub struct LocalRun {
 
     #[structopt(flatten)]
     compiler: CompilerOptions,
-
-    #[structopt(flatten)]
-    resources: ResourceOptions,
 
     #[structopt(flatten)]
     binary: BinaryOptions,
@@ -68,7 +63,6 @@ fn from_local_run(command: Command, options: LocalRun) -> opts::Options {
     opts::Options {
         command,
         compiler: options.compiler.into(),
-        resources: options.resources.resources,
         binary: options.binary.into(),
         android: options.android.into(),
         ios: options.ios.into(),
@@ -103,10 +97,7 @@ mod tests {
 
     #[test]
     fn test_tests_with_resource() {
-        let o = Options::parse_from(
-            "cargo-tai tests --target x86_64-apple-ios -r test_txt=./data/test.txt"
-                .split_whitespace(),
-        );
+        let o = Options::parse_from("cargo-tai tests --target x86_64-apple-ios".split_whitespace());
         let o = match o {
             Options::Tests(o) => o,
             _ => panic!(""),
@@ -115,10 +106,6 @@ mod tests {
         assert_eq!(
             &o.compiler.target,
             get_builtin_target_by_triple("x86_64-apple-ios").unwrap()
-        );
-        assert_eq!(
-            &o.resources.resources.unwrap(),
-            &vec![("test_txt".to_string(), "./data/test.txt".into())]
         );
     }
 

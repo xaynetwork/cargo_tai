@@ -3,7 +3,6 @@ use tracing::instrument;
 use crate::{
     common::{
         bundle::{create_bundles, BuiltBundles},
-        opts::Options,
         project::ProjectMetadata,
         task::Task,
     },
@@ -25,7 +24,6 @@ impl Task<Context> for CreateSignedBundles {
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let built_units = context.remove::<BuiltUnits>().0;
         let sig_settings: &SigningSettings = context.get();
-        let resources = &context.get::<Options>().resources;
         let project_meta: &ProjectMetadata = context.get();
 
         let bundles = create_bundles(
@@ -35,7 +33,6 @@ impl Task<Context> for CreateSignedBundles {
                 create_bundle(
                     unit,
                     bundles_root,
-                    resources,
                     &sig_settings.app_id,
                     &project_meta.resources_dir,
                     &project_meta.package_graph,

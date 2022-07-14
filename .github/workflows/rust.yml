@@ -83,7 +83,7 @@ jobs:
         working-directory: ${{ github.workspace }}/examples/test-project
         env:
           RUST_LOG: "tai=trace"
-        run: cargo-tai tests --target x86_64-apple-ios -r test_txt=./data/test.txt --args -Z,unstable-options,--report-time
+        run: cargo-tai tests --target x86_64-apple-ios --args -Z,unstable-options,--report-time
 
       # - name: Run iOS benchmark
       #   working-directory: ${{ github.workspace }}/test-project

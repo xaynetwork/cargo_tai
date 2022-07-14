@@ -97,21 +97,18 @@ We are using the `examples/test-project` as an example.
 **Real device**
 
 ```shell
-# run all test binaries (unit/integration) and include the test data `test.txt`
-cargo-tai tests --target aarch64-apple-ios -r test_txt=./data/test.txt --ios-mobile-provision ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprovision
+# run all test binaries (unit/integration)
+cargo-tai tests --target aarch64-apple-ios --ios-mobile-provision ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprovision
 
 # compile and run all test binaries in release mode
-cargo-tai tests --target aarch64-apple-ios -r test_txt=./data/test.txt --ios-mobile-provision ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprovision -- --release
+cargo-tai tests --target aarch64-apple-ios --ios-mobile-provision ~/Library/MobileDevice/Provisioning\ Profiles/<ID>.mobileprovision -- --release
 ```
 
 **Simulator**
 
 ```shell
-# run all test binaries and include the test data `test.txt`
-cargo-tai tests --target x86_64-apple-ios -r test_txt=./data/test.txt
-
 # pass additional arguments to all test binaries
-cargo-tai tests --target x86_64-apple-ios -r test_txt=./data/test.txt --args -Z,unstable-options,--report-time
+cargo-tai tests --target x86_64-apple-ios --args -Z,unstable-options,--report-time
 
 # run a specific integration test binary
 # https://doc.rust-lang.org/cargo/reference/cargo-targets.html#integration-tests
@@ -181,8 +178,8 @@ You need to enable `USB file transfer` and `USB debugging`.
 We are using the `examples/test-project` as an example.
 
 ```shell
-# run all test binaries (unit/integration) and include the test data `test.txt`
-cargo-tai tests --target aarch64-linux-android --android-api-lvl 21 --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670 -r test_txt=./data/test.txt
+# run all test binaries (unit/integration)
+cargo-tai tests --target aarch64-linux-android --android-api-lvl 21 --android-ndk ~/Library/Android/sdk/ndk/22.1.7171670
 ```
 
 #### Running benchmarks on Android
