@@ -12,7 +12,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.58"
-clap = { version = "3.2.10", features = ["derive", "env"] }
+clap = { version = "3.2.12", features = ["derive", "env"] }
 cfg-expr = "0.8.1"
 tracing = "0.1.35"
 tracing-subscriber = { version = "0.3.14", features = ["env-filter"] }
