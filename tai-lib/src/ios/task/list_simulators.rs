@@ -9,7 +9,7 @@ pub struct Simulators(pub Vec<simctl::Device>);
 pub struct ListSimulators;
 
 impl Task<Context> for ListSimulators {
-    #[instrument(name = "Find Simulator(s)", skip(self, context))]
+    #[instrument(name = "Find Simulator(s)", skip_all)]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let simulators = xcrun::list_booted_simulators()?;
         if simulators.is_empty() {

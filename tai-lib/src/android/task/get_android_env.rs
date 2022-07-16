@@ -12,7 +12,7 @@ use super::Context;
 pub struct GetAndroidEnv;
 
 impl Task<Context> for GetAndroidEnv {
-    #[instrument(name = "Get Android Environment", skip(self, context))]
+    #[instrument(name = "Get Android Environment", skip_all)]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let opts = context
             .get::<Options>()

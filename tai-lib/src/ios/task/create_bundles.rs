@@ -11,7 +11,7 @@ use super::{build_built_units::BuiltUnits, Context};
 pub struct CreateBundles;
 
 impl Task<Context> for CreateBundles {
-    #[instrument(name = "Create Bundles", skip(self, context))]
+    #[instrument(name = "Create Bundles", skip_all)]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let built_units = context.remove::<BuiltUnits>().0;
         let project_meta: &ProjectMetadata = context.get();

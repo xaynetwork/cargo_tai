@@ -23,7 +23,7 @@ const ANDROID_REMOTE_WORKDIR: &str = "/data/local/tmp/cargo-tai";
 pub struct RunOnDevices;
 
 impl Task<Context> for RunOnDevices {
-    #[instrument(name = "Run On Device(s)", skip(self, context))]
+    #[instrument(name = "Run On Device(s)", skip_all)]
     fn run(&self, context: Context) -> TaiResult<Context> {
         let env: &AndroidEnv = context.get();
         let bundles = context.get::<BuiltBundles>();
@@ -65,7 +65,6 @@ fn install_and_run_bundle(
     }
 }
 
-#[instrument(level = "debug", name = "install", skip(env, bundle))]
 fn install_bundle(
     env: &AndroidEnv,
     device: &str,
@@ -86,12 +85,12 @@ fn install_bundle(
     Ok((remote_root, remote_exe))
 }
 
-fn run_bundle(
+fn run_bundle<R: AsRef<Path>, E: AsRef<Path>>(
     env: &AndroidEnv,
     device: &str,
     binary_opt: &BinaryOptions,
-    remote_root: &Path,
-    remote_exe: &Path,
+    remote_root: R,
+    remote_exe: E,
 ) -> TaiResult<std::process::Output> {
     let envs_as_string = binary_opt
         .envs
@@ -106,9 +105,9 @@ fn run_bundle(
 
     let start_script = format!(
         include_str!("../templates/start_script.tmpl"),
-        remote_bundle_root = remote_root.to_string_lossy(),
+        remote_bundle_root = remote_root.as_ref().to_string_lossy(),
         envs = envs_as_string,
-        remote_executable = remote_exe.to_string_lossy(),
+        remote_executable = remote_exe.as_ref().to_string_lossy(),
         args = binary_opt.args.as_ref().unwrap_or(&vec![]).join(" ")
     );
     info!("App stdout:");

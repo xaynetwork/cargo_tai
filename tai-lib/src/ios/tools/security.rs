@@ -7,7 +7,7 @@ use crate::TaiResult;
 
 const SECURITY: &str = "security";
 
-pub fn decode_cms<P: AsRef<Path>>(file: P) -> TaiResult<Output> {
+pub fn decode_cms<F: AsRef<Path>>(file: F) -> TaiResult<Output> {
     Command::new(SECURITY)
         .args(&["cms", "-D", "-i"])
         .arg(file.as_ref())

@@ -10,7 +10,7 @@ pub struct PhysicalDevices(pub Vec<libimobiledevice::Device>);
 pub struct ListPhysicalDevices;
 
 impl Task<Context> for ListPhysicalDevices {
-    #[instrument(name = "Find Device(s)", skip(self, context))]
+    #[instrument(name = "Find Device(s)", skip_all)]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let devices = libimobiledevice::list_devices()?;
         if devices.is_empty() {

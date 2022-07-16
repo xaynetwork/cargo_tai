@@ -15,7 +15,7 @@ use super::Context;
 pub struct ReadSigningSettings;
 
 impl Task<Context> for ReadSigningSettings {
-    #[instrument(name = "Read Signing Settings", skip(self, context))]
+    #[instrument(name = "Read Signing Settings", skip_all)]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let opts: &Options = context.get();
         let maybe_mobile_provision = opts

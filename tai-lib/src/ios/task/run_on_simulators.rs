@@ -29,7 +29,7 @@ use super::{list_simulators::Simulators, Context};
 pub struct RunOnSimulators;
 
 impl Task<Context> for RunOnSimulators {
-    #[instrument(name = "Run On Simulator(s)", skip(self, context))]
+    #[instrument(name = "Run On Simulator(s)", skip_all)]
     fn run(&self, context: Context) -> TaiResult<Context> {
         let bundles: &BuiltBundles = context.get();
         let opts: &Options = context.get();
@@ -57,10 +57,9 @@ impl Task<Context> for RunOnSimulators {
     }
 }
 
-#[instrument(level = "debug", name = "install_launch", fields(device = %device.udid), skip(bundle_root))]
-fn install_and_launch<P: AsRef<Path>>(
+fn install_and_launch<B: AsRef<Path>>(
     device: &Device,
-    bundle_root: P,
+    bundle_root: B,
     binary_opt: &BinaryOptions,
 ) -> TaiResult<()> {
     let bundle_root = bundle_root.as_ref();
@@ -79,12 +78,12 @@ fn install_and_launch<P: AsRef<Path>>(
             info!("Run completed successfully!");
             Ok(())
         }
-        ec => {
+        exit_code => {
             bail!(
                 "Run `{}` `{}` failed with exit code: {}",
                 APP_ID,
                 bundle_root.display(),
-                ec
+                exit_code
             )
         }
     }

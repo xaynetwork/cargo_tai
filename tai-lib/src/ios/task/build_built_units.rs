@@ -19,7 +19,7 @@ pub struct BuiltUnits(pub Vec<BuiltUnit>);
 pub struct BuildBuiltUnits;
 
 impl Task<Context> for BuildBuiltUnits {
-    #[instrument(name = "Build Units", skip(self, context))]
+    #[instrument(name = "Build Units", skip_all)]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let opts: &Options = context.get();
         debug!("{:#?}", opts.compiler);

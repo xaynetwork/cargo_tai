@@ -9,7 +9,7 @@ use anyhow::{anyhow, bail, Context};
 use chrono::{DateTime, Utc};
 use openssl::{nid::Nid, x509::X509};
 use serde::Deserialize;
-use tracing::{debug, info, instrument};
+use tracing::{debug, info};
 
 use crate::{
     common::bundle::BuiltBundle,
@@ -43,11 +43,10 @@ pub struct MobileProvision {
 #[derive(Deserialize, Debug)]
 pub struct Data(#[serde(with = "serde_bytes")] Vec<u8>);
 
-#[instrument(name = "sign", skip(bundle, settings))]
-pub fn sign_bundle(
+pub fn sign_bundle<E: AsRef<Path>>(
     bundle: &BuiltBundle,
     settings: &SigningSettings,
-    entitlements: &Path,
+    entitlements: E,
 ) -> TaiResult<()> {
     info!("Sign bundle: `{}`", bundle.build_unit.name);
 
@@ -63,9 +62,8 @@ pub fn sign_bundle(
         .execute()
 }
 
-#[instrument(name = "entitlements", skip(dest, entitlements))]
-pub fn create_entitlements_file(dest: &Path, entitlements: &str) -> TaiResult<PathBuf> {
-    let path = dest.join(ENTITLEMENTS_XCENT);
+pub fn create_entitlements_file<D: AsRef<Path>>(dest: D, entitlements: &str) -> TaiResult<PathBuf> {
+    let path = dest.as_ref().join(ENTITLEMENTS_XCENT);
     debug!("Create entitlements file: `{}`", path.display());
 
     let mut plist = File::create(&path)?;

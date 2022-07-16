@@ -1,10 +1,10 @@
 use std::{
     fs::{copy, create_dir_all, remove_dir_all},
-    path::{Path, PathBuf},
+    path::Path,
 };
 
 use guppy::graph::PackageGraph;
-use tracing::{debug, info, instrument};
+use tracing::{debug, info};
 
 use crate::{
     common::{
@@ -14,11 +14,10 @@ use crate::{
     TaiResult,
 };
 
-#[instrument(level = "debug", name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, resources_dir, package_graph))]
-pub fn create_bundle<P: AsRef<Path>>(
+pub fn create_bundle<B: AsRef<Path>, R: AsRef<Path>>(
     unit: BuiltUnit,
-    bundles_root: P,
-    resources_dir: &PathBuf,
+    bundles_root: B,
+    resources_dir: R,
     package_graph: &PackageGraph,
 ) -> TaiResult<BuiltBundle> {
     info!("Create Android app bundle for `{}`", unit.name);

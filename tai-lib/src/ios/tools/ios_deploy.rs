@@ -20,7 +20,7 @@ pub struct IosDeployLaunch<'a, 'e> {
 }
 
 impl<'a, 'e> IosDeployLaunch<'a, 'e> {
-    pub fn new<P: AsRef<Path>>(device: &str, bundle: P) -> Self {
+    pub fn new<B: AsRef<Path>>(device: &str, bundle: B) -> Self {
         Self {
             device: device.to_owned(),
             bundle: bundle.as_ref().to_owned(),

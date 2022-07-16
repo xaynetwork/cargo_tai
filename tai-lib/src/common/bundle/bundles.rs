@@ -6,19 +6,20 @@ use std::{
 use anyhow::{anyhow, Context, Error};
 use guppy::{graph::PackageGraph, PackageId};
 use serde::Deserialize;
+use tracing::debug;
 
 use crate::{common::compiler::BuiltUnit, TaiResult};
 
 use super::{BuiltBundle, BuiltBundles};
 
-pub fn create_bundles(
+pub fn create_bundles<T: AsRef<Path>>(
     units: Vec<BuiltUnit>,
-    target: &Path,
+    target: T,
     f: impl Fn(BuiltUnit, &Path) -> TaiResult<BuiltBundle>,
 ) -> TaiResult<BuiltBundles> {
     let bundles = units
         .into_iter()
-        .map(|unit| f(unit, target))
+        .map(|unit| f(unit, target.as_ref()))
         .collect::<Result<Vec<_>, Error>>()
         .with_context(|| "Failed to built all bundles".to_string())?;
     Ok(BuiltBundles { bundles })
@@ -31,9 +32,9 @@ pub struct Resource {
     pub resource_destination: PathBuf,
 }
 
-pub fn find_resources(
+pub fn find_resources<R: AsRef<Path>>(
     package_id: &str,
-    resources_dir: &PathBuf,
+    resources_dir: R,
     package_graph: &PackageGraph,
 ) -> TaiResult<Vec<Resource>> {
     read_dir(resources_dir)?
@@ -48,6 +49,7 @@ pub fn find_resources(
                     .into_iter()
                     .filter_map(|entry| {
                         entry.path().is_file().then(|| {
+                            debug!("Found resource metadata at `{}`", entry.path().display());
                             let content = read(entry.path())?;
                             serde_json::from_slice::<Resource>(&content).map_err(|err| anyhow!(err))
                         })
@@ -70,15 +72,26 @@ pub fn find_resources(
         .collect()
 }
 
-pub fn copy_resources<P: AsRef<Path>>(dest_dir: P, resources: &[Resource]) -> TaiResult<()> {
+pub fn copy_resources<D: AsRef<Path>>(dest_dir: D, resources: &[Resource]) -> TaiResult<()> {
     resources
         .iter()
         .map(|res| {
-            let res_rel_dest = PathBuf::from(&res.resource_destination);
-            let res_rel_dest_dir = res_rel_dest.parent().unwrap();
+            let res_rel_dest_dir = res
+                .resource_destination
+                .parent()
+                .expect("Failed to determine parent of resource file");
             let bundle_dest_dir = dest_dir.as_ref().join(res_rel_dest_dir);
             create_dir_all(&bundle_dest_dir)?;
-            let remote_path = bundle_dest_dir.join(res_rel_dest.file_name().unwrap());
+            let remote_path = bundle_dest_dir.join(
+                res.resource_destination
+                    .file_name()
+                    .expect("Failed to get filename of resource file"),
+            );
+            debug!(
+                "Copy resource `{}` to `{}`",
+                res.resource_source.display(),
+                remote_path.display()
+            );
             copy(&res.resource_source, &remote_path)?;
 
             Ok(())

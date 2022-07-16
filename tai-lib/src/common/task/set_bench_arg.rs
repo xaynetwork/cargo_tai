@@ -10,7 +10,7 @@ use super::context::Context;
 pub struct SetBenchArg;
 
 impl Task<Context> for SetBenchArg {
-    #[instrument(name = "Set Bench Argument", skip(self, context))]
+    #[instrument(name = "Set Bench Argument", skip_all)]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         set_bench_arg(context.get_mut());
         Ok(context)

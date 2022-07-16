@@ -17,7 +17,7 @@ pub struct Devices(pub Vec<Device>);
 pub struct ListDevices;
 
 impl Task<Context> for ListDevices {
-    #[instrument(name = "Find Device(s)", skip(self, context))]
+    #[instrument(name = "Find Device(s)", skip_all)]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let env: &AndroidEnv = context.get();
 

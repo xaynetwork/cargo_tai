@@ -7,7 +7,7 @@ use anyhow::{bail, Context};
 use cfg_expr::targets::{Arch, TargetInfo};
 use guppy::graph::PackageGraph;
 use serde::Serialize;
-use tracing::{debug, info, instrument};
+use tracing::{debug, info};
 
 use crate::{
     common::{
@@ -20,12 +20,11 @@ use crate::{
 pub const APP_DISPLAY_NAME: &str = "cargo-tai";
 const INFO_PLIST: &str = "Info.plist";
 
-#[instrument(level = "debug", name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, app_id, resources_dir, package_graph))]
-pub fn create_bundle<P: AsRef<Path>>(
+pub fn create_bundle<B: AsRef<Path>, R: AsRef<Path>>(
     unit: BuiltUnit,
-    bundles_root: P,
+    bundles_root: B,
     app_id: &str,
-    resources_dir: &PathBuf,
+    resources_dir: R,
     package_graph: &PackageGraph,
 ) -> TaiResult<BuiltBundle> {
     info!("Create iOS app bundle for `{}`", unit.name);
@@ -81,8 +80,8 @@ pub struct InfoPlist<'a> {
     pub ls_supports_opening_documents_in_place: bool,
 }
 
-fn create_plist<P: AsRef<Path>>(
-    bundle_root: P,
+fn create_plist<B: AsRef<Path>>(
+    bundle_root: B,
     build_unit: &BuiltUnit,
     app_id: &str,
 ) -> TaiResult<PathBuf> {

@@ -29,11 +29,6 @@ impl<'f> CodeSign<'f> {
         self
     }
 
-    // pub fn verbose(&mut self) -> &mut Self {
-    //     self.verbose = true;
-    //     self
-    // }
-
     pub fn execute(&mut self) -> TaiResult<()> {
         let mut cmd = Command::new(CODE_SIGN);
         if !self.verbose {
@@ -47,6 +42,6 @@ impl<'f> CodeSign<'f> {
             .map(|path| cmd.arg("--entitlements").arg(path));
         cmd.args(self.files);
 
-        cmd.status()?.expect_success("failed to run codesign")
+        cmd.status()?.expect_success("Failed to run codesign")
     }
 }

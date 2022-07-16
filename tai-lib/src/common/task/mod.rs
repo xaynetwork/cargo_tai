@@ -13,7 +13,7 @@ pub trait Task<C> {
 pub struct Runner;
 
 impl Runner {
-    #[instrument(name = "Task", skip(tasks, context))]
+    #[instrument(name = "Task", skip_all)]
     pub fn execute<T, C>(tasks: &[T], context: C) -> TaiResult<C>
     where
         T: Task<C>,

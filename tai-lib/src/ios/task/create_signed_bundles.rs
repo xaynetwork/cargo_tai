@@ -20,7 +20,7 @@ pub struct SignedBuiltBundles(pub BuiltBundles);
 pub struct CreateSignedBundles;
 
 impl Task<Context> for CreateSignedBundles {
-    #[instrument(name = "Create Signed Bundles", skip(self, context))]
+    #[instrument(name = "Create Signed Bundles", skip_all)]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let built_units = context.remove::<BuiltUnits>().0;
         let sig_settings: &SigningSettings = context.get();
