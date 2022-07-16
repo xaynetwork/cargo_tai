@@ -134,7 +134,6 @@ dependencies = [
  "cfg-expr 0.8.1",
  "clap 3.2.12",
  "tai-lib",
- "tracing",
  "tracing-subscriber",
 ]
 

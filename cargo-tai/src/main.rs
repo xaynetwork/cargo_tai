@@ -1,5 +1,3 @@
-use anyhow::Error;
-
 use clap::Parser;
 use tai_lib::common::{command::run, opts::Options};
 
@@ -8,7 +6,7 @@ mod opts;
 use opts::Command;
 use tracing_subscriber::{prelude::*, EnvFilter};
 
-fn main() -> Result<(), Error> {
+fn main() {
     tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
@@ -22,5 +20,5 @@ fn main() -> Result<(), Error> {
     let command = Command::from_args();
     let requested: Options = command.into();
 
-    run(requested)
+    let _ = run(requested);
 }

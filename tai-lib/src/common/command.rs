@@ -1,6 +1,6 @@
 use anyhow::bail;
 use cfg_expr::targets::{Arch, Os};
-use tracing::{debug, info};
+use tracing::{debug, error, info};
 
 use crate::{android, common::opts::Options, ios, TaiResult};
 
@@ -18,7 +18,7 @@ pub fn run(requested: Options) -> TaiResult<()> {
         requested.command, requested.compiler.target.triple
     );
     debug!("{:#?}", requested);
-    match (requested.compiler.target.arch, requested.compiler.target.os) {
+    let result = match (requested.compiler.target.arch, requested.compiler.target.os) {
         #[cfg(feature = "ios")]
         (Arch::aarch64, Some(Os::ios)) => ios::platform::physical::run_command(requested),
         #[cfg(feature = "ios")]
@@ -27,5 +27,9 @@ pub fn run(requested: Options) -> TaiResult<()> {
             android::platform::run_command(requested)
         }
         _ => bail!("Unsupported target `{}`", requested.compiler.target.triple),
+    };
+    if let Err(err) = &result {
+        error!("{}", err)
     }
+    result
 }

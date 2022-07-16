@@ -19,7 +19,7 @@ impl Task<Context> for GetAndroidEnv {
             .get::<Options>()
             .android
             .as_ref()
-            .ok_or_else(|| anyhow!("Failed to find Android NDK"))?;
+            .ok_or_else(|| anyhow!("Android NDK is unset"))?;
         let env = AndroidEnv::derive_env(opts)?;
 
         debug!("{:#?}", env);
