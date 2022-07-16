@@ -12,7 +12,7 @@ pub enum Command {
     Tests,
 }
 
-pub fn run_command(requested: Options) -> TaiResult<()> {
+pub fn run(requested: Options) -> TaiResult<()> {
     info!(
         "Run `{:?}` for target: `{}`",
         requested.command, requested.compiler.target.triple

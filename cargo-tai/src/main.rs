@@ -1,11 +1,11 @@
 use anyhow::Error;
 
 use clap::Parser;
-use tai_lib::common::command::run_command;
+use tai_lib::common::{command::run, opts::Options};
 
 mod opts;
 
-use opts::Options;
+use opts::Command;
 use tracing_subscriber::{prelude::*, EnvFilter};
 
 fn main() -> Result<(), Error> {
@@ -19,8 +19,8 @@ fn main() -> Result<(), Error> {
         .finish()
         .init();
 
-    let opt = Options::from_args();
-    let requested_opt: tai_lib::common::opts::Options = opt.into();
+    let command = Command::from_args();
+    let requested: Options = command.into();
 
-    run_command(requested_opt)
+    run(requested)
 }
