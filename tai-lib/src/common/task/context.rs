@@ -2,7 +2,7 @@ use anymap::AnyMap;
 
 use crate::common::opts::Options;
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct Context(AnyMap);
 
 impl Context {

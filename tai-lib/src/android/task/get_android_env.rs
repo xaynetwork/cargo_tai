@@ -9,6 +9,7 @@ use crate::{
 
 use super::Context;
 
+#[derive(Debug)]
 pub struct GetAndroidEnv;
 
 impl Task<Context> for GetAndroidEnv {

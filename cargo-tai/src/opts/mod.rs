@@ -18,33 +18,33 @@ use self::{
     ios::IosOptions,
 };
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 pub enum Options {
-    #[structopt(about = "Benchmark only the specified bench target")]
+    #[clap(about = "Benchmark only the specified bench target")]
     Bench(LocalRun),
-    #[structopt(about = "Test only the specified test target")]
+    #[clap(about = "Test only the specified test target")]
     Test(LocalRun),
-    #[structopt(about = "Benchmark all benches")]
+    #[clap(about = "Benchmark all benches")]
     Benches(LocalRun),
-    #[structopt(about = "Test all tests")]
+    #[clap(about = "Test all tests")]
     Tests(LocalRun),
 }
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 pub struct LocalRun {
-    #[structopt(flatten)]
+    #[clap(flatten)]
     cli: CliOptions,
 
-    #[structopt(flatten)]
+    #[clap(flatten)]
     compiler: CompilerOptions,
 
-    #[structopt(flatten)]
+    #[clap(flatten)]
     binary: BinaryOptions,
 
-    #[structopt(flatten)]
+    #[clap(flatten)]
     android: AndroidOptions,
 
-    #[structopt(flatten)]
+    #[clap(flatten)]
     ios: IosOptions,
 }
 

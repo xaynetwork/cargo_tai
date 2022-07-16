@@ -28,7 +28,7 @@ pub struct SigningSettings {
     pub mobile_provision: MobileProvision,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug, Deserialize)]
 pub struct MobileProvision {
     #[serde(rename = "ProvisionedDevices")]
     pub provisioned_devices: Vec<String>,
@@ -40,7 +40,7 @@ pub struct MobileProvision {
     pub developer_certificates: Vec<Data>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug, Deserialize)]
 pub struct Data(#[serde(with = "serde_bytes")] Vec<u8>);
 
 pub fn sign_bundle<E: AsRef<Path>>(

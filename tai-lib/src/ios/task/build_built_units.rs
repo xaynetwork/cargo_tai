@@ -14,8 +14,10 @@ use crate::{
 
 use super::Context;
 
+#[derive(Debug)]
 pub struct BuiltUnits(pub Vec<BuiltUnit>);
 
+#[derive(Debug)]
 pub struct BuildBuiltUnits;
 
 impl Task<Context> for BuildBuiltUnits {

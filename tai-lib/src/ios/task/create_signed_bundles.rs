@@ -15,8 +15,10 @@ use crate::{
 
 use super::{build_built_units::BuiltUnits, Context};
 
+#[derive(Debug)]
 pub struct SignedBuiltBundles(pub BuiltBundles);
 
+#[derive(Debug)]
 pub struct CreateSignedBundles;
 
 impl Task<Context> for CreateSignedBundles {

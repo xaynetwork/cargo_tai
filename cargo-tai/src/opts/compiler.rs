@@ -3,7 +3,7 @@ use cfg_expr::targets::{get_builtin_target_by_triple, TargetInfo};
 use clap::Parser;
 use tai_lib::common::opts;
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 pub struct CompilerOptions {
     /// Build for the target triples
     #[clap(long, parse(try_from_str = parse_target), long_help =

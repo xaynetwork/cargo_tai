@@ -62,7 +62,7 @@ pub fn create_bundle<B: AsRef<Path>, R: AsRef<Path>>(
     })
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct InfoPlist<'a> {
     #[serde(rename = "CFBundleExecutable")]
     pub cf_bundle_executable: &'a str,

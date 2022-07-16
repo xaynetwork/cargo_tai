@@ -30,7 +30,7 @@ pub fn device_info(udid: &str) -> TaiResult<Device> {
     })
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Device {
     #[serde(rename = "UniqueDeviceID")]
     pub id: String,

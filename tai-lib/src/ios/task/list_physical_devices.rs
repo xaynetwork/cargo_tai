@@ -5,8 +5,10 @@ use crate::{common::task::Task, ios::tools::libimobiledevice, TaiResult};
 
 use super::Context;
 
+#[derive(Debug)]
 pub struct PhysicalDevices(pub Vec<libimobiledevice::Device>);
 
+#[derive(Debug)]
 pub struct ListPhysicalDevices;
 
 impl Task<Context> for ListPhysicalDevices {

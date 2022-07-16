@@ -8,7 +8,6 @@ pub use bundles::{copy_resources, create_bundles, find_resources};
 
 #[derive(Debug)]
 pub struct BuiltBundles {
-    // pub root: PathBuf,
     pub bundles: Vec<BuiltBundle>,
 }
 

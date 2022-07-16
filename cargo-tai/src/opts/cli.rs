@@ -1,7 +1,7 @@
 use clap::Parser;
 use tai_lib::common::opts;
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 pub struct CliOptions {
     #[clap(short, long)]
     pub verbose: bool,

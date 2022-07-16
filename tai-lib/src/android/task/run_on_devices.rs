@@ -20,6 +20,7 @@ use super::{list_devices::Devices, Context};
 
 const ANDROID_REMOTE_WORKDIR: &str = "/data/local/tmp/cargo-tai";
 
+#[derive(Debug)]
 pub struct RunOnDevices;
 
 impl Task<Context> for RunOnDevices {

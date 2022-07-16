@@ -12,6 +12,7 @@ use crate::{
 
 use super::Context;
 
+#[derive(Debug)]
 pub struct ReadSigningSettings;
 
 impl Task<Context> for ReadSigningSettings {

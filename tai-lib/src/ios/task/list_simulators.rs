@@ -4,8 +4,11 @@ use tracing::{info, instrument};
 use crate::{common::task::Task, ios::tools::xcrun, TaiResult};
 
 use super::Context;
+
+#[derive(Debug)]
 pub struct Simulators(pub Vec<simctl::Device>);
 
+#[derive(Debug)]
 pub struct ListSimulators;
 
 impl Task<Context> for ListSimulators {

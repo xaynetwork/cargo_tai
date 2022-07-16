@@ -24,6 +24,7 @@ use super::{
     Context,
 };
 
+#[derive(Debug)]
 pub struct RunOnPhysicalDevice;
 
 impl Task<Context> for RunOnPhysicalDevice {

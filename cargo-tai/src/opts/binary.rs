@@ -3,7 +3,7 @@ use tai_lib::common::opts;
 
 use super::parse_key_val;
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 pub struct BinaryOptions {
     /// A comma-separated list of arguments to pass to the app when launching it.
     ///

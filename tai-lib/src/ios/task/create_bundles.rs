@@ -8,6 +8,7 @@ use crate::{
 
 use super::{build_built_units::BuiltUnits, Context};
 
+#[derive(Debug)]
 pub struct CreateBundles;
 
 impl Task<Context> for CreateBundles {

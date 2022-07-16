@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use clap::Parser;
 use tai_lib::common::opts;
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 pub struct AndroidOptions {
     /// Android API level: only required when "target" is "*-linux-android*"
     ///

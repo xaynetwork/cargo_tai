@@ -10,7 +10,7 @@ use proc_macro::{TokenStream, TokenTree};
 use quote::quote;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Resource {
     package_id: PackageId,
     resource_source: PathBuf,

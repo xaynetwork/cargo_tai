@@ -7,6 +7,7 @@ use crate::{common::tools::command_ext::ExitStatusExt, TaiResult};
 
 const IOS_DEPLOY: &str = "ios-deploy";
 
+#[derive(Debug)]
 pub struct IosDeployLaunch<'a, 'e> {
     device: String,
     bundle: PathBuf,

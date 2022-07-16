@@ -7,6 +7,7 @@ use crate::{common::tools::command_ext::ExitStatusExt, TaiResult};
 
 const RSYNC: &str = "rsync";
 
+#[derive(Debug)]
 pub struct Rsync {
     source: PathBuf,
     destination: PathBuf,

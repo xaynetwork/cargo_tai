@@ -7,6 +7,7 @@ use crate::{
 
 use super::context::Context;
 
+#[derive(Debug)]
 pub struct GetProjectMetadata;
 
 impl Task<Context> for GetProjectMetadata {

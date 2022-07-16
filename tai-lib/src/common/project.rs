@@ -16,6 +16,7 @@ pub const CARGO_TAI_TARGET_DIR: &str = "cargo-tai";
 pub const IOS_CACHE_DIR: &str = "cache-ios";
 pub const RESOURCES_DIR: &str = "resources";
 
+#[derive(Debug)]
 pub struct ProjectMetadata {
     pub meta: Metadata,
     pub cargo_opts: CargoOptions,
@@ -25,6 +26,7 @@ pub struct ProjectMetadata {
     pub package_graph: PackageGraph,
 }
 
+#[derive(Debug)]
 pub struct CargoOptions {
     pub manifest_path: PathBuf,
     pub profile: Profile,

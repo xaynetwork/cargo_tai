@@ -12,8 +12,10 @@ use crate::{
 
 use super::Context;
 
+#[derive(Debug)]
 pub struct Devices(pub Vec<Device>);
 
+#[derive(Debug)]
 pub struct ListDevices;
 
 impl Task<Context> for ListDevices {

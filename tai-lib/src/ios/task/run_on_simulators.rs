@@ -26,6 +26,7 @@ use crate::{
 
 use super::{list_simulators::Simulators, Context};
 
+#[derive(Debug)]
 pub struct RunOnSimulators;
 
 impl Task<Context> for RunOnSimulators {

@@ -10,6 +10,7 @@ pub trait Task<C> {
     fn run(&self, context: C) -> TaiResult<C>;
 }
 
+#[derive(Debug)]
 pub struct Runner;
 
 impl Runner {
