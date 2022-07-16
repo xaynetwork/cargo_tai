@@ -1257,6 +1257,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "tai-util"
+version = "0.0.1"
+dependencies = [
+ "ns-path-utilities-sys",
+]
+
+[[package]]
 name = "target-lexicon"
 version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1303,6 +1310,7 @@ dependencies = [
  "criterion",
  "include_dir",
  "tai-resource",
+ "tai-util",
 ]
 
 [[package]]
