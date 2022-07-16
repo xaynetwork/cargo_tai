@@ -6,6 +6,7 @@ use std::{
 use crate::common::tools::cargo_metadata;
 use cargo_metadata::Metadata;
 use guppy::graph::PackageGraph;
+use tracing::{debug, info};
 
 use crate::TaiResult;
 
@@ -51,6 +52,7 @@ impl CargoOptions {
             true => Profile::Release,
         };
 
+        info!("Search for manifest file (`Cargo.toml`)");
         // https://docs.rs/cargo_metadata/0.14.0/cargo_metadata/#examples
         let mut iter = args
             .iter()
@@ -63,6 +65,7 @@ impl CargoOptions {
             Some(p) => p.trim_start_matches("--manifest-path=").into(),
             None => std::env::current_dir()?.join("Cargo.toml"),
         };
+        info!("Found manifest at  `{}`", manifest_path.display());
 
         Ok(Self {
             manifest_path,
@@ -74,20 +77,30 @@ impl CargoOptions {
 impl ProjectMetadata {
     pub fn from_cargo_args(cargo_args: &[String]) -> TaiResult<Self> {
         let cargo_opts = CargoOptions::from_cargo_args(cargo_args)?;
+        info!(
+            "Read metadata for package `{}`",
+            cargo_opts.manifest_path.display()
+        );
         let meta = cargo_metadata(&cargo_opts.manifest_path)?;
+        info!("Create package graph");
         let package_graph = package_graph(&cargo_opts.manifest_path)?;
 
         let tai_target = meta
             .target_directory
             .join(CARGO_TAI_TARGET_DIR)
             .into_std_path_buf();
+        debug!("`cargo-tai` target directory `{}`", tai_target.display());
 
+        info!("Create iOS app cache");
         let ios_cache = tai_target.join(IOS_CACHE_DIR);
         create_dir_all(&ios_cache)?;
+        debug!("iOS cache directory `{}`", ios_cache.display());
 
+        info!("Create directory for resource metadata");
         let resources_dir = tai_target.join(RESOURCES_DIR);
         let _ = remove_dir_all(&resources_dir);
         create_dir_all(&resources_dir)?;
+        debug!("Resource metadata directory `{}`", resources_dir.display());
 
         Ok(Self {
             meta,

@@ -7,7 +7,7 @@ use anyhow::{bail, Context};
 use cfg_expr::targets::{Arch, TargetInfo};
 use guppy::graph::PackageGraph;
 use serde::Serialize;
-use tracing::{debug, instrument};
+use tracing::{debug, info, instrument};
 
 use crate::{
     common::{
@@ -20,7 +20,7 @@ use crate::{
 pub const APP_DISPLAY_NAME: &str = "cargo-tai";
 const INFO_PLIST: &str = "Info.plist";
 
-#[instrument(name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, app_id, resources_dir, package_graph))]
+#[instrument(level = "debug", name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, app_id, resources_dir, package_graph))]
 pub fn create_bundle<P: AsRef<Path>>(
     unit: BuiltUnit,
     bundles_root: P,
@@ -28,6 +28,8 @@ pub fn create_bundle<P: AsRef<Path>>(
     resources_dir: &PathBuf,
     package_graph: &PackageGraph,
 ) -> TaiResult<BuiltBundle> {
+    info!("Create iOS app bundle for `{}`", unit.name);
+
     let version_root = bundles_root
         .as_ref()
         .join(unit.target.triple)
@@ -35,22 +37,22 @@ pub fn create_bundle<P: AsRef<Path>>(
 
     if version_root.exists() {
         remove_dir_all(&version_root)
-            .with_context(|| format!("Failed to remove old bundle {}", version_root.display()))?;
+            .with_context(|| format!("Failed to remove old bundle `{}`", version_root.display()))?;
     }
 
     let bundle_root = version_root.join(format!("{}.app", APP_DISPLAY_NAME));
 
     create_dir_all(&bundle_root)
-        .with_context(|| format!("Failed to create bundle root {}", bundle_root.display()))?;
-    debug!("create dir: {}", bundle_root.display());
+        .with_context(|| format!("Failed to create bundle root `{}`", bundle_root.display()))?;
+    debug!("Create dir: `{}`", bundle_root.display());
 
     let to = bundle_root.join(&unit.name);
     copy(&unit.artifact, &to)
-        .with_context(|| format!("Failed to copy artifact {}", unit.artifact.display()))?;
-    debug!("copy {} to {}", &unit.artifact.display(), to.display());
+        .with_context(|| format!("Failed to copy artifact `{}`", unit.artifact.display()))?;
+    debug!("Copy `{}` to `{}`", &unit.artifact.display(), to.display());
 
     create_plist(&bundle_root, &unit, app_id)
-        .with_context(|| format!("Failed to create {}", INFO_PLIST))?;
+        .with_context(|| format!("Failed to create file `{}`", INFO_PLIST))?;
 
     let resources = find_resources(&unit.package_id, resources_dir, package_graph)?;
     copy_resources(&bundle_root, &resources)?;
@@ -86,7 +88,7 @@ fn create_plist<P: AsRef<Path>>(
 ) -> TaiResult<PathBuf> {
     let path = bundle_root.as_ref().join(INFO_PLIST);
 
-    debug!("create file: {}", path.display());
+    debug!("Create plist file: `{}`", path.display());
     let plist = File::create(&path)?;
     plist::to_writer_xml(
         plist,
@@ -107,6 +109,6 @@ fn to_apple_arch(target: &TargetInfo) -> TaiResult<&'static str> {
     match target.arch {
         Arch::aarch64 => Ok("arm64"),
         Arch::x86_64 => Ok("x86_64"),
-        _ => bail!("unknown target"),
+        _ => bail!("Unknown target `{}`", target.triple),
     }
 }

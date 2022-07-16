@@ -6,6 +6,7 @@ use crate::{common::opts::AndroidOptions, TaiResult};
 
 pub mod adb;
 
+#[derive(Debug)]
 pub struct AndroidEnv {
     pub adb: PathBuf,
     pub ndk: PathBuf,
@@ -19,7 +20,7 @@ impl AndroidEnv {
             .sdk
             .clone()
             .or_else(|| ndk.parent().and_then(|p| p.parent()).map(Into::into))
-            .ok_or_else(|| anyhow!("failed to find `sdk` folder in ../../{}", ndk.display()))?;
+            .ok_or_else(|| anyhow!("Failed to find SDK folder in `../../{}`", ndk.display()))?;
 
         let adb = sdk.join("platform-tools").join("adb");
         Ok(Self { adb, ndk, sdk })

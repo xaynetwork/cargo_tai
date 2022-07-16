@@ -4,7 +4,7 @@ use std::{
 };
 
 use anyhow::bail;
-use tracing::{debug, instrument};
+use tracing::{debug, info, instrument};
 
 use crate::{
     android::tools::{adb, AndroidEnv},
@@ -23,6 +23,7 @@ const ANDROID_REMOTE_WORKDIR: &str = "/data/local/tmp/cargo-tai";
 pub struct RunOnDevices;
 
 impl Task<Context> for RunOnDevices {
+    #[instrument(name = "Run On Device(s)", skip(self, context))]
     fn run(&self, context: Context) -> TaiResult<Context> {
         let env: &AndroidEnv = context.get();
         let bundles = context.get::<BuiltBundles>();
@@ -33,10 +34,10 @@ impl Task<Context> for RunOnDevices {
         };
 
         context.get::<Devices>().0.iter().try_for_each(|device| {
-            bundles
-                .bundles
-                .iter()
-                .try_for_each(|bundle| install_and_run_bundle(env, &device.id, bundle, binary_opt))
+            bundles.bundles.iter().try_for_each(|bundle| {
+                info!("On `{}` run bundle `{}`", device.id, bundle.build_unit.name);
+                install_and_run_bundle(env, &device.id, bundle, binary_opt)
+            })
         })?;
         Ok(context)
     }
@@ -53,14 +54,18 @@ fn install_and_run_bundle(
 
     adb::rm(env, device, &remote_root)?;
 
-    if result.status.success() {
-        Ok(())
-    } else {
-        bail!("test failed")
+    match result.status.success() {
+        true => {
+            info!("Run completed successfully!");
+            Ok(())
+        }
+        false => {
+            bail!("Run failed with exit code: {:?}", result.status.code())
+        }
     }
 }
 
-#[instrument(name = "install", skip(env, bundle))]
+#[instrument(level = "debug", name = "install", skip(env, bundle))]
 fn install_bundle(
     env: &AndroidEnv,
     device: &str,
@@ -70,13 +75,13 @@ fn install_bundle(
     adb::mkdir(env, device, &remote_workdir)?;
     let remote_root = remote_workdir.join(&bundle.root.file_name().unwrap());
     debug!(
-        "copy from: {} to: {}",
+        "Copy from `{}` to `{}`",
         bundle.root.display(),
         remote_root.display()
     );
     adb::sync(env, device, &bundle.root, &remote_root)?;
     let remote_exe = remote_root.join(&bundle.build_unit.name);
-    debug!("chmod {}", remote_exe.display());
+    debug!("chmod `{}`", remote_exe.display());
     adb::chmod(env, device, &remote_exe)?;
     Ok((remote_root, remote_exe))
 }
@@ -88,14 +93,16 @@ fn run_bundle(
     remote_root: &Path,
     remote_exe: &Path,
 ) -> TaiResult<std::process::Output> {
-    let envs_as_string = if let Some(envs) = &binary_opt.envs {
-        envs.iter()
-            .map(|(key, value)| format!("{}={}", key, value))
-            .collect::<Vec<String>>()
-            .join(" ")
-    } else {
-        String::from("")
-    };
+    let envs_as_string = binary_opt
+        .envs
+        .as_ref()
+        .map(|envs| {
+            envs.iter()
+                .map(|(key, value)| format!("{}={}", key, value))
+                .collect::<Vec<String>>()
+                .join(" ")
+        })
+        .unwrap_or_default();
 
     let start_script = format!(
         include_str!("../templates/start_script.tmpl"),
@@ -104,6 +111,7 @@ fn run_bundle(
         remote_executable = remote_exe.to_string_lossy(),
         args = binary_opt.args.as_ref().unwrap_or(&vec![]).join(" ")
     );
+    info!("App stdout:");
     let result = adb::run(env, device, &start_script)?;
     let _ = std::io::stdout().write(result.stdout.as_slice());
     let _ = std::io::stderr().write(result.stderr.as_slice());

@@ -15,14 +15,14 @@ use super::Context;
 pub struct ReadSigningSettings;
 
 impl Task<Context> for ReadSigningSettings {
-    #[instrument(name = "read_signing_settings", skip(self, context))]
+    #[instrument(name = "Read Signing Settings", skip(self, context))]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let opts: &Options = context.get();
         let maybe_mobile_provision = opts
             .ios
             .as_ref()
             .map(|ios| &ios.mobile_provision)
-            .ok_or_else(|| anyhow!("building for iphoneos requires a mobile provision file"));
+            .ok_or_else(|| anyhow!("Building for iphoneos requires a mobile provision file"));
 
         if let Sdk::IPhoneOS = Sdk::try_from(&opts.compiler.target)? {
             // for IPhoneOS we require a mobile_provision

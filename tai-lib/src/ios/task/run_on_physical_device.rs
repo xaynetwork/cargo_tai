@@ -27,7 +27,7 @@ use super::{
 pub struct RunOnPhysicalDevice;
 
 impl Task<Context> for RunOnPhysicalDevice {
-    #[instrument(name = "run_on_physical_device", skip(self, context))]
+    #[instrument(name = "Run On Device(s)", skip(self, context))]
     fn run(&self, context: Context) -> TaiResult<Context> {
         let provisioned_devices = &context
             .get::<SigningSettings>()
@@ -59,6 +59,10 @@ impl Task<Context> for RunOnPhysicalDevice {
                     }
                     cmd.execute()?;
 
+                    info!(
+                        "On `{}` run bundle `{}`",
+                        provisioned_device.id, bundle.build_unit.name
+                    );
                     install_and_launch(
                         &provisioned_device.id,
                         ios_cache.join(format!("{}.app", APP_DISPLAY_NAME)),
@@ -72,7 +76,11 @@ impl Task<Context> for RunOnPhysicalDevice {
     }
 }
 
-#[instrument(name = "install_launch", skip(bundle_root, app_deltas))]
+#[instrument(
+    level = "debug",
+    name = "install_launch",
+    skip(bundle_root, app_deltas)
+)]
 fn install_and_launch<P1, P2>(
     device: &str,
     bundle_root: P1,
@@ -102,12 +110,12 @@ where
 
     match cmd.execute() {
         Ok(_) => {
-            info!("test result ok");
+            info!("Run completed successfully!");
             Ok(())
         }
         Err(err) => {
             bail!(
-                "test {} {} failed with: {}",
+                "Run `{}` `{}` failed with exit code: {}",
                 APP_ID,
                 &bundle_root.as_ref().display(),
                 err

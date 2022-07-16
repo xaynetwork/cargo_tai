@@ -9,7 +9,7 @@ use anyhow::{anyhow, bail, Context};
 use chrono::{DateTime, Utc};
 use openssl::{nid::Nid, x509::X509};
 use serde::Deserialize;
-use tracing::{debug, instrument};
+use tracing::{debug, info, instrument};
 
 use crate::{
     common::bundle::BuiltBundle,
@@ -49,8 +49,10 @@ pub fn sign_bundle(
     settings: &SigningSettings,
     entitlements: &Path,
 ) -> TaiResult<()> {
+    info!("Sign bundle: `{}`", bundle.build_unit.name);
+
     debug!(
-        "will sign {} using identity: {} and profile: {}",
+        "Sign `{}` using identity `{}` and profile `{}`",
         bundle.root.display(),
         settings.identity_name,
         settings.mobile_provision_path.display()
@@ -64,7 +66,7 @@ pub fn sign_bundle(
 #[instrument(name = "entitlements", skip(dest, entitlements))]
 pub fn create_entitlements_file(dest: &Path, entitlements: &str) -> TaiResult<PathBuf> {
     let path = dest.join(ENTITLEMENTS_XCENT);
-    debug!("create entitlements file: {}", path.display());
+    debug!("Create entitlements file: `{}`", path.display());
 
     let mut plist = File::create(&path)?;
     writeln!(plist, r#"<?xml version="1.0" encoding="UTF-8"?>"#)?;
@@ -91,7 +93,7 @@ pub fn find_signing_settings<P: AsRef<Path>>(profile: P) -> TaiResult<SigningSet
     let expiration_date: SystemTime = mobile_provision.expiration_date.into();
     if expiration_date < SystemTime::now() {
         bail!(
-            "provisioning profile expired on: {}",
+            "Provisioning profile expired on: {}",
             <DateTime<Utc>>::from(expiration_date)
         );
     }
@@ -99,7 +101,7 @@ pub fn find_signing_settings<P: AsRef<Path>>(profile: P) -> TaiResult<SigningSet
     let cert_decoded = &mobile_provision
         .developer_certificates
         .first()
-        .ok_or_else(|| anyhow!("missing team identifier"))?
+        .ok_or_else(|| anyhow!("Missing team identifier"))?
         .0;
     let cert_encoded = base64::encode(cert_decoded);
 
@@ -121,7 +123,7 @@ pub fn find_signing_settings<P: AsRef<Path>>(profile: P) -> TaiResult<SigningSet
         .name
         .split(' ')
         .last()
-        .ok_or_else(|| anyhow!("missing app id"))?
+        .ok_or_else(|| anyhow!("Missing app Id"))?
         .to_string();
 
     Ok(SigningSettings {

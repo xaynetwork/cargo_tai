@@ -1,6 +1,6 @@
 use anyhow::bail;
 use cfg_expr::targets::{Arch, Os};
-use tracing::debug;
+use tracing::{debug, info};
 
 use crate::{android, common::opts::Options, ios, TaiResult};
 
@@ -13,7 +13,11 @@ pub enum Command {
 }
 
 pub fn run_command(requested: Options) -> TaiResult<()> {
-    debug!("run command with options:\n{:?}", requested);
+    info!(
+        "Run `{:?}` for target: `{}`",
+        requested.command, requested.compiler.target.triple
+    );
+    debug!("{:#?}", requested);
     match (requested.compiler.target.arch, requested.compiler.target.os) {
         #[cfg(feature = "ios")]
         (Arch::aarch64, Some(Os::ios)) => ios::platform::physical::run_command(requested),
@@ -22,6 +26,6 @@ pub fn run_command(requested: Options) -> TaiResult<()> {
         (Arch::aarch64 | Arch::arm | Arch::x86 | Arch::x86_64, Some(Os::android)) => {
             android::platform::run_command(requested)
         }
-        _ => bail!("unsupported target: {:?}", requested.compiler.target),
+        _ => bail!("Unsupported target `{}`", requested.compiler.target.triple),
     }
 }

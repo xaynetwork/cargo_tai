@@ -1,3 +1,5 @@
+use tracing::instrument;
+
 use crate::TaiResult;
 
 pub mod context;
@@ -11,6 +13,7 @@ pub trait Task<C> {
 pub struct Runner;
 
 impl Runner {
+    #[instrument(name = "Task", skip(tasks, context))]
     pub fn execute<T, C>(tasks: &[T], context: C) -> TaiResult<C>
     where
         T: Task<C>,

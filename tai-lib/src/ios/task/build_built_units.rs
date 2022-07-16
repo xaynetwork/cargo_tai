@@ -1,4 +1,4 @@
-use tracing::instrument;
+use tracing::{debug, instrument};
 
 use crate::{
     common::{
@@ -19,9 +19,10 @@ pub struct BuiltUnits(pub Vec<BuiltUnit>);
 pub struct BuildBuiltUnits;
 
 impl Task<Context> for BuildBuiltUnits {
-    #[instrument(name = "build_built_units", skip(self, context))]
+    #[instrument(name = "Build Units", skip(self, context))]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let opts: &Options = context.get();
+        debug!("{:#?}", opts.compiler);
 
         let cmd = match opts.command {
             Command::Bench => bench_command(&opts.compiler)?,

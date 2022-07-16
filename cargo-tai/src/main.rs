@@ -6,16 +6,16 @@ use tai_lib::common::command::run_command;
 mod opts;
 
 use opts::Options;
-use tracing_subscriber::{fmt::format::FmtSpan, prelude::*, EnvFilter};
+use tracing_subscriber::{prelude::*, EnvFilter};
 
 fn main() -> Result<(), Error> {
     tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env())
+        .with_env_filter(
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
+        )
         .with_ansi(true)
         .with_target(false)
-        .with_level(false)
         .without_time()
-        .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .finish()
         .init();
 

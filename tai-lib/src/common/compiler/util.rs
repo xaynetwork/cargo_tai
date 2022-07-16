@@ -6,6 +6,7 @@ use std::{
 
 use anyhow::{anyhow, bail};
 use cargo_metadata::{camino::Utf8PathBuf, diagnostic::DiagnosticLevel, Artifact, Message};
+use tracing::{debug, info};
 
 use crate::{
     common::{opts::CompilerOptions, project::ProjectMetadata},
@@ -39,8 +40,12 @@ pub fn compile<F: Fn(&Artifact) -> Option<&Utf8PathBuf>>(
     f: F,
     meta: &ProjectMetadata,
 ) -> TaiResult<Vec<BuiltUnit>> {
+    info!("Compile units");
+
     let cmd = extend_with_cargo_args(&mut cmd, requested, meta)?;
     cmd.stdout(Stdio::piped());
+    debug!("Spawn process: {:?}", cmd);
+
     let mut child = cmd.spawn()?;
     let cargo_output = child
         .stdout
@@ -56,7 +61,7 @@ pub fn compile<F: Fn(&Artifact) -> Option<&Utf8PathBuf>>(
                     let unit = BuiltUnit {
                         name: path
                             .file_name()
-                            .ok_or_else(|| anyhow!("build artifact should have a name"))?
+                            .ok_or_else(|| anyhow!("Build artifact should have a name"))?
                             .to_string(),
 
                         artifact: path.into(),
@@ -77,6 +82,13 @@ pub fn compile<F: Fn(&Artifact) -> Option<&Utf8PathBuf>>(
         });
 
     child.wait()?;
+
+    if let Ok(units) = &built_units {
+        units
+            .iter()
+            .for_each(|unit| info!("Compiled unit: `{}`", unit.name));
+    }
+
     built_units
 }
 

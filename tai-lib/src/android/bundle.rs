@@ -4,7 +4,7 @@ use std::{
 };
 
 use guppy::graph::PackageGraph;
-use tracing::{debug, instrument};
+use tracing::{debug, info, instrument};
 
 use crate::{
     common::{
@@ -14,13 +14,14 @@ use crate::{
     TaiResult,
 };
 
-#[instrument(name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, resources_dir, package_graph))]
+#[instrument(level = "debug", name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, resources_dir, package_graph))]
 pub fn create_bundle<P: AsRef<Path>>(
     unit: BuiltUnit,
     bundles_root: P,
     resources_dir: &PathBuf,
     package_graph: &PackageGraph,
 ) -> TaiResult<BuiltBundle> {
+    info!("Create Android app bundle for `{}`", unit.name);
     let bundle_root = bundles_root
         .as_ref()
         .join(unit.target.triple)
@@ -31,10 +32,10 @@ pub fn create_bundle<P: AsRef<Path>>(
     }
 
     create_dir_all(&bundle_root)?;
-    debug!("create dir: {}", bundle_root.display());
+    debug!("Create dir: `{}`", bundle_root.display());
     let to = bundle_root.join(&unit.name);
     copy(&unit.artifact, &to)?;
-    debug!("copy {} to {}", &unit.artifact.display(), to.display());
+    debug!("Copy `{}` to `{}`", &unit.artifact.display(), to.display());
 
     let resources = find_resources(&unit.package_id, resources_dir, package_graph)?;
     copy_resources(&bundle_root, &resources)?;

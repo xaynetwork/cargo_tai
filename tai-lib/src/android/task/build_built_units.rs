@@ -1,3 +1,5 @@
+use tracing::instrument;
+
 use crate::{
     android::{
         compiler::{bench_command, benches_command, test_command, tests_command},
@@ -20,6 +22,7 @@ pub struct BuiltUnits(pub Vec<BuiltUnit>);
 pub struct BuildBuiltUnits;
 
 impl Task<Context> for BuildBuiltUnits {
+    #[instrument(name = "Build Units", skip(self, context))]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let env: &AndroidEnv = context.get();
         let opts: &Options = context.get();
