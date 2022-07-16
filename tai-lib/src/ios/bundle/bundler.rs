@@ -1,5 +1,5 @@
 use std::{
-    fs::{copy, create_dir_all, File},
+    fs::{copy, create_dir_all, remove_dir_all, File},
     path::{Path, PathBuf},
 };
 
@@ -9,22 +9,33 @@ use serde::Serialize;
 use tracing::{debug, instrument};
 
 use crate::{
-    bundle::{copy_resources, BuildBundle},
-    compiler::BuildUnit,
+    common::{
+        bundle::{copy_resources, BuiltBundle},
+        compiler::BuiltUnit,
+    },
     TaiResult,
 };
 
-const APP_DISPLAY_NAME: &str = "cargo-tai";
+pub const APP_DISPLAY_NAME: &str = "cargo-tai";
 const INFO_PLIST: &str = "Info.plist";
 
 #[instrument(name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, app_id, resources))]
 pub fn create_bundle<P: AsRef<Path>>(
-    unit: BuildUnit,
+    unit: BuiltUnit,
     bundles_root: P,
     resources: &Option<Vec<(String, PathBuf)>>,
     app_id: &str,
-) -> TaiResult<BuildBundle> {
-    let version_root = bundles_root.as_ref().join(&unit.name);
+) -> TaiResult<BuiltBundle> {
+    let version_root = bundles_root
+        .as_ref()
+        .join(unit.target.triple)
+        .join(&unit.name);
+
+    if version_root.exists() {
+        remove_dir_all(&version_root)
+            .with_context(|| format!("Failed to remove old bundle {}", version_root.display()))?;
+    }
+
     let bundle_root = version_root.join(format!("{}.app", APP_DISPLAY_NAME));
 
     create_dir_all(&bundle_root)
@@ -32,15 +43,18 @@ pub fn create_bundle<P: AsRef<Path>>(
     debug!("create dir: {}", bundle_root.display());
 
     let to = bundle_root.join(&unit.name);
-    copy(&unit.executable, &to)
-        .with_context(|| format!("Failed to copy executable {}", unit.executable.display()))?;
-    debug!("copy {} to {}", &unit.executable.display(), to.display());
+    copy(&unit.artifact, &to)
+        .with_context(|| format!("Failed to copy artifact {}", unit.artifact.display()))?;
+    debug!("copy {} to {}", &unit.artifact.display(), to.display());
 
     create_plist(&bundle_root, &unit, app_id)
         .with_context(|| format!("Failed to create {}", INFO_PLIST))?;
-    copy_resources(&bundle_root, resources)?;
 
-    Ok(BuildBundle {
+    if let Some(resources) = resources {
+        copy_resources(&bundle_root, resources)?;
+    }
+
+    Ok(BuiltBundle {
         root: bundle_root,
         build_unit: unit,
     })
@@ -66,7 +80,7 @@ pub struct InfoPlist<'a> {
 
 fn create_plist<P: AsRef<Path>>(
     bundle_root: P,
-    build_unit: &BuildUnit,
+    build_unit: &BuiltUnit,
     app_id: &str,
 ) -> TaiResult<PathBuf> {
     let path = bundle_root.as_ref().join(INFO_PLIST);

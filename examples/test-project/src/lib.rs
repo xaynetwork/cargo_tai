@@ -12,6 +12,13 @@ mod tests {
         File::open(path).unwrap();
     }
 
+    #[test]
+    fn test_data_host_and_device_include_dir() {
+        use include_dir::{include_dir, Dir};
+        static PROJECT_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/data");
+        PROJECT_DIR.get_file("test.txt").unwrap();
+    }
+
     #[cfg(all(test, target_os = "ios", target_arch = "aarch64"))]
     #[test]
     fn test_aarch64_ios() {

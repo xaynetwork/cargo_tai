@@ -1,8 +1,2 @@
 [workspace]
-members = [
-    "cargo-tai",
-    "ns-path-utilities-sys",
-    "tai-lib",
-    "tai-util",
-    "test-project",
-]
+members = ["cargo-tai", "ns-path-utilities-sys", "tai-lib", "tai-util", "examples/test-project"]

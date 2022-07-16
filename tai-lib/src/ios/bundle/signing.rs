@@ -12,8 +12,8 @@ use serde::Deserialize;
 use tracing::{debug, instrument};
 
 use crate::{
-    bundle::BuildBundle,
-    ios::tools::{codesign, security},
+    common::bundle::BuiltBundle,
+    ios::tools::{codesign::CodeSign, security},
     TaiResult,
 };
 
@@ -24,27 +24,28 @@ pub struct SigningSettings {
     pub identity_name: String,
     pub app_id: String,
     pub entitlements: String,
-    pub provision: PathBuf,
+    pub mobile_provision_path: PathBuf,
+    pub mobile_provision: MobileProvision,
 }
 
 #[derive(Deserialize, Debug)]
-struct MobileProvision {
+pub struct MobileProvision {
     #[serde(rename = "ProvisionedDevices")]
-    provisioned_devices: Vec<String>,
+    pub provisioned_devices: Vec<String>,
     #[serde(rename = "Name")]
-    name: String,
+    pub name: String,
     #[serde(rename = "ExpirationDate")]
-    expiration_date: plist::Date,
+    pub expiration_date: plist::Date,
     #[serde(rename = "DeveloperCertificates")]
-    developer_certificates: Vec<Data>,
+    pub developer_certificates: Vec<Data>,
 }
 
 #[derive(Deserialize, Debug)]
-struct Data(#[serde(with = "serde_bytes")] Vec<u8>);
+pub struct Data(#[serde(with = "serde_bytes")] Vec<u8>);
 
 #[instrument(name = "sign", skip(bundle, settings))]
 pub fn sign_bundle(
-    bundle: &BuildBundle,
+    bundle: &BuiltBundle,
     settings: &SigningSettings,
     entitlements: &Path,
 ) -> TaiResult<()> {
@@ -52,15 +53,17 @@ pub fn sign_bundle(
         "will sign {} using identity: {} and profile: {}",
         bundle.root.display(),
         settings.identity_name,
-        settings.provision.display()
+        settings.mobile_provision_path.display()
     );
 
-    codesign::sign(&settings.identity_name, &entitlements, &bundle.root)
+    CodeSign::new(&settings.identity_name, &[&bundle.root])
+        .entitlements(entitlements)
+        .execute()
 }
 
-#[instrument(name = "entitlements", skip(bundles_root, entitlements))]
-pub fn create_entitlements_file(bundles_root: &Path, entitlements: &str) -> TaiResult<PathBuf> {
-    let path = bundles_root.join(ENTITLEMENTS_XCENT);
+#[instrument(name = "entitlements", skip(dest, entitlements))]
+pub fn create_entitlements_file(dest: &Path, entitlements: &str) -> TaiResult<PathBuf> {
+    let path = dest.join(ENTITLEMENTS_XCENT);
     debug!("create entitlements file: {}", path.display());
 
     let mut plist = File::create(&path)?;
@@ -76,10 +79,7 @@ pub fn create_entitlements_file(bundles_root: &Path, entitlements: &str) -> TaiR
     Ok(path)
 }
 
-pub fn find_signing_settings<P: AsRef<Path>>(
-    device_id: &str,
-    profile: P,
-) -> TaiResult<SigningSettings> {
+pub fn find_signing_settings<P: AsRef<Path>>(profile: P) -> TaiResult<SigningSettings> {
     let output = security::decode_cms(profile.as_ref())?.stdout;
     let mobile_provision: MobileProvision = plist::from_bytes(&output).with_context(|| {
         format!(
@@ -87,6 +87,14 @@ pub fn find_signing_settings<P: AsRef<Path>>(
             profile.as_ref().display()
         )
     })?;
+
+    let expiration_date: SystemTime = mobile_provision.expiration_date.into();
+    if expiration_date < SystemTime::now() {
+        bail!(
+            "provisioning profile expired on: {}",
+            <DateTime<Utc>>::from(expiration_date)
+        );
+    }
 
     let cert_decoded = &mobile_provision
         .developer_certificates
@@ -100,22 +108,6 @@ pub fn find_signing_settings<P: AsRef<Path>>(
     with_header.push_str("\n-----END CERTIFICATE-----");
 
     let identity_name = get_signing_identity_name(with_header.as_bytes())?;
-
-    let expiration_date: SystemTime = mobile_provision.expiration_date.into();
-    if expiration_date < SystemTime::now() {
-        bail!(
-            "provisioning profile expired on: {}",
-            <DateTime<Utc>>::from(expiration_date)
-        );
-    }
-
-    if !mobile_provision
-        .provisioned_devices
-        .iter()
-        .any(|d| d == device_id)
-    {
-        bail!("device: {} not in provisioning profile", device_id);
-    }
 
     let entitlements = String::from_utf8(output)?
         .split('\n')
@@ -136,7 +128,8 @@ pub fn find_signing_settings<P: AsRef<Path>>(
         identity_name,
         app_id,
         entitlements,
-        provision: profile.as_ref().to_path_buf(),
+        mobile_provision_path: profile.as_ref().to_path_buf(),
+        mobile_provision,
     })
 }
 

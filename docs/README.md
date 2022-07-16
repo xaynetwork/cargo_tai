@@ -1,17 +1,17 @@
 # Documentation
 
-* [Documentation](#documentation)
-   * [Installation](#installation)
-   * [Usage](#usage)
-      * [iOS](#ios)
-         * [Setup (real device only)](#setup-real-device-only)
-         * [Running tests on iOS](#running-tests-on-ios)
-         * [Running benchmarks on iOS](#running-benchmarks-on-ios)
-      * [Android](#android)
-         * [Setup (real device only)](#setup-real-device-only-1)
-         * [Runnings tests on Android](#runnings-tests-on-android)
-         * [Running benchmarks on Android](#running-benchmarks-on-android)
-   * [cargo-tai logs](#cargo-tai-logs)
+- [Documentation](#documentation)
+  - [Installation](#installation)
+  - [Usage](#usage)
+    - [iOS](#ios)
+      - [Setup (real device only)](#setup-real-device-only)
+      - [Running tests on iOS](#running-tests-on-ios)
+      - [Running benchmarks on iOS](#running-benchmarks-on-ios)
+    - [Android](#android)
+      - [Setup (real device only)](#setup-real-device-only-1)
+      - [Runnings tests on Android](#runnings-tests-on-android)
+      - [Running benchmarks on Android](#running-benchmarks-on-android)
+  - [cargo-tai logs](#cargo-tai-logs)
 
 ## Installation
 
@@ -92,7 +92,7 @@ If the org identifier + the product name matches the last part of the
 
 #### Running tests on iOS
 
-We are using the `test-project` as an example.
+We are using the `examples/test-project` as an example.
 
 **Real device**
 
@@ -115,15 +115,21 @@ cargo-tai tests --target x86_64-apple-ios -r test_txt=./data/test.txt --args -Z,
 
 # run a specific integration test binary
 # https://doc.rust-lang.org/cargo/reference/cargo-targets.html#integration-tests
-cargo-tai test --target x86_64-apple-ios --args test_x86_64_ios, -- integration
+cargo-tai test --target x86_64-apple-ios --args test_x86_64_ios -- integration
 
 # run a specific test in release mode
-cargo-tai tests --target x86_64-apple-ios --args test_x86_64_ios, -- --release
+cargo-tai tests --target x86_64-apple-ios --args test_x86_64_ios -- --release
 ```
+
+You can also use [`include_dir`](https://github.com/Michael-F-Bryan/include_dir) to embed resources
+into your binary (see test `test_data_host_and_device_include_dir` in `examples/test-project/src/lib/rs`).
+This way, you don't need to specify the resources using the `-r` flag. With large resources however,
+this may cause the app to take longer to transfer to the phone. By separating the code from the resources,
+the upload tools can skip resources already present in the app from the previous run.
 
 #### Running benchmarks on iOS
 
-We are using the `test-project` as an example.
+We are using the `examples/test-project` as an example.
 
 **Real device**
 
@@ -153,7 +159,7 @@ xcrun simctl get_app_container booted cargo-tai data
 open /Users/xayn/Library/Developer/CoreSimulator/Devices/125E4403-E4AA-4AB0-ABC4-1E3C8882CD9F/data/Containers/Data/Application/32EB09BE-493A-456F-AC86-3EB9091129E2/Documents/target/report/index.html
 ```
 
-In `test-project/benches/criterion.rs` we store the benchmark report in `user_documents`
+In `examples/test-project/benches/criterion.rs` we store the benchmark report in `user_documents`
 which allows the report to be accessed via the `Files` app or via the `Finder`.
 
 **`Files` App**
@@ -172,7 +178,7 @@ You need to enable `USB file transfer` and `USB debugging`.
 
 #### Runnings tests on Android
 
-We are using the `test-project` as an example.
+We are using the `examples/test-project` as an example.
 
 ```shell
 # run all test binaries (unit/integration) and include the test data `test.txt`
@@ -183,7 +189,7 @@ cargo-tai tests --target aarch64-linux-android --android-api-lvl 21 --android-nd
 
 `cargo-tai` installs a bundle for each test/benchmark binary in its own directory `/data/local/tmp/cargo-tai/<Name of Bundle>`.
 The directory will be deleted after the test/benchmark has been run. If you want to persist the benchmark report, you will need to
-change the path of `CRITERION_HOME` (for example to [`/data/local/tmp/cargo-tai`](../test-project/benches/criterion.rs)).
+change the path of `CRITERION_HOME` (for example to [`/data/local/tmp/cargo-tai`](../examples/test-project/benches/criterion.rs)).
 
 ```shell
 # run all benchmark binaries
