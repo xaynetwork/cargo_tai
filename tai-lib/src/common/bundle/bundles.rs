@@ -27,8 +27,8 @@ pub fn create_bundles(
 #[derive(Debug, Deserialize)]
 pub struct Resource {
     pub package_id: String,
-    pub resource_path_absolute: String,
-    pub resource_path_relative: String,
+    pub resource_source: PathBuf,
+    pub resource_destination: PathBuf,
 }
 
 pub fn find_resources(
@@ -41,13 +41,24 @@ pub fn find_resources(
         .collect::<Result<Vec<DirEntry>, _>>()?
         .into_iter()
         .filter_map(|entry| {
-            entry.path().is_file().then(|| {
-                let content = read(entry.path())?;
-                serde_json::from_slice::<Resource>(&content).map_err(|err| anyhow!(err))
+            entry.path().is_dir().then(|| {
+                read_dir(entry.path())?
+                    .into_iter()
+                    .collect::<Result<Vec<DirEntry>, _>>()?
+                    .into_iter()
+                    .filter_map(|entry| {
+                        entry.path().is_file().then(|| {
+                            let content = read(entry.path())?;
+                            serde_json::from_slice::<Resource>(&content).map_err(|err| anyhow!(err))
+                        })
+                    })
+                    .collect::<Result<Vec<Resource>, _>>()
+                    .map_err(|err| anyhow!(err))
             })
         })
-        .collect::<Result<Vec<Resource>, _>>()?
+        .collect::<Result<Vec<Vec<Resource>>, _>>()?
         .into_iter()
+        .flatten()
         .filter_map(|dep| {
             package_graph
                 .depends_on(
@@ -63,12 +74,12 @@ pub fn copy_resources<P: AsRef<Path>>(dest_dir: P, resources: &[Resource]) -> Ta
     resources
         .iter()
         .map(|res| {
-            let rel_path = PathBuf::from(&res.resource_path_relative);
-            let rel_dirs = rel_path.parent().unwrap();
-            let dest_resource_dir = dest_dir.as_ref().join(rel_dirs);
-            create_dir_all(&dest_resource_dir)?;
-            let remote_path = dest_resource_dir.join(rel_path.file_name().unwrap());
-            copy(&res.resource_path_absolute, &remote_path)?;
+            let res_rel_dest = PathBuf::from(&res.resource_destination);
+            let res_rel_dest_dir = res_rel_dest.parent().unwrap();
+            let bundle_dest_dir = dest_dir.as_ref().join(res_rel_dest_dir);
+            create_dir_all(&bundle_dest_dir)?;
+            let remote_path = bundle_dest_dir.join(res_rel_dest.file_name().unwrap());
+            copy(&res.resource_source, &remote_path)?;
 
             Ok(())
         })

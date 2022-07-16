@@ -1,6 +1,10 @@
 extern crate proc_macro;
-use std::{fs::File, path::PathBuf};
+use std::{
+    fs::{create_dir_all, File},
+    path::PathBuf,
+};
 
+use cargo_metadata::PackageId;
 use fasthash::city;
 use proc_macro::{TokenStream, TokenTree};
 use quote::quote;
@@ -8,9 +12,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 struct Resource {
-    package_id: String,
-    resource_path_absolute: String,
-    resource_path_relative: String,
+    package_id: PackageId,
+    resource_source: PathBuf,
+    resource_destination: PathBuf,
 }
 
 #[proc_macro]
@@ -22,30 +26,50 @@ pub fn include_file(input: TokenStream) -> TokenStream {
         _ => panic!("This macro only accepts a single, non-empty string argument"),
     };
 
+    let mut resource_path = PathBuf::from(&resource_path);
+
     if let Ok(out_dir) = std::env::var("CARGO_TAI_RESOURCE_DIR") {
         let _recompile = option_env!("CARGO_TAI_RECOMPILE");
         let crate_root = std::env::var("CARGO_MANIFEST_DIR").expect("Failed to find manifest dir");
 
         let mut cmd = cargo_metadata::MetadataCommand::new();
-        let meta = cmd
+        let crate_meta = cmd
             .manifest_path(PathBuf::from(&crate_root).join("Cargo.toml"))
             .exec()
             .expect("Failed to read manifest");
 
-        let resource = Resource {
-            package_id: meta.root_package().unwrap().id.repr.to_owned(),
-            resource_path_absolute: PathBuf::from(crate_root)
-                .join(&resource_path)
-                .display()
-                .to_string(),
-            resource_path_relative: resource_path.clone(),
+        let package_id = crate_meta
+            .root_package()
+            .expect("Failed to read the metadata for the root package")
+            .id
+            .clone();
+
+        let resource_source = PathBuf::from(&crate_root).join(&resource_path);
+
+        // add crate scope
+        let package_id_hash = city::hash64(&package_id.repr).to_string();
+        resource_path = PathBuf::from(&package_id_hash).join(&resource_path);
+
+        let resource_meta = Resource {
+            package_id,
+            // for copying
+            resource_source,
+            // path inside the app bundle
+            resource_destination: resource_path.clone(),
         };
 
-        let hash = city::hash64(&resource_path.as_bytes());
-        let resource_file = PathBuf::from(out_dir).join(hash.to_string());
-        let file = File::create(resource_file).expect("Failed to create resource info");
-        serde_json::ser::to_writer(file, &resource).expect("Failed to write resource info");
+        let hash = city::hash64(&resource_path.display().to_string());
+        let resource_crate_meta_dir = PathBuf::from(&out_dir).join(&package_id_hash);
+        create_dir_all(&resource_crate_meta_dir).expect("Failed to create resource directory");
+        let resource_meta_file =
+            PathBuf::from(&resource_crate_meta_dir).join(format!("{}.json", hash));
+        let meta_file =
+            File::create(&resource_meta_file).expect("Failed to create resource info file");
+        serde_json::ser::to_writer(&meta_file, &resource_meta)
+            .expect("Failed to write resource info");
     }
+
+    let resource_path = resource_path.display().to_string();
 
     quote! {
         {
