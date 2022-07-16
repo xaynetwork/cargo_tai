@@ -29,7 +29,7 @@ Supported targets:
 }
 
 fn parse_target(src: &str) -> Result<TargetInfo<'static>, Error> {
-    let target = get_builtin_target_by_triple(src).ok_or_else(|| anyhow!("unsupported target"))?;
+    let target = get_builtin_target_by_triple(src).ok_or_else(|| anyhow!("Unsupported target"))?;
     Ok(target.to_owned())
 }
 
