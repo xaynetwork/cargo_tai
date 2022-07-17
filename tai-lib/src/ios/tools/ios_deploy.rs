@@ -3,7 +3,7 @@ use std::{
     process::{Command, Stdio},
 };
 
-use crate::{common::tools::command_ext::ExitStatusExt, TaiResult};
+use crate::{common::{tools::command_ext::ExitStatusExt, utils::envs_as_string}, TaiResult};
 
 const IOS_DEPLOY: &str = "ios-deploy";
 
@@ -89,12 +89,7 @@ impl<'a, 'e> IosDeployLaunch<'a, 'e> {
         };
 
         if let Some(envs) = self.envs {
-            let envs_as_string = envs
-                .iter()
-                .map(|(key, value)| format!("{}={}", key, value))
-                .collect::<Vec<String>>()
-                .join(" ");
-            cmd.args(&["--envs", &envs_as_string]);
+            cmd.args(&["--envs", &envs_as_string(envs)]);
         };
 
         self.app_deltas

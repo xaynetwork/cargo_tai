@@ -50,11 +50,11 @@ pub enum Sdk {
 impl TryFrom<&TargetInfo<'_>> for Sdk {
     type Error = anyhow::Error;
 
-    fn try_from(value: &TargetInfo<'_>) -> Result<Self, Self::Error> {
-        match value.triple {
+    fn try_from(target: &TargetInfo<'_>) -> Result<Self, Self::Error> {
+        match target.triple {
             "aarch64-apple-ios" => Ok(Sdk::IPhoneOS),
             "x86_64-apple-ios" => Ok(Sdk::IPhoneSimulator),
-            _ => bail!("unsupported target"),
+            _ => bail!("Unsupported target `{}`", target.triple),
         }
     }
 }

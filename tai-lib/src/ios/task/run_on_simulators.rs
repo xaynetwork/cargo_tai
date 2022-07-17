@@ -64,12 +64,12 @@ fn install_and_launch<B: AsRef<Path>>(
     binary_opt: &BinaryOptions,
 ) -> TaiResult<()> {
     let bundle_root = bundle_root.as_ref();
-    info!("Uninstall app with Id: `{}`", APP_ID);
+    info!("Uninstall app with Id `{}`", APP_ID);
     device
         .uninstall(APP_ID)
         .map_err(|_| anyhow!("Failed to uninstall: `{}`", APP_ID))?;
 
-    info!("Install: `{}`", bundle_root.display());
+    info!("Install `{}`", bundle_root.display());
     device
         .install(bundle_root.as_ref())
         .map_err(|_| anyhow!("Failed to install: `{}`", APP_ID))?;
@@ -96,8 +96,8 @@ fn launch_app(device: &Device, binary_opt: &BinaryOptions) -> TaiResult<u32> {
         .map_err(|err| anyhow!("{:?}", err))?;
     let stdout = install_path.join("stdout");
     let stdout_str = stdout.to_string_lossy();
-    debug!("Write stdout to: `{}`", stdout_str);
-    info!("App stdout:");
+    debug!("Write stdout to `{}`", stdout_str);
+    info!("App output:");
     let app_pid = xcrun::launch_app(
         &device.udid,
         APP_ID,
@@ -105,7 +105,7 @@ fn launch_app(device: &Device, binary_opt: &BinaryOptions) -> TaiResult<u32> {
         &binary_opt.args,
         &binary_opt.envs,
     )?;
-    debug!("App PID: `{}`", app_pid);
+    debug!("App PID `{}`", app_pid);
     let (lldb_path, guard) = create_lldb_script(&app_pid)?;
     let output = lldb::run_source(&lldb_path)?;
 
@@ -129,7 +129,7 @@ fn create_lldb_script(app_pid: &str) -> Result<(PathBuf, TempDir), Error> {
         app_pid = app_pid,
     ))?;
 
-    debug!("Temporary lldb-script: `{}`", path.display());
+    debug!("Temporary lldb-script `{}`", path.display());
     Ok((path, temp_dir))
 }
 
@@ -175,5 +175,5 @@ fn extract_lldb_exit_status(stdout: &[u8]) -> TaiResult<u32> {
 
     exit_status
         .parse::<u32>()
-        .map_err(|err| anyhow!("Failed to parse exit status: `{}`", err))
+        .map_err(|err| anyhow!("Failed to parse exit status `{}`", err))
 }

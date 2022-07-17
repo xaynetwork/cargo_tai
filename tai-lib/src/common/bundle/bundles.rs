@@ -51,11 +51,12 @@ pub fn find_resources<R: AsRef<Path>>(
                         entry.path().is_file().then(|| {
                             debug!("Found resource metadata at `{}`", entry.path().display());
                             let content = read(entry.path())?;
-                            serde_json::from_slice::<Resource>(&content).map_err(|err| anyhow!(err))
+                            serde_json::from_slice::<Resource>(&content)
+                                .map_err::<anyhow::Error, _>(Into::into)
                         })
                     })
                     .collect::<Result<Vec<Resource>, _>>()
-                    .map_err(|err| anyhow!(err))
+                    .map_err::<anyhow::Error, _>(Into::into)
             })
         })
         .collect::<Result<Vec<Vec<Resource>>, _>>()?
