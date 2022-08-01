@@ -15,16 +15,13 @@ pub struct Runner;
 
 impl Runner {
     #[instrument(name = "Task", skip_all)]
-    pub fn execute<T, C>(tasks: &[T], context: C) -> TaiResult<C>
+    pub fn execute<T, C>(tasks: &[T], mut context: C) -> TaiResult<C>
     where
         T: Task<C>,
     {
-        let mut context = context;
-
         for task in tasks {
             context = task.run(context)?;
         }
-
         Ok(context)
     }
 }
