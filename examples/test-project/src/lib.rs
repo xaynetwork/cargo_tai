@@ -1,15 +1,27 @@
+use std::fs::read_to_string;
+
+pub fn test_resources() {
+    use tai_resource::include_file;
+
+    let data = include_file!("data/test.txt");
+    let data_nested = include_file!("data/data-nested/test.txt");
+
+    let text = read_to_string(data).unwrap();
+    assert_eq!("42", &text);
+    let text_nested = read_to_string(data_nested).unwrap();
+    assert_eq!("4242", &text_nested);
+}
+
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use std::env;
 
+    use crate::test_resources;
+
     #[test]
     fn test_data_host_and_device() {
-        use std::fs::File;
-        use tai_util::try_resources_file_path;
-        let path = try_resources_file_path("test_txt").unwrap_or_else(|| "./data/test.txt".into());
-
-        File::open(path).unwrap();
+        test_resources()
     }
 
     #[test]

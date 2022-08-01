@@ -1,24 +1,26 @@
 use std::{
     fs::{copy, create_dir_all, remove_dir_all},
-    path::{Path, PathBuf},
+    path::Path,
 };
 
-use tracing::{debug, instrument};
+use guppy::graph::PackageGraph;
+use tracing::{debug, info};
 
 use crate::{
     common::{
-        bundle::{copy_resources, BuiltBundle},
+        bundle::{copy_resources, find_resources, BuiltBundle},
         compiler::BuiltUnit,
     },
     TaiResult,
 };
 
-#[instrument(name = "bundle", fields(unit = %unit.name), skip(unit, bundles_root, resources))]
-pub fn create_bundle<P: AsRef<Path>>(
+pub fn create_bundle<B: AsRef<Path>, R: AsRef<Path>>(
     unit: BuiltUnit,
-    bundles_root: P,
-    resources: &Option<Vec<(String, PathBuf)>>,
+    bundles_root: B,
+    resources_dir: R,
+    package_graph: &PackageGraph,
 ) -> TaiResult<BuiltBundle> {
+    info!("Create Android app bundle for `{}`", unit.name);
     let bundle_root = bundles_root
         .as_ref()
         .join(unit.target.triple)
@@ -29,14 +31,13 @@ pub fn create_bundle<P: AsRef<Path>>(
     }
 
     create_dir_all(&bundle_root)?;
-    debug!("create dir: {}", bundle_root.display());
+    debug!("Create dir: `{}`", bundle_root.display());
     let to = bundle_root.join(&unit.name);
     copy(&unit.artifact, &to)?;
-    debug!("copy {} to {}", &unit.artifact.display(), to.display());
+    debug!("Copy `{}` to `{}`", &unit.artifact.display(), to.display());
 
-    if let Some(resources) = resources {
-        copy_resources(&bundle_root, resources)?;
-    }
+    let resources = find_resources(&unit.package_id, resources_dir, package_graph)?;
+    copy_resources(&bundle_root, &resources)?;
 
     Ok(BuiltBundle {
         root: bundle_root,

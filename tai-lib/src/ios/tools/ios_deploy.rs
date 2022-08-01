@@ -3,10 +3,14 @@ use std::{
     process::{Command, Stdio},
 };
 
-use crate::{common::tools::command_ext::ExitStatusExt, TaiResult};
+use crate::{
+    common::{tools::command_ext::ExitStatusExt, utils::envs_as_string},
+    TaiResult,
+};
 
 const IOS_DEPLOY: &str = "ios-deploy";
 
+#[derive(Debug)]
 pub struct IosDeployLaunch<'a, 'e> {
     device: String,
     bundle: PathBuf,
@@ -20,7 +24,7 @@ pub struct IosDeployLaunch<'a, 'e> {
 }
 
 impl<'a, 'e> IosDeployLaunch<'a, 'e> {
-    pub fn new<P: AsRef<Path>>(device: &str, bundle: P) -> Self {
+    pub fn new<B: AsRef<Path>>(device: &str, bundle: B) -> Self {
         Self {
             device: device.to_owned(),
             bundle: bundle.as_ref().to_owned(),
@@ -88,12 +92,7 @@ impl<'a, 'e> IosDeployLaunch<'a, 'e> {
         };
 
         if let Some(envs) = self.envs {
-            let envs_as_string = envs
-                .iter()
-                .map(|(key, value)| format!("{}={}", key, value))
-                .collect::<Vec<String>>()
-                .join(" ");
-            cmd.args(&["--envs", &envs_as_string]);
+            cmd.args(&["--envs", &envs_as_string(envs)]);
         };
 
         self.app_deltas

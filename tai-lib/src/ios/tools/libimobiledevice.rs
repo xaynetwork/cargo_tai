@@ -24,13 +24,13 @@ pub fn device_info(udid: &str) -> TaiResult<Device> {
 
     plist::from_bytes(&output.stdout).map_err(|err| {
         anyhow!(format!(
-            "Failed to deserialize device info for {}, err:{}",
+            "Failed to deserialize device info for device id `{}`. Error: {}",
             udid, err
         ))
     })
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Device {
     #[serde(rename = "UniqueDeviceID")]
     pub id: String,

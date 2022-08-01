@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use clap::Parser;
 use tai_lib::common::opts;
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 pub struct AndroidOptions {
     /// Android API level: only required when "target" is "*-linux-android*"
     ///
@@ -57,21 +57,15 @@ pub struct AndroidOptions {
 }
 
 impl From<AndroidOptions> for Option<opts::AndroidOptions> {
-    fn from(
-        AndroidOptions {
-            api_lvl,
-            sdk,
-            ndk,
-            cargo_ndk_args,
-        }: AndroidOptions,
-    ) -> Self {
-        match (api_lvl, ndk) {
-            (Some(api_lvl), Some(ndk)) => Some(opts::AndroidOptions {
+    fn from(opts: AndroidOptions) -> Self {
+        match (opts.api_lvl, opts.ndk) {
+            (Some(api_lvl), Some(ndk)) => opts::AndroidOptions {
                 api_lvl,
-                sdk,
+                sdk: opts.sdk,
                 ndk,
-                cargo_ndk_args,
-            }),
+                cargo_ndk_args: opts.cargo_ndk_args,
+            }
+            .into(),
             _ => None,
         }
     }

@@ -1,26 +1,24 @@
-use anyhow::Error;
-
 use clap::Parser;
-use tai_lib::common::command::run_command;
+use tai_lib::common::{command::run, opts::Options};
 
 mod opts;
 
-use opts::Options;
-use tracing_subscriber::{fmt::format::FmtSpan, prelude::*, EnvFilter};
+use opts::Command;
+use tracing_subscriber::{prelude::*, EnvFilter};
 
-fn main() -> Result<(), Error> {
+fn main() {
     tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env())
+        .with_env_filter(
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
+        )
         .with_ansi(true)
         .with_target(false)
-        .with_level(false)
         .without_time()
-        .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .finish()
         .init();
 
-    let opt = Options::from_args();
-    let requested_opt: tai_lib::common::opts::Options = opt.into();
+    let command = Command::from_args();
+    let requested: Options = command.into();
 
-    run_command(requested_opt)
+    let _ = run(requested);
 }

@@ -1,4 +1,5 @@
 use anyhow::bail;
+use tracing::{info, instrument};
 
 use crate::{
     android::tools::{
@@ -11,11 +12,14 @@ use crate::{
 
 use super::Context;
 
+#[derive(Debug)]
 pub struct Devices(pub Vec<Device>);
 
+#[derive(Debug)]
 pub struct ListDevices;
 
 impl Task<Context> for ListDevices {
+    #[instrument(name = "Find Device(s)", skip_all)]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let env: &AndroidEnv = context.get();
 
@@ -23,10 +27,14 @@ impl Task<Context> for ListDevices {
             .into_iter()
             .filter(|device| device.arch == context.get::<Options>().compiler.target.arch)
             .collect::<Vec<Device>>();
-
         if devices.is_empty() {
-            bail!("no android device available")
+            bail!("No Android device available")
         }
+
+        info!("Found the following Android device(s):");
+        devices
+            .iter()
+            .for_each(|device| info!("ID: `{}`", device.id));
 
         context.insert(Devices(devices));
         Ok(context)

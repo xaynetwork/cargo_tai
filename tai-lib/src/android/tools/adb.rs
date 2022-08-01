@@ -3,7 +3,6 @@ use std::{
     process::{Command, Output},
 };
 
-use anyhow::anyhow;
 use cfg_expr::targets::Arch;
 use once_cell::sync::OnceCell;
 
@@ -52,7 +51,7 @@ pub fn mkdir<P: AsRef<Path>>(env: &AndroidEnv, device: &str, path: P) -> TaiResu
         .args(&["-s", device, "shell", "mkdir", "-p"])
         .arg(path.as_ref())
         .status()?
-        .expect_success("failed to create directory")
+        .expect_success("Failed to create directory")
 }
 
 pub fn sync<FP: AsRef<Path>, TP: AsRef<Path>>(
@@ -65,7 +64,7 @@ pub fn sync<FP: AsRef<Path>, TP: AsRef<Path>>(
         .args(&["-s", device, "push", "--sync"])
         .args(&[from.as_ref(), to.as_ref()])
         .status()?
-        .expect_success("failed to sync files")
+        .expect_success("Failed to sync files")
 }
 
 pub fn rm<P: AsRef<Path>>(env: &AndroidEnv, device: &str, path: P) -> TaiResult<()> {
@@ -73,7 +72,7 @@ pub fn rm<P: AsRef<Path>>(env: &AndroidEnv, device: &str, path: P) -> TaiResult<
         .args(&["-s", device, "shell", "rm", "-rf"])
         .arg(path.as_ref())
         .status()?
-        .expect_success("failed to remove files/directories")
+        .expect_success("Failed to remove files/directories")
 }
 
 pub fn chmod<P: AsRef<Path>>(env: &AndroidEnv, device: &str, path: P) -> TaiResult<()> {
@@ -81,7 +80,7 @@ pub fn chmod<P: AsRef<Path>>(env: &AndroidEnv, device: &str, path: P) -> TaiResu
         .args(&["-s", device, "shell", "chmod", "755"])
         .arg(path.as_ref())
         .status()?
-        .expect_success("failed to chmod file/directory")
+        .expect_success("Failed to chmod file/directory")
 }
 
 pub fn run(env: &AndroidEnv, device: &str, start_script: &str) -> TaiResult<Output> {
@@ -89,7 +88,7 @@ pub fn run(env: &AndroidEnv, device: &str, start_script: &str) -> TaiResult<Outp
         .args(&["-s", device, "shell"])
         .arg(start_script)
         .output()
-        .map_err(|err| anyhow!("{}", err))
+        .map_err(Into::into)
 }
 
 // #TODO replace with https://github.com/rust-windowing/android-ndk-rs/blob/master/ndk-build/src/target.rs

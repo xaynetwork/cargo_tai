@@ -3,7 +3,7 @@ use cfg_expr::targets::{get_builtin_target_by_triple, TargetInfo};
 use clap::Parser;
 use tai_lib::common::opts;
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 pub struct CompilerOptions {
     /// Build for the target triples
     #[clap(long, parse(try_from_str = parse_target), long_help =
@@ -29,7 +29,7 @@ Supported targets:
 }
 
 fn parse_target(src: &str) -> Result<TargetInfo<'static>, Error> {
-    let target = get_builtin_target_by_triple(src).ok_or_else(|| anyhow!("unsupported target"))?;
+    let target = get_builtin_target_by_triple(src).ok_or_else(|| anyhow!("Unsupported target"))?;
     Ok(target.to_owned())
 }
 

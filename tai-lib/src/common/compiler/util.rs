@@ -1,26 +1,31 @@
 use std::{
     io::BufReader,
     process::{Command, Stdio},
+    time::SystemTime,
 };
 
 use anyhow::{anyhow, bail};
 use cargo_metadata::{camino::Utf8PathBuf, diagnostic::DiagnosticLevel, Artifact, Message};
+use tracing::{debug, info};
 
-use crate::{common::opts::CompilerOptions, TaiResult};
+use crate::{
+    common::{opts::CompilerOptions, project::ProjectMetadata},
+    TaiResult,
+};
 
 use super::BuiltUnit;
 
-pub fn is_test(artifact: Artifact) -> Option<Utf8PathBuf> {
-    if let (Some(path), true) = (artifact.executable, artifact.profile.test) {
+pub fn is_test(artifact: &Artifact) -> Option<&Utf8PathBuf> {
+    if let (Some(path), true) = (&artifact.executable, artifact.profile.test) {
         Some(path)
     } else {
         None
     }
 }
 
-pub fn is_bench(artifact: Artifact) -> Option<Utf8PathBuf> {
+pub fn is_bench(artifact: &Artifact) -> Option<&Utf8PathBuf> {
     if let (Some(path), true) = (
-        artifact.executable,
+        &artifact.executable,
         artifact.target.kind.contains(&String::from("bench")),
     ) {
         Some(path)
@@ -29,13 +34,18 @@ pub fn is_bench(artifact: Artifact) -> Option<Utf8PathBuf> {
     }
 }
 
-pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
+pub fn compile<F: Fn(&Artifact) -> Option<&Utf8PathBuf>>(
     mut cmd: Command,
     requested: &CompilerOptions,
     f: F,
+    meta: &ProjectMetadata,
 ) -> TaiResult<Vec<BuiltUnit>> {
-    let cmd = extend_with_cargo_args(&mut cmd, requested)?;
+    info!("Compile units");
+
+    let cmd = extend_with_cargo_args(&mut cmd, requested, meta)?;
     cmd.stdout(Stdio::piped());
+    debug!("Spawn process: {:?}", cmd);
+
     let mut child = cmd.spawn()?;
     let cargo_output = child
         .stdout
@@ -47,13 +57,15 @@ pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
         .into_iter()
         .try_fold(vec![], |mut acc, msg| match msg? {
             Message::CompilerArtifact(art) => {
-                if let Some(path) = f(art) {
+                if let Some(path) = f(&art) {
                     let unit = BuiltUnit {
                         name: path
                             .file_name()
-                            .ok_or_else(|| anyhow!("build artifact should have a name"))?
+                            .ok_or_else(|| anyhow!("Build artifact should have a name"))?
                             .to_string(),
+
                         artifact: path.into(),
+                        package_id: art.package_id.repr,
                         target: requested.target.clone(),
                     };
                     acc.push(unit);
@@ -70,14 +82,35 @@ pub fn compile<F: Fn(Artifact) -> Option<Utf8PathBuf>>(
         });
 
     child.wait()?;
+
+    if let Ok(units) = &built_units {
+        units
+            .iter()
+            .for_each(|unit| info!("Compiled unit: `{}`", unit.name));
+    }
+
     built_units
 }
 
 pub fn extend_with_cargo_args<'a>(
     cmd: &'a mut Command,
     requested: &CompilerOptions,
+    meta: &ProjectMetadata,
 ) -> TaiResult<&'a mut Command> {
     cmd.args(&requested.cargo_args);
     cmd.args(&["--message-format", "json"]);
+
+    cmd.env(
+        "CARGO_TAI_RESOURCE_DIR",
+        meta.resources_dir.display().to_string(),
+    );
+
+    cmd.env(
+        "CARGO_TAI_RECOMPILE",
+        SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)?
+            .as_secs()
+            .to_string(),
+    );
     Ok(cmd)
 }

@@ -12,7 +12,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-tai-util = { path = "../../tai-util" }
+tai-resource = { path = "../../tai-resource" }
 
 [lib]
 bench = false

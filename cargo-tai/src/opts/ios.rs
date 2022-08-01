@@ -2,9 +2,9 @@ use clap::Parser;
 use std::path::PathBuf;
 use tai_lib::common::opts::{self};
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 pub struct IosOptions {
-    #[structopt(
+    #[clap(
         long = "ios-mobile-provision",
         required_if("target", "aarch64-apple-ios")
     )]

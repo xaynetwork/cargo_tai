@@ -12,17 +12,18 @@ use crate::{
 
 use super::Context;
 
+#[derive(Debug)]
 pub struct ReadSigningSettings;
 
 impl Task<Context> for ReadSigningSettings {
-    #[instrument(name = "read_signing_settings", skip(self, context))]
+    #[instrument(name = "Read Signing Settings", skip_all)]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let opts: &Options = context.get();
         let maybe_mobile_provision = opts
             .ios
             .as_ref()
             .map(|ios| &ios.mobile_provision)
-            .ok_or_else(|| anyhow!("building for iphoneos requires a mobile provision file"));
+            .ok_or_else(|| anyhow!("Building for iphoneos requires a mobile provision file"));
 
         if let Sdk::IPhoneOS = Sdk::try_from(&opts.compiler.target)? {
             // for IPhoneOS we require a mobile_provision
@@ -49,11 +50,11 @@ pub enum Sdk {
 impl TryFrom<&TargetInfo<'_>> for Sdk {
     type Error = anyhow::Error;
 
-    fn try_from(value: &TargetInfo<'_>) -> Result<Self, Self::Error> {
-        match value.triple {
+    fn try_from(target: &TargetInfo<'_>) -> Result<Self, Self::Error> {
+        match target.triple {
             "aarch64-apple-ios" => Ok(Sdk::IPhoneOS),
             "x86_64-apple-ios" => Ok(Sdk::IPhoneSimulator),
-            _ => bail!("unsupported target"),
+            _ => bail!("Unsupported target `{}`", target.triple),
         }
     }
 }

@@ -1,5 +1,5 @@
 [package]
-name = "tai-util"
+name = "test-project-nested"
 version = "0.0.1"
 authors = ["Xayn Engineering <engineering@xaynet.dev>"]
 license = "Apache-2.0"
@@ -9,6 +9,8 @@ keywords = ["test", "mobile", "ios", "android", "cargo"]
 categories = ["development-tools::cargo-plugins", "development-tools::testing", "development-tools::profiling"]
 readme = "../README.md"
 edition = "2021"
+publish = false
 
-[target.'cfg(target_os="ios")'.dependencies]
-ns-path-utilities-sys = { path = "../ns-path-utilities-sys" }
+[dependencies]
+tai-resource = { path = "../../tai-resource" }
+test-project = { path = "../test-project" }

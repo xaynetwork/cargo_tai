@@ -26,10 +26,11 @@ use crate::{
 
 use super::{list_simulators::Simulators, Context};
 
+#[derive(Debug)]
 pub struct RunOnSimulators;
 
 impl Task<Context> for RunOnSimulators {
-    #[instrument(name = "run_on_simulator", skip(self, context))]
+    #[instrument(name = "Run On Simulator(s)", skip_all)]
     fn run(&self, context: Context) -> TaiResult<Context> {
         let bundles: &BuiltBundles = context.get();
         let opts: &Options = context.get();
@@ -44,44 +45,46 @@ impl Task<Context> for RunOnSimulators {
             .0
             .iter()
             .try_for_each(|simulator| {
-                bundles
-                    .bundles
-                    .iter()
-                    .try_for_each(|bundle| install_and_launch(simulator, &bundle.root, binary_opt))
+                bundles.bundles.iter().try_for_each(|bundle| {
+                    info!(
+                        "On `{}` run bundle `{}`",
+                        simulator.info().udid,
+                        bundle.build_unit.name
+                    );
+                    install_and_launch(simulator, &bundle.root, binary_opt)
+                })
             })?;
         Ok(context)
     }
 }
 
-#[instrument(name = "install_launch", fields(device = %device.udid), skip(bundle_root))]
-fn install_and_launch<P: AsRef<Path>>(
+fn install_and_launch<B: AsRef<Path>>(
     device: &Device,
-    bundle_root: P,
+    bundle_root: B,
     binary_opt: &BinaryOptions,
 ) -> TaiResult<()> {
     let bundle_root = bundle_root.as_ref();
-    info!("uninstall app with app id: {}", APP_ID);
+    info!("Uninstall app with Id `{}`", APP_ID);
     device
         .uninstall(APP_ID)
-        .map_err(|_| anyhow!("failed to uninstall: {}", APP_ID))?;
+        .map_err(|_| anyhow!("Failed to uninstall: `{}`", APP_ID))?;
 
-    info!("install: {}", bundle_root.display());
+    info!("Install `{}`", bundle_root.display());
     device
         .install(bundle_root.as_ref())
-        .map_err(|_| anyhow!("failed to install: {}", APP_ID))?;
+        .map_err(|_| anyhow!("Failed to install: `{}`", APP_ID))?;
 
-    info!("launch app with app id:: {}", APP_ID);
     match launch_app(device, binary_opt)? {
         0 => {
-            info!("test result ok");
+            info!("Run completed successfully!");
             Ok(())
         }
-        ec => {
+        exit_code => {
             bail!(
-                "test {} {} failed with exit code: {}",
+                "Run `{}` `{}` failed with exit code: {}",
                 APP_ID,
                 bundle_root.display(),
-                ec
+                exit_code
             )
         }
     }
@@ -93,8 +96,8 @@ fn launch_app(device: &Device, binary_opt: &BinaryOptions) -> TaiResult<u32> {
         .map_err(|err| anyhow!("{:?}", err))?;
     let stdout = install_path.join("stdout");
     let stdout_str = stdout.to_string_lossy();
-    debug!("write stdout to: {}", stdout_str);
-
+    debug!("Write stdout to `{}`", stdout_str);
+    info!("App output:");
     let app_pid = xcrun::launch_app(
         &device.udid,
         APP_ID,
@@ -102,7 +105,7 @@ fn launch_app(device: &Device, binary_opt: &BinaryOptions) -> TaiResult<u32> {
         &binary_opt.args,
         &binary_opt.envs,
     )?;
-    debug!("app pid: {}", app_pid);
+    debug!("App PID `{}`", app_pid);
     let (lldb_path, guard) = create_lldb_script(&app_pid)?;
     let output = lldb::run_source(&lldb_path)?;
 
@@ -126,7 +129,7 @@ fn create_lldb_script(app_pid: &str) -> Result<(PathBuf, TempDir), Error> {
         app_pid = app_pid,
     ))?;
 
-    debug!("temp lldb-script: {}", path.display());
+    debug!("Temporary lldb-script `{}`", path.display());
     Ok((path, temp_dir))
 }
 
@@ -158,7 +161,7 @@ fn extract_lldb_exit_status(stdout: &[u8]) -> TaiResult<u32> {
         .lines()
         .rev()
         .find(|s| s.contains("exited with status ="))
-        .ok_or_else(|| anyhow!("failed to find the exit status line from lldb output"))?;
+        .ok_or_else(|| anyhow!("Failed to find the exit status line from lldb output"))?;
 
     static EXIST_STATUS_REGEX: OnceCell<regex::Regex> = OnceCell::new();
     let re = EXIST_STATUS_REGEX
@@ -168,9 +171,9 @@ fn extract_lldb_exit_status(stdout: &[u8]) -> TaiResult<u32> {
         .captures_iter(exit_status_line)
         .next()
         .and_then(|cap| cap.get(1).map(|code| code.as_str()))
-        .ok_or_else(|| anyhow!("failed to extract the exit status line from lldb output"))?;
+        .ok_or_else(|| anyhow!("Failed to extract the exit status line from lldb output"))?;
 
     exit_status
         .parse::<u32>()
-        .map_err(|err| anyhow!("failed to parse exit status: {}", err))
+        .map_err(|err| anyhow!("Failed to parse exit status `{}`", err))
 }

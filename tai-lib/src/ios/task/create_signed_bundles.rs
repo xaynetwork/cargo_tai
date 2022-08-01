@@ -3,7 +3,6 @@ use tracing::instrument;
 use crate::{
     common::{
         bundle::{create_bundles, BuiltBundles},
-        opts::Options,
         project::ProjectMetadata,
         task::Task,
     },
@@ -16,22 +15,31 @@ use crate::{
 
 use super::{build_built_units::BuiltUnits, Context};
 
+#[derive(Debug)]
 pub struct SignedBuiltBundles(pub BuiltBundles);
 
+#[derive(Debug)]
 pub struct CreateSignedBundles;
 
 impl Task<Context> for CreateSignedBundles {
-    #[instrument(name = "create_signed_bundles", skip(self, context))]
+    #[instrument(name = "Create Signed Bundles", skip_all)]
     fn run(&self, mut context: Context) -> TaiResult<Context> {
         let built_units = context.remove::<BuiltUnits>().0;
         let sig_settings: &SigningSettings = context.get();
-        let resources = &context.get::<Options>().resources;
         let project_meta: &ProjectMetadata = context.get();
 
         let bundles = create_bundles(
             built_units,
             &project_meta.tai_target,
-            |unit, bundles_root| create_bundle(unit, bundles_root, resources, &sig_settings.app_id),
+            |unit, bundles_root| {
+                create_bundle(
+                    unit,
+                    bundles_root,
+                    &sig_settings.app_id,
+                    &project_meta.resources_dir,
+                    &project_meta.package_graph,
+                )
+            },
         )?;
 
         let entitlements =

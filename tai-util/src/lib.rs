@@ -1,26 +1,3 @@
-use std::{env, path::PathBuf};
-
-// cannot use resources https://stackoverflow.com/questions/29271548/code-sign-error-bundle-format-unrecognized-invalid-or-unsuitable
-pub const DATA_DIR_NAME: &str = "test-data";
-
-pub fn resources_file_path(test_data_id: &str) -> PathBuf {
-    try_resources_file_path(test_data_id)
-        .unwrap_or_else(|| panic!("couldn't find test data {}", test_data_id))
-}
-
-pub fn try_resources_file_path(test_data_id: &str) -> Option<PathBuf> {
-    let current_exe = env::current_exe().expect("current exe path not accessible");
-
-    if cfg!(any(target_os = "ios", target_os = "android")) {
-        current_exe
-            .parent()
-            .map(|p| p.join(DATA_DIR_NAME))
-            .map(|p| p.join(test_data_id))
-    } else {
-        None
-    }
-}
-
 #[cfg(target_os = "ios")]
 pub mod ios {
     //! https://docs.microsoft.com/de-de/xamarin/ios/app-fundamentals/file-system#application-directories
