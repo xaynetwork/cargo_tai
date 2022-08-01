@@ -3,7 +3,10 @@ use std::{
     process::{Command, Stdio},
 };
 
-use crate::{common::{tools::command_ext::ExitStatusExt, utils::envs_as_string}, TaiResult};
+use crate::{
+    common::{tools::command_ext::ExitStatusExt, utils::envs_as_string},
+    TaiResult,
+};
 
 const IOS_DEPLOY: &str = "ios-deploy";
 

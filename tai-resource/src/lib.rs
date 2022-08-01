@@ -27,14 +27,15 @@ pub fn include_file(input: TokenStream) -> TokenStream {
     };
 
     let mut resource_path = PathBuf::from(&resource_path);
+    let crate_root = std::env::var("CARGO_MANIFEST_DIR").expect("Failed to find manifest dir");
+    let crate_root = PathBuf::from(crate_root);
 
     if let Ok(out_dir) = std::env::var("CARGO_TAI_RESOURCE_DIR") {
         let _recompile = option_env!("CARGO_TAI_RECOMPILE");
-        let crate_root = std::env::var("CARGO_MANIFEST_DIR").expect("Failed to find manifest dir");
 
         let mut cmd = cargo_metadata::MetadataCommand::new();
         let crate_meta = cmd
-            .manifest_path(PathBuf::from(&crate_root).join("Cargo.toml"))
+            .manifest_path(crate_root.join("Cargo.toml"))
             .exec()
             .expect("Failed to read manifest");
 
@@ -44,7 +45,7 @@ pub fn include_file(input: TokenStream) -> TokenStream {
             .id
             .clone();
 
-        let resource_source = PathBuf::from(&crate_root).join(&resource_path);
+        let resource_source = crate_root.join(&resource_path);
 
         // add crate scope
         let package_id_hash = city::hash64(&package_id.repr).to_string();
@@ -67,10 +68,12 @@ pub fn include_file(input: TokenStream) -> TokenStream {
             File::create(&resource_meta_file).expect("Failed to create resource info file");
         serde_json::ser::to_writer(&meta_file, &resource_meta)
             .expect("Failed to write resource info");
+    } else {
+        // add crate scope
+        resource_path = crate_root.join(&resource_path);
     }
 
     let resource_path = resource_path.display().to_string();
-
     quote! {
         {
             use std::{env, path::PathBuf};

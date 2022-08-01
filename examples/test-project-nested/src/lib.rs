@@ -8,7 +8,7 @@ mod tests {
     use test_project::test_resources;
 
     #[test]
-    fn test_data_host_and_device() {
+    fn test_data_host_and_device_nested() {
         test_resources();
         let data = include_file!("data/test.txt");
         let data_nested = include_file!("data/data-nested/test.txt");
