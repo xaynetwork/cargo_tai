@@ -41,7 +41,7 @@ impl<'f> CodeSign<'f> {
             cmd.stderr(Stdio::null());
         }
 
-        cmd.args(&["-s", self.identity.as_ref()]);
+        cmd.args(["-s", self.identity.as_ref()]);
         self.entitlements
             .as_ref()
             .map(|path| cmd.arg("--entitlements").arg(path));

@@ -51,8 +51,8 @@ Furthermore, ideas were taken from the following projects:
 
 **iOS**
 
-- Real device: iPhone 8 with iOS 15.5 & iPhone 13 mini with iOS 15.5
-- Simulator: iPhone 13 with iOS 15.5
+- Real device: iPhone 8 with iOS 15.5 & iPhone 13 mini with iOS 16.1.1
+- Simulator: iPhone 13 with iOS 16.1.1
 
 **Android**
 
@@ -61,12 +61,12 @@ Furthermore, ideas were taken from the following projects:
 
 **Host**
 
-- Intel based Mac with macOS BigSur 12.4
-- Xcode 13.4
-- ios-deploy 1.11.4
+- Intel based Mac with macOS BigSur 12.6.1
+- Xcode 14.1
+- ios-deploy 1.12
 - API level 21
 - NDK 22.1.7171670
-- cargo 1.62.0
+- cargo 1.65.0
 - cargo toolchains:
   - `x86_64-linux-android`
   - `aarch64-linux-android`

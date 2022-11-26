@@ -68,7 +68,7 @@ fn install_bundle(
 ) -> TaiResult<(PathBuf, PathBuf)> {
     let remote_workdir = PathBuf::from(ANDROID_REMOTE_WORKDIR);
     adb::mkdir(env, device, &remote_workdir)?;
-    let remote_root = remote_workdir.join(&bundle.root.file_name().unwrap());
+    let remote_root = remote_workdir.join(bundle.root.file_name().unwrap());
     debug!(
         "copy from: {} to: {}",
         bundle.root.display(),

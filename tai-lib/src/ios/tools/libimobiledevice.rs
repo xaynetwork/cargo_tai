@@ -19,7 +19,7 @@ pub fn list_devices() -> TaiResult<Vec<Device>> {
 
 pub fn device_info(udid: &str) -> TaiResult<Device> {
     let output = Command::new(IDEVICEINFO)
-        .args(&["-s", "-x", "-u", udid])
+        .args(["-s", "-x", "-u", udid])
         .output()?;
 
     plist::from_bytes(&output.stdout).map_err(|err| {

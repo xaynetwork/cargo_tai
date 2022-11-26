@@ -29,4 +29,4 @@ runs:
       shell: bash
       run: rustup target add ${{ inputs.rust-target }}
 
-    - uses: Swatinem/rust-cache@cb2cf0cc7c5198d3364b9630e2c3d457f160790c # v1.4.0
+    - uses: Swatinem/rust-cache@359a70e43a0bb8a13953b04a90f76428b4959bb6 # v2.2.0

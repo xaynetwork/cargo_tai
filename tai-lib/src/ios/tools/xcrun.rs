@@ -16,7 +16,7 @@ pub fn launch_app(
 ) -> TaiResult<String> {
     let mut cmd = Command::new(XCRUN);
 
-    cmd.args(&[
+    cmd.args([
         "simctl",
         "launch",
         &format!("--stdout={}", stdout),

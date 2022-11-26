@@ -52,7 +52,7 @@ impl Task<Context> for RunOnPhysicalDevice {
             .filter(|device| provisioned_devices.contains(&device.id))
             .try_for_each(|provisioned_device| {
                 bundles.bundles.iter().try_for_each(|bundle| {
-                    let mut cmd = Rsync::new(&bundle.root, &ios_cache);
+                    let mut cmd = Rsync::new(&bundle.root, ios_cache);
                     cmd.archive().delete();
                     if opts.cli.verbose {
                         cmd.verbose();

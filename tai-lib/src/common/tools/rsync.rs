@@ -61,8 +61,8 @@ impl Rsync {
             cmd.arg("-v");
         }
 
-        self.archive.then(|| ()).map(|_| cmd.arg("-a"));
-        self.delete.then(|| ()).map(|_| cmd.arg("--delete"));
+        self.archive.then_some(()).map(|_| cmd.arg("-a"));
+        self.delete.then_some(()).map(|_| cmd.arg("--delete"));
 
         if self.only_content {
             cmd.arg(format!("{}/", self.source.display()));

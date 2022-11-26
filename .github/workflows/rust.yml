@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
       - name: Setup CI
         uses: ./.github/setup
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
       - name: Setup CI
         uses: ./.github/setup
@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
       - name: Setup CI
         uses: ./.github/setup
@@ -60,11 +60,11 @@ jobs:
           cargo test --all-targets --all-features --workspace --exclude test-project
 
   test-on-ios-simulator:
-    runs-on: macos-10.15
+    runs-on: macos-11
     timeout-minutes: 30
     needs: cargo-test
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
       - name: Setup CI
         uses: ./.github/setup
@@ -73,7 +73,7 @@ jobs:
 
       - name: Start iOS simulator
         run: |
-          xcrun simctl create "Test Device" "iPhone 12 Pro" iOS14.4
+          xcrun simctl create "Test Device" "iPhone 12 Pro" iOS15.2
           xcrun simctl boot "Test Device"
 
       - name: Install cargo-tai

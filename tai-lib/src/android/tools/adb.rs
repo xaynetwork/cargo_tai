@@ -41,7 +41,7 @@ pub fn devices(env: &AndroidEnv) -> TaiResult<Vec<Device>> {
 
 pub fn arch(env: &AndroidEnv, device: &str) -> TaiResult<Arch<'static>> {
     let output = Command::new(&env.adb)
-        .args(&["-s", device, "shell", "getprop", "ro.product.cpu.abi"])
+        .args(["-s", device, "shell", "getprop", "ro.product.cpu.abi"])
         .output()?;
     let cpu_arch: CpuArch = String::from_utf8(output.stdout)?.trim().into();
     Ok(cpu_arch.into())
@@ -49,7 +49,7 @@ pub fn arch(env: &AndroidEnv, device: &str) -> TaiResult<Arch<'static>> {
 
 pub fn mkdir<P: AsRef<Path>>(env: &AndroidEnv, device: &str, path: P) -> TaiResult<()> {
     Command::new(&env.adb)
-        .args(&["-s", device, "shell", "mkdir", "-p"])
+        .args(["-s", device, "shell", "mkdir", "-p"])
         .arg(path.as_ref())
         .status()?
         .expect_success("failed to create directory")
@@ -62,15 +62,15 @@ pub fn sync<FP: AsRef<Path>, TP: AsRef<Path>>(
     to: TP,
 ) -> TaiResult<()> {
     Command::new(&env.adb)
-        .args(&["-s", device, "push", "--sync"])
-        .args(&[from.as_ref(), to.as_ref()])
+        .args(["-s", device, "push", "--sync"])
+        .args([from.as_ref(), to.as_ref()])
         .status()?
         .expect_success("failed to sync files")
 }
 
 pub fn rm<P: AsRef<Path>>(env: &AndroidEnv, device: &str, path: P) -> TaiResult<()> {
     Command::new(&env.adb)
-        .args(&["-s", device, "shell", "rm", "-rf"])
+        .args(["-s", device, "shell", "rm", "-rf"])
         .arg(path.as_ref())
         .status()?
         .expect_success("failed to remove files/directories")
@@ -78,7 +78,7 @@ pub fn rm<P: AsRef<Path>>(env: &AndroidEnv, device: &str, path: P) -> TaiResult<
 
 pub fn chmod<P: AsRef<Path>>(env: &AndroidEnv, device: &str, path: P) -> TaiResult<()> {
     Command::new(&env.adb)
-        .args(&["-s", device, "shell", "chmod", "755"])
+        .args(["-s", device, "shell", "chmod", "755"])
         .arg(path.as_ref())
         .status()?
         .expect_success("failed to chmod file/directory")
@@ -86,7 +86,7 @@ pub fn chmod<P: AsRef<Path>>(env: &AndroidEnv, device: &str, path: P) -> TaiResu
 
 pub fn run(env: &AndroidEnv, device: &str, start_script: &str) -> TaiResult<Output> {
     Command::new(&env.adb)
-        .args(&["-s", device, "shell"])
+        .args(["-s", device, "shell"])
         .arg(start_script)
         .output()
         .map_err(|err| anyhow!("{}", err))

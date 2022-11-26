@@ -78,13 +78,13 @@ impl<'a, 'e> IosDeployLaunch<'a, 'e> {
         cmd.arg("--id").arg(&self.device);
 
         self.non_interactive
-            .then(|| ())
+            .then_some(())
             .map(|_| cmd.arg("--noninteractive"));
-        self.debug.then(|| ()).map(|_| cmd.arg("--debug"));
-        self.no_wifi.then(|| ()).map(|_| cmd.arg("--no-wifi"));
+        self.debug.then_some(()).map(|_| cmd.arg("--debug"));
+        self.no_wifi.then_some(()).map(|_| cmd.arg("--no-wifi"));
 
         if let Some(args) = self.args {
-            cmd.args(&["--args", &args.join(" ")]);
+            cmd.args(["--args", &args.join(" ")]);
         };
 
         if let Some(envs) = self.envs {
@@ -93,7 +93,7 @@ impl<'a, 'e> IosDeployLaunch<'a, 'e> {
                 .map(|(key, value)| format!("{}={}", key, value))
                 .collect::<Vec<String>>()
                 .join(" ");
-            cmd.args(&["--envs", &envs_as_string]);
+            cmd.args(["--envs", &envs_as_string]);
         };
 
         self.app_deltas
