@@ -15,7 +15,7 @@ fn sdk_path(target: &str) -> Result<String, std::io::Error> {
     };
 
     let output = Command::new("xcrun")
-        .args(&["--sdk", sdk, "--show-sdk-path"])
+        .args(["--sdk", sdk, "--show-sdk-path"])
         .output()?
         .stdout;
     let prefix_str = std::str::from_utf8(&output).expect("invalid output from `xcrun`");
@@ -47,7 +47,7 @@ fn build(sdk_path: Option<&str>, target: &str) {
     let target_arg = format!("--target={}", target);
     let mut clang_args = vec!["-x", "objective-c", "-fblocks", &target_arg];
     if let Some(sdk_path) = sdk_path {
-        clang_args.extend(&["-isysroot", sdk_path]);
+        clang_args.extend(["-isysroot", sdk_path]);
     }
 
     let builder = bindgen::builder()

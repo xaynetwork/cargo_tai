@@ -29,16 +29,19 @@ Furthermore, ideas were taken from the following projects:
 
 - Xcode
 - [ios-deploy](https://github.com/ios-control/ios-deploy)
+- [libimobiledevice](https://libimobiledevice.org)
+- rsync
 - A valid iOS Development certificate
-- toolchains:
+- rustup toolchains:
   - `x86_64-apple-ios`
   - `aarch64-apple-ios`
 
 ### Android
 
-- [Android Studio](https://developer.android.com/studio)
+- Android SDK
 - Android NDK
-- toolchains:
+- [cargo-ndk](https://github.com/bbqsrc/cargo-ndk)
+- rustup toolchains:
   - `x86_64-linux-android`
   - `aarch64-linux-android`
   - `i686-linux-android`
@@ -48,8 +51,8 @@ Furthermore, ideas were taken from the following projects:
 
 **iOS**
 
-- Real device: iPhone 8 with iOS 14.5.1
-- Simulator: iPhone 12 with iOS 14.5.1
+- Real device: iPhone 8 with iOS 15.5 & iPhone 13 mini with iOS 16.1.1
+- Simulator: iPhone 13 with iOS 16.1.1
 
 **Android**
 
@@ -58,13 +61,12 @@ Furthermore, ideas were taken from the following projects:
 
 **Host**
 
-- Intel based Mac with macOS BigSur 11.4
-- Xcode 12.5
-- ios-deploy 1.11.4
-- Android Studio 4.2
+- Intel based Mac with macOS BigSur 12.6.1
+- Xcode 14.1
+- ios-deploy 1.12
 - API level 21
 - NDK 22.1.7171670
-- cargo 1.53.0
+- cargo 1.65.0
 - cargo toolchains:
   - `x86_64-linux-android`
   - `aarch64-linux-android`
@@ -75,7 +77,6 @@ Furthermore, ideas were taken from the following projects:
 
 ## Limitations/Backwards Compatibility
 
-- Tests and benchmarks can only be run on one iOS device.
-  - (cargo-tai will use the first device that is returned by `ios-deploy --detect --json --no-wifi`)
 - There are currently no plans to add support for older versions of Xcode and other tools.
 - Resource data is included in all test/benchmark binary bundles even if they are not needed.
+- support for `aarch64-apple-ios-sim` and `armv7-apple-ios` is currently not implemented

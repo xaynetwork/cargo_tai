@@ -5,15 +5,13 @@ authors = ["Xayn Engineering <engineering@xaynet.dev>"]
 license = "Apache-2.0"
 description = "Mobile-testing made easier"
 repository = "https://github.com/xaynetwork/cargo_tai"
-keywords = [
-    "test", "mobile", "ios", "android", "cargo"
-]
+keywords = ["test", "mobile", "ios", "android", "cargo"]
 categories = ["development-tools::cargo-plugins", "development-tools::testing", "development-tools::profiling"]
 readme = "../README.md"
-edition = "2018"
+edition = "2021"
 
 [build-dependencies]
-bindgen = "0.59.1"
+bindgen = "0.62.0"
 
 [target.'cfg(target_os = "ios")'.dependencies]
 objc = "0.2.7"

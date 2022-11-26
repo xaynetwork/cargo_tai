@@ -5,17 +5,20 @@ authors = ["Xayn Engineering <engineering@xaynet.dev>"]
 license = "Apache-2.0"
 description = "Mobile-testing made easier"
 repository = "https://github.com/xaynetwork/cargo_tai"
-keywords = [
-    "test", "mobile", "ios", "android", "cargo"
-]
+keywords = ["test", "mobile", "ios", "android", "cargo"]
 categories = ["development-tools::cargo-plugins", "development-tools::testing"]
 readme = "../README.md"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
-anyhow = "1.0.44"
+anyhow = "1.0.66"
+clap = { version = "3.2.23", features = ["derive", "env"] }
 cfg-expr = "0.8.1"
-structopt = "0.3.23"
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
+
+[target.'cfg(not(target_os="macos"))'.dependencies]
+tai-lib = { path = "../tai-lib" }
+
+[target.'cfg(target_os="macos")'.dependencies]
 tai-lib = { path = "../tai-lib", features = ["ios"] }
-tracing = "0.1.28"
-tracing-subscriber = "0.2.24"

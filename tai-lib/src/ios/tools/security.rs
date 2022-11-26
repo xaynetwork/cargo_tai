@@ -11,7 +11,7 @@ const SECURITY: &str = "security";
 
 pub fn decode_cms<P: AsRef<Path>>(file: P) -> TaiResult<Output> {
     Command::new(SECURITY)
-        .args(&["cms", "-D", "-i"])
+        .args(["cms", "-D", "-i"])
         .arg(file.as_ref())
         .output()
         .map_err(|err| anyhow!("{}", err))
