@@ -2,9 +2,7 @@ use crate::{
     common::{
         opts::Options,
         task::{
-            context::Context,
-            get_project_metadata::GetProjectMetadata,
-            set_bench_arg::SetBenchArg,
+            context::Context, get_project_metadata::GetProjectMetadata, set_bench_arg::SetBenchArg,
             Runner,
         },
     },

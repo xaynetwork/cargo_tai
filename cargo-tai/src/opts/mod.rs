@@ -12,12 +12,8 @@ pub mod ios;
 pub mod resource;
 
 use self::{
-    android::AndroidOptions,
-    binary::BinaryOptions,
-    cli::CliOptions,
-    compiler::CompilerOptions,
-    ios::IosOptions,
-    resource::ResourceOptions,
+    android::AndroidOptions, binary::BinaryOptions, cli::CliOptions, compiler::CompilerOptions,
+    ios::IosOptions, resource::ResourceOptions,
 };
 
 #[derive(Parser, Debug)]

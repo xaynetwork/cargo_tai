@@ -1,12 +1,8 @@
-name: 'Setup Runner'
-description: 'Setup rust'
+name: "Setup Runner"
+description: "Setup rust"
 inputs:
-  rust-nightly:
-    description: 'Install rust nightly instead of stable'
-    default: ""
-    required: false
   rust-target:
-    description: 'Install an additional rust target'
+    description: "Install an additional rust target"
     default: ""
     required: false
 
@@ -16,13 +12,6 @@ runs:
     - name: Install stable toolchain
       shell: bash
       run: rustup show
-
-    - name: Install nightly toolchain
-      if: inputs.rust-nightly != ''
-      shell: bash
-      run: |
-        rustup install ${{ env.RUST_NIGHTLY }}
-        rustup component add rustfmt --toolchain ${{ env.RUST_NIGHTLY }}
 
     - name: Install additional rust target
       if: inputs.rust-target != ''

@@ -1,8 +1,6 @@
 use crate::{
     common::task::{
-        context::Context,
-        get_project_metadata::GetProjectMetadata,
-        set_bench_arg::SetBenchArg,
+        context::Context, get_project_metadata::GetProjectMetadata, set_bench_arg::SetBenchArg,
     },
     TaiResult,
 };
@@ -17,14 +15,10 @@ mod run_on_physical_device;
 mod run_on_simulators;
 
 pub use self::{
-    build_built_units::BuildBuiltUnits,
-    create_bundles::CreateBundles,
-    create_signed_bundles::CreateSignedBundles,
-    list_physical_devices::ListPhysicalDevices,
-    list_simulators::ListSimulators,
-    read_signing_settings::ReadSigningSettings,
-    run_on_physical_device::RunOnPhysicalDevice,
-    run_on_simulators::RunOnSimulators,
+    build_built_units::BuildBuiltUnits, create_bundles::CreateBundles,
+    create_signed_bundles::CreateSignedBundles, list_physical_devices::ListPhysicalDevices,
+    list_simulators::ListSimulators, read_signing_settings::ReadSigningSettings,
+    run_on_physical_device::RunOnPhysicalDevice, run_on_simulators::RunOnSimulators,
 };
 
 pub enum Task {
