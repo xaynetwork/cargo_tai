@@ -8,6 +8,7 @@ use super::command::Command;
 pub struct Options {
     pub command: Command,
     pub compiler: CompilerOptions,
+    pub libraries: Option<Vec<PathBuf>>,
     pub resources: Option<Vec<(String, PathBuf)>>,
     pub binary: Option<BinaryOptions>,
     pub android: Option<AndroidOptions>,

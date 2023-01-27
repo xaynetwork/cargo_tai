@@ -9,6 +9,7 @@ pub mod binary;
 pub mod cli;
 pub mod compiler;
 pub mod ios;
+pub mod library;
 pub mod resource;
 
 use self::{
@@ -17,6 +18,7 @@ use self::{
     cli::CliOptions,
     compiler::CompilerOptions,
     ios::IosOptions,
+    library::LibraryOptions,
     resource::ResourceOptions,
 };
 
@@ -39,6 +41,9 @@ pub struct LocalRun {
 
     #[structopt(flatten)]
     compiler: CompilerOptions,
+
+    #[structopt(flatten)]
+    libraries: LibraryOptions,
 
     #[structopt(flatten)]
     resources: ResourceOptions,
@@ -68,6 +73,7 @@ fn from_local_run(command: Command, options: LocalRun) -> opts::Options {
     opts::Options {
         command,
         compiler: options.compiler.into(),
+        libraries: options.libraries.libraries,
         resources: options.resources.resources,
         binary: options.binary.into(),
         android: options.android.into(),

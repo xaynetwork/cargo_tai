@@ -2,6 +2,7 @@ use std::{env, path::PathBuf};
 
 // cannot use resources https://stackoverflow.com/questions/29271548/code-sign-error-bundle-format-unrecognized-invalid-or-unsuitable
 pub const DATA_DIR_NAME: &str = "test-data";
+pub const LIB_DIR_NAME: &str = "lib";
 
 pub fn resources_file_path(test_data_id: &str) -> PathBuf {
     try_resources_file_path(test_data_id)

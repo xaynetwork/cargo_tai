@@ -7,7 +7,7 @@ use tracing::{debug, instrument};
 
 use crate::{
     common::{
-        bundle::{copy_resources, BuiltBundle},
+        bundle::{copy_libraries, copy_resources, BuiltBundle},
         compiler::BuiltUnit,
     },
     TaiResult,
@@ -17,6 +17,7 @@ use crate::{
 pub fn create_bundle<P: AsRef<Path>>(
     unit: BuiltUnit,
     bundles_root: P,
+    libraries: &Option<Vec<PathBuf>>,
     resources: &Option<Vec<(String, PathBuf)>>,
 ) -> TaiResult<BuiltBundle> {
     let bundle_root = bundles_root
@@ -33,6 +34,10 @@ pub fn create_bundle<P: AsRef<Path>>(
     let to = bundle_root.join(&unit.name);
     copy(&unit.artifact, &to)?;
     debug!("copy {} to {}", &unit.artifact.display(), to.display());
+
+    if let Some(libraries) = libraries {
+        copy_libraries(&bundle_root, libraries)?;
+    }
 
     if let Some(resources) = resources {
         copy_resources(&bundle_root, resources)?;
