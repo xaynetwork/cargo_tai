@@ -1,8 +1,6 @@
 use crate::{
     common::task::{
-        context::Context,
-        get_project_metadata::GetProjectMetadata,
-        set_bench_arg::SetBenchArg,
+        context::Context, get_project_metadata::GetProjectMetadata, set_bench_arg::SetBenchArg,
     },
     TaiResult,
 };
@@ -14,11 +12,8 @@ pub mod list_devices;
 pub mod run_on_devices;
 
 pub use self::{
-    build_built_units::BuildBuiltUnits,
-    create_bundles::CreateBundles,
-    get_android_env::GetAndroidEnv,
-    list_devices::ListDevices,
-    run_on_devices::RunOnDevices,
+    build_built_units::BuildBuiltUnits, create_bundles::CreateBundles,
+    get_android_env::GetAndroidEnv, list_devices::ListDevices, run_on_devices::RunOnDevices,
 };
 
 pub enum Task {

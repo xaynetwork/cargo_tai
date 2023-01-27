@@ -19,9 +19,7 @@ use crate::{
 };
 
 use super::{
-    create_signed_bundles::SignedBuiltBundles,
-    list_physical_devices::PhysicalDevices,
-    Context,
+    create_signed_bundles::SignedBuiltBundles, list_physical_devices::PhysicalDevices, Context,
 };
 
 pub struct RunOnPhysicalDevice;
