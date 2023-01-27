@@ -1,4 +1,5 @@
 use std::{
+    io::ErrorKind,
     path::Path,
     process::{Command, Output},
 };
@@ -20,7 +21,12 @@ pub struct Device {
 }
 
 pub fn devices(env: &AndroidEnv) -> TaiResult<Vec<Device>> {
-    let output = Command::new(&env.adb).arg("devices").output()?;
+    let output = Command::new(&env.adb).arg("devices").output().map_err(|error| {
+        match error.kind() {
+            ErrorKind::NotFound => anyhow!("Cannot list devices because adb is not installed at {}", env.adb.to_str().unwrap()),
+            _ => anyhow!("adb devices: {}", error)
+        }
+    })?;
     let device_regex =
         DEVICE_REGEX.get_or_init(|| regex::Regex::new(r#"^(\S+)\tdevice\r?$"#).unwrap());
 
