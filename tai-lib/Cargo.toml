@@ -13,7 +13,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.68"
 anymap = "1.0.0-beta.2"
-base64 = "0.20.0"
+base64 = "0.21.0"
 cargo_metadata = "0.15.1"
 cfg-expr = "0.8.1"
 handlebars = "4.3.6"
